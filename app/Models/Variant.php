@@ -87,6 +87,16 @@ class Variant extends Model
     }
 
     /**
+     * The printing including a trashed one, for admin lists and titles only.
+     *
+     * @return BelongsTo<Printing, $this>
+     */
+    public function printingWithTrashed(): BelongsTo
+    {
+        return $this->belongsTo(Printing::class, 'printing_id')->withTrashed();
+    }
+
+    /**
      * @return HasMany<VariantPhoto, $this>
      */
     public function photos(): HasMany

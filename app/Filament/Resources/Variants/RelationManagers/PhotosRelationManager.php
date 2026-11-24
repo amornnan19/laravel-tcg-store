@@ -26,6 +26,16 @@ class PhotosRelationManager extends RelationManager
         return __('admin.models.variant_photo.plural');
     }
 
+    public static function getModelLabel(): string
+    {
+        return __('admin.models.variant_photo.singular');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.models.variant_photo.plural');
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema

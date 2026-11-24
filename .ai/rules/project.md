@@ -78,6 +78,10 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
   trashed children:** foreign keys count them.
 - **The Filament panel uses `IBM Plex Sans Thai`; every relationship a repeater edits has an explicit
   order; a header action that changes related rows saves the form before refreshing it.**
+- **A Filament Importer that overrides `resolveRecord()` or `fillRecord()` reads a column only when
+  `filled($this->columnMap[$name] ?? null)`: `$this->data` still holds the raw CSV row keyed by header, so an
+  unmapped column is present but was never validated. Every admin edit page that saves stock or price refuses a
+  stale save.**
 
 ## Language
 

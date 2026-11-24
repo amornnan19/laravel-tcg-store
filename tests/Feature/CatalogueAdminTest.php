@@ -618,3 +618,98 @@ test('a list page renders the Thai results text and Thai boolean labels', functi
         ->assertDontSee('2 results')
         ->assertSee('ไม่ใช่');
 });
+
+test('a printing page left open cannot overwrite a variant changed elsewhere', function () {
+    $printing = Printing::factory()->create();
+    $variant = Variant::factory()->for($printing)->create(['price_satang' => 100, 'qty' => 1]);
+    $row = "data.variants.record-{$variant->getKey()}";
+
+    $component = Livewire::test(EditPrinting::class, ['record' => $printing->getKey()]);
+
+    $variant->update(['qty' => 50]);
+
+    $component
+        ->set("{$row}.price_satang", '999')
+        ->call('save')
+        ->assertNotified(__('admin.notifications.variants_changed_elsewhere'));
+
+    expect($variant->fresh()->qty)->toBe(50)
+        ->and($variant->fresh()->price_satang)->toBe(100);
+});
+
+test('a printing page left open does not delete a variant created elsewhere', function () {
+    $printing = Printing::factory()->create();
+    Variant::factory()->for($printing)->create(['condition' => CardCondition::Nm]);
+
+    $component = Livewire::test(EditPrinting::class, ['record' => $printing->getKey()]);
+
+    $created = Variant::factory()->for($printing)->create(['condition' => CardCondition::Lp]);
+
+    $component->call('save')->assertNotified(__('admin.notifications.variants_changed_elsewhere'));
+
+    expect(Variant::query()->whereKey($created->getKey())->exists())->toBeTrue();
+});
+
+test('a printing page left open does not resurrect a variant deleted elsewhere', function () {
+    $printing = Printing::factory()->create();
+    $gone = Variant::factory()->for($printing)->create(['condition' => CardCondition::Nm]);
+    Variant::factory()->for($printing)->create(['condition' => CardCondition::Lp]);
+
+    $component = Livewire::test(EditPrinting::class, ['record' => $printing->getKey()]);
+
+    $gone->delete();
+
+    $component->call('save')->assertNotified(__('admin.notifications.variants_changed_elsewhere'));
+
+    expect(Variant::query()->where('printing_id', $printing->getKey())->count())->toBe(1);
+});
+
+test('a printing page saves normally and twice in a row when nothing changed elsewhere', function () {
+    $printing = Printing::factory()->create();
+    $variant = Variant::factory()->for($printing)->create(['price_satang' => 100, 'qty' => 1]);
+    $row = "data.variants.record-{$variant->getKey()}";
+
+    Livewire::test(EditPrinting::class, ['record' => $printing->getKey()])
+        ->set("{$row}.qty", 5)
+        ->call('save')
+        ->assertHasNoFormErrors()
+        ->assertNotified()
+        ->set("{$row}.qty", 6)
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($variant->fresh()->qty)->toBe(6);
+});
+
+test('a stale printing page does not generate variants either', function () {
+    $printing = Printing::factory()->create();
+    $variant = Variant::factory()->for($printing)->create(['qty' => 1]);
+
+    $component = Livewire::test(EditPrinting::class, ['record' => $printing->getKey()]);
+
+    $variant->update(['qty' => 9]);
+
+    $component->callAction('generateVariants')->assertNotified(__('admin.notifications.variants_changed_elsewhere'));
+
+    expect($printing->variants()->count())->toBe(1)
+        ->and($variant->fresh()->qty)->toBe(9);
+});
+
+test('generate variants then save still works', function () {
+    $printing = Printing::factory()->create();
+    Variant::factory()->for($printing)->create(['condition' => CardCondition::Nm]);
+
+    $component = Livewire::test(EditPrinting::class, ['record' => $printing->getKey()])
+        ->callAction('generateVariants')
+        ->assertNotified(__('admin.actions.generate_variants_done', ['count' => 4]));
+
+    $component->call('save')->assertHasNoFormErrors();
+
+    expect($printing->variants()->count())->toBe(5);
+
+    $component->callAction('generateVariants')
+        ->assertNotified(__('admin.actions.generate_variants_done', ['count' => 0]));
+    $component->call('save')->assertHasNoFormErrors();
+
+    expect($printing->variants()->count())->toBe(5);
+});
