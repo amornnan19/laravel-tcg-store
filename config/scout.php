@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\CardSet;
+use App\Models\Printing;
+
 return [
 
     /*
@@ -55,7 +58,7 @@ return [
     |
     */
 
-    'after_commit' => false,
+    'after_commit' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -139,16 +142,19 @@ return [
     'meilisearch' => [
         'host' => env('MEILISEARCH_HOST', 'http://localhost:7700'),
         'key' => env('MEILISEARCH_KEY'),
+        'timeout' => (float) env('MEILISEARCH_TIMEOUT', 2.0),
+        'connect_timeout' => (float) env('MEILISEARCH_CONNECT_TIMEOUT', 1.0),
         'index-settings' => [
-            // 'users' => [
-            //     'filterableAttributes' => ['id', 'name', 'email'],
-            //     'embedders' => [
-            //         'default' => [
-            //             'source' => 'userProvided',
-            //             'dimensions' => 1536,
-            //         ],
-            //     ],
-            // ],
+            Printing::class => [
+                'searchableAttributes' => ['name_en', 'name_ja', 'name_th', 'set_code', 'number', 'number_plain', 'set_name'],
+                'filterableAttributes' => ['game', 'set_id', 'set_code', 'rarity', 'language', 'card_type', 'traits', 'has_foil', 'in_stock', 'conditions', 'has_real_photo', 'from_satang'],
+                'sortableAttributes' => ['from_satang', 'number_plain', 'released_on'],
+                'rankingRules' => ['words', 'typo', 'proximity', 'attribute', 'exactness', 'in_stock:desc', 'from_satang:asc'],
+            ],
+            CardSet::class => [
+                'searchableAttributes' => ['code', 'name_en', 'name_th'],
+                'filterableAttributes' => ['game'],
+            ],
         ],
         'model-settings' => [
             // User::class => [

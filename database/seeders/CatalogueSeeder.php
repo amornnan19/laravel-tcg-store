@@ -38,15 +38,21 @@ class CatalogueSeeder extends Seeder
     {
         fake()->seed(1);
 
-        foreach (Game::query()->orderBy('sort')->get() as $game) {
-            $path = database_path("seeders/data/{$game->slug}.json");
+        // Index once at the end instead of queueing a job per row; the search observers honour this too.
+        Printing::withoutSyncingToSearch(fn () => CardSet::withoutSyncingToSearch(function (): void {
+            foreach (Game::query()->orderBy('sort')->get() as $game) {
+                $path = database_path("seeders/data/{$game->slug}.json");
 
-            if (! is_file($path)) {
-                throw new RuntimeException("Missing seed data [{$path}]. Run catalogue:fetch-seed-data.");
+                if (! is_file($path)) {
+                    throw new RuntimeException("Missing seed data [{$path}]. Run catalogue:fetch-seed-data.");
+                }
+
+                $this->seedSet($game, json_decode(file_get_contents($path), true, flags: JSON_THROW_ON_ERROR));
             }
+        }));
 
-            $this->seedSet($game, json_decode(file_get_contents($path), true, flags: JSON_THROW_ON_ERROR));
-        }
+        Printing::makeAllSearchable();
+        CardSet::makeAllSearchable();
     }
 
     /**

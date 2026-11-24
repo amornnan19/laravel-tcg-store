@@ -76,6 +76,7 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **A relation to a soft-deletable model (`Card`, `Printing`) that admin titles, labels or selects
   read must tolerate a trashed parent, and any has-children check before a hard delete must include
   trashed children:** foreign keys count them.
+- **A search jump only targets what the index would show: never a printing of a trashed card or an inactive game, nor a set of an inactive game.**
 - **The Filament panel uses `IBM Plex Sans Thai`; every relationship a repeater edits has an explicit
   order; a header action that changes related rows saves the form before refreshing it.**
 - **A Filament Importer that overrides `resolveRecord()` or `fillRecord()` reads a column only when

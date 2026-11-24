@@ -1,0 +1,10 @@
+services:
+  meilisearch:
+    image: getmeili/meilisearch:v1.58.0
+    ports:
+      - "7700:7700"
+    environment:
+      MEILI_ENV: development
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - ./storage/meilisearch:/meili_data

@@ -13,7 +13,7 @@ the second.
 
 ```bash
 # development
-docker run -p 7700:7700 -v ./.meili:/meili_data getmeili/meilisearch
+docker compose up -d meilisearch
 ```
 
 ```dotenv
