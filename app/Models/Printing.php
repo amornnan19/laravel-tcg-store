@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CardCondition;
 use App\Enums\Language;
 use Database\Factories\PrintingFactory;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
@@ -48,6 +49,17 @@ class Printing extends Model
     }
 
     /**
+     * The card including a trashed one, for admin titles, labels and search only: the storefront and
+     * search index must keep using card().
+     *
+     * @return BelongsTo<Card, $this>
+     */
+    public function cardWithTrashed(): BelongsTo
+    {
+        return $this->belongsTo(Card::class, 'card_id')->withTrashed();
+    }
+
+    /**
      * @return BelongsTo<CardSet, $this>
      */
     public function set(): BelongsTo
@@ -56,10 +68,18 @@ class Printing extends Model
     }
 
     /**
+     * Ordered best condition first (NM to DMG), normal before foil; the admin repeater relies on it.
+     *
      * @return HasMany<Variant, $this>
      */
     public function variants(): HasMany
     {
-        return $this->hasMany(Variant::class);
+        $conditionOrder = collect(CardCondition::cases())
+            ->map(fn (CardCondition $condition): string => "when '{$condition->value}' then {$condition->sort()}")
+            ->implode(' ');
+
+        return $this->hasMany(Variant::class)
+            ->orderByRaw("case variants.condition {$conditionOrder} else 99 end")
+            ->orderByRaw("case variants.finish when 'normal' then 1 else 2 end");
     }
 }

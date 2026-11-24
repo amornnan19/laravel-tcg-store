@@ -20,6 +20,11 @@ class Variant extends Model
 
     protected static function booted(): void
     {
+        // Delete photos through Eloquent so each one removes its file; the FK cascade alone would orphan them.
+        static::deleting(function (Variant $variant): void {
+            $variant->photos()->get()->each->delete();
+        });
+
         static::creating(function (Variant $variant): void {
             if (blank($variant->sku)) {
                 $variant->sku = static::makeSku($variant);

@@ -28,6 +28,9 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->databaseTransactions()
+            ->font('IBM Plex Sans Thai')
+            ->brandName(__('admin.brand'))
             ->colors([
                 'primary' => Color::Amber,
             ])

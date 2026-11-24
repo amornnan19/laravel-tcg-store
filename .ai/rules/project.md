@@ -73,6 +73,11 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
   Editing a card must never change an order that already exists.
 - **Never print an invented price, address, phone number or opening hour.** The shop supplies them.
   Seeders and factories may use plausible values; Blade may not hard-code them.
+- **A relation to a soft-deletable model (`Card`, `Printing`) that admin titles, labels or selects
+  read must tolerate a trashed parent, and any has-children check before a hard delete must include
+  trashed children:** foreign keys count them.
+- **The Filament panel uses `IBM Plex Sans Thai`; every relationship a repeater edits has an explicit
+  order; a header action that changes related rows saves the form before refreshing it.**
 
 ## Language
 
