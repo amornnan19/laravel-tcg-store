@@ -13,5 +13,6 @@ Project rules — the stack, the decisions already taken, the rules that are eas
 
 @.ai/rules/index.md
 
-If `php artisan boost:update` ever writes a `<laravel-boost-guidelines>` block back into this file,
-delete the block and leave the two imports above.
+`config/boost.php` points Claude Code's guidelines at `AGENTS.md`, so `php artisan boost:update`
+should never write here. If a Boost guidelines block ever appears in this file anyway, delete it and
+leave the two imports above. Do not write the block's tag name in this file: Boost matches on it.
