@@ -88,6 +88,23 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - Feature tests over unit tests; a new table gets a factory and a seeder in the same change.
 - Do not add a Composer or npm dependency without asking first.
 
+## Branching
+
+**Deployment status: not deployed.**
+
+While that line says "not deployed", commit straight to `main`. No feature branch, no pull request.
+Nobody is using the shop, there is nothing to break, and a branch per change at this stage is
+ceremony that buys nothing.
+
+**The first deploy ends that.** From then on `main` is what is running in production, so a commit
+straight to it is a release nobody reviewed. Every change goes on its own branch —
+`feat/<thing>`, `fix/<thing>`, `docs/<thing>`, `chore/<thing>` — and `main` only moves by merging
+one in.
+
+Whoever deploys first edits the line above to read **"Deployment status: deployed since
+YYYY-MM-DD."** That line is the switch, and it is the only thing to check. Do not infer the answer
+from the git history, from whether a remote exists, or from anything in `.env`.
+
 ## Commits
 
 Conventional Commits, English, imperative, lower case after the colon, under 72 characters:
