@@ -4,6 +4,80 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+  /* ground and surface — dark is the default */
+  --color-bg:            #0B0C10;
+  --color-sunken:        #12141A;
+  --color-surface:       #171A21;
+  --color-raised:        #1E222B;
+  --color-line:          #2A2F3A;
+  --color-line-strong:   #3A404E;
+
+  /* text, three roles only */
+  --color-ink:           #F3F4F7;   /* 18.4:1 on bg */
+  --color-muted:         #A8B0BF;   /*  8.9:1 */
+  --color-faint:         #7D8597;   /*  5.2:1 */
+
+  /* one accent, plus semantics */
+  --color-accent:        #E7B64E;   /* 10.4:1 — the only filled button, and prices */
+  --color-accent-ink:    #121318;   /* text on the accent */
+  --color-stock:         #49C98A;
+  --color-low:           #F09A4E;
+  --color-danger:        #F0616D;
+  --color-info:          #5B9BE8;
+
+  /* rarity — borders and letters only, never a fill */
+  --color-rarity-c:      #8A93A3;
+  --color-rarity-u:      #49C98A;
+  --color-rarity-r:      #5B9BE8;
+  --color-rarity-rr:     #A77BE0;
+  --color-rarity-sar:    #E7B64E;
+  --color-rarity-sec:    #E87BB5;
+
+  /* condition — green to red, and lightness falls with it, so the order
+     survives colour blindness */
+  --color-cond-nm:       #49C98A;
+  --color-cond-lp:       #5B9BE8;
+  --color-cond-mp:       #E7B64E;
+  --color-cond-hp:       #F09A4E;
+  --color-cond-dmg:      #F0616D;
+
+  /* type */
+  --font-display: "Anuphan", "IBM Plex Sans Thai", sans-serif;
+  --font-sans:    "IBM Plex Sans Thai", "IBM Plex Sans", system-ui, sans-serif;
+
+  --text-label:   12px;   --text-label--line-height: 16px;
+  --text-small:   13px;   --text-small--line-height: 20px;
+  --text-body:    15px;   --text-body--line-height: 1.6;
+  --text-card:    16px;   --text-card--line-height: 1.4;
+  --text-h3:      20px;   --text-h3--line-height: 1.3;
+  --text-h2:      24px;   --text-h2--line-height: 1.25;
+  --text-h1:      32px;   --text-h1--line-height: 1.2;
+  --text-display: 48px;   --text-display--line-height: 1.1;
+
+  /* radius */
+  --radius-tag:    6px;
+  --radius-control:10px;
+  --radius-card:   14px;
+  --radius-sheet:  20px;
+}
+
+/* light mode — only these change */
+@layer theme {
+  [data-theme="light"] {
+    --color-bg:          #FAFAF8;
+    --color-sunken:      #F4F4F0;
+    --color-surface:     #FFFFFF;
+    --color-raised:      #F0F0EB;
+    --color-line:        #E6E6E1;
+    --color-line-strong: #CFCFC8;
+    --color-ink:         #16181D;   /* 16.6:1 */
+    --color-muted:       #5A6170;   /*  6.1:1 */
+    --color-faint:       #7A8090;
+    --color-accent:      #C98B2E;   /* the fill */
+    --color-accent-ink:  #1A1203;
+    --color-stock:       #1F7A4D;
+    --color-low:         #9A6512;
+    --color-danger:      #C0392F;
+    --color-info:        #1F5FA8;
+  }
 }
