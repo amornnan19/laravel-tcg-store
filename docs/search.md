@@ -50,7 +50,7 @@ public function toSearchableArray(): array
         'rarity'        => $this->rarity_code,
         'language'      => $this->language->value,
         'card_type'     => $this->card->card_type,
-        'attributes'    => $this->card->attributes,   // colour, cost: filterable per game
+        'traits'        => $this->card->traits,   // colour, cost: filterable per game
         'has_foil'      => $this->has_foil,
         'in_stock'      => $this->variants()->available()->exists(),
         'has_real_photo'=> $this->variants()->where('has_real_photo', true)->exists(),
@@ -65,7 +65,7 @@ Index settings:
 
 ```php
 'searchableAttributes' => ['name_en', 'name_ja', 'name_th', 'set_code', 'number', 'number_plain', 'set_name'],
-'filterableAttributes' => ['game', 'set_code', 'rarity', 'language', 'card_type', 'attributes', 'has_foil', 'in_stock', 'conditions', 'has_real_photo', 'from_satang'],
+'filterableAttributes' => ['game', 'set_code', 'rarity', 'language', 'card_type', 'traits', 'has_foil', 'in_stock', 'conditions', 'has_real_photo', 'from_satang'],
 'sortableAttributes'   => ['from_satang', 'number_plain', 'released_on'],
 'rankingRules'         => ['words', 'typo', 'proximity', 'attribute', 'exactness', 'in_stock:desc', 'from_satang:asc'],
 ```
@@ -142,7 +142,7 @@ filters change.
 | set | `set_code` | searchable list; 42 sets does not fit as chips |
 | rarity | `rarity` | |
 | card type | `card_type` | only when the game declares it |
-| colour / attribute | `attributes.*` | only when the game declares it |
+| colour / attribute | `traits.*` | only when the game declares it |
 | language | `language` | |
 | condition | `conditions` | an array facet: a printing matches if any available variant does |
 | price | `from_satang` | a range |

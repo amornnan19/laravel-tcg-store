@@ -1,0 +1,1250 @@
+{
+    "game": {
+        "slug": "yugioh"
+    },
+    "set": {
+        "code": "ROTA",
+        "name_en": "Rage of the Abyss",
+        "name_th": null,
+        "released_on": "2024-10-10",
+        "card_count": 101
+    },
+    "cards": [
+        {
+            "name_en": "Ultimate Dragon of Pride and Soul",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "DARK",
+                "race": "Dragon",
+                "level": 12
+            },
+            "number": "000",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Surfacing Big Jaws",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WATER",
+                "race": "Fish",
+                "level": 4
+            },
+            "number": "001",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Drake Shark",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WATER",
+                "race": "Fish",
+                "level": 4
+            },
+            "number": "002",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Armored Shark",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WATER",
+                "race": "Fish",
+                "level": 3
+            },
+            "number": "003",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Heart of the Blue-Eyes",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "LIGHT",
+                "race": "Dragon",
+                "level": 8
+            },
+            "number": "004",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Red-Eyes Black Fullmetal Dragon",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "DARK",
+                "race": "Machine",
+                "level": 8
+            },
+            "number": "005",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Metalzoa X",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "DARK",
+                "race": "Machine",
+                "level": 8
+            },
+            "number": "006",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Zoa the Fiendish Beast",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "DARK",
+                "race": "Fiend",
+                "level": 7
+            },
+            "number": "007",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Metal Illusionist",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "LIGHT",
+                "race": "Spellcaster",
+                "level": 1
+            },
+            "number": "008",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Battlewasp - Rapier the Onslaught",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WIND",
+                "race": "Insect",
+                "level": 5
+            },
+            "number": "009",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Performage Ball Balancer",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "EARTH",
+                "race": "Spellcaster",
+                "level": 4
+            },
+            "number": "010",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Chaos Allure Queen",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "LIGHT",
+                "race": "Spellcaster",
+                "level": 7
+            },
+            "number": "011",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Goblin Bikers Gone Wild",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "DARK",
+                "race": "Fiend",
+                "level": 6
+            },
+            "number": "012",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Primite Imperial Dragon",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "EARTH",
+                "race": "Dragon",
+                "level": 6
+            },
+            "number": "013",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Lacrima the Crimson Tears",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "LIGHT",
+                "race": "Fiend",
+                "level": 4
+            },
+            "number": "014",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Mementotlan Akihiron",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WATER",
+                "race": "Aqua",
+                "level": 5
+            },
+            "number": "015",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Centur-Ion Chimerea",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "DARK",
+                "race": "Pyro",
+                "level": 4
+            },
+            "number": "016",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Abyssrhine, the Atlantean Spirit",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WATER",
+                "race": "Aqua",
+                "level": 3
+            },
+            "number": "017",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Mermail Shadow Squad",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WATER",
+                "race": "Sea Serpent",
+                "level": 3
+            },
+            "number": "018",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Anarchist Monk of the Six Samurai",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "DARK",
+                "race": "Warrior",
+                "level": 3
+            },
+            "number": "019",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Tactical Trainer of the Six Samurai",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "EARTH",
+                "race": "Warrior",
+                "level": 2
+            },
+            "number": "020",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Wandering Titan of Tartarus",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "EARTH",
+                "race": "Zombie",
+                "level": 9
+            },
+            "number": "021",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Union Pilot",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "LIGHT",
+                "race": "Machine",
+                "level": 5
+            },
+            "number": "022",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Eria the Water Channeler",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WATER",
+                "race": "Spellcaster",
+                "level": 5
+            },
+            "number": "023",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Mulcharmy Fuwalos",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WIND",
+                "race": "Winged Beast",
+                "level": 4
+            },
+            "number": "024",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Tsuru-Puru-Purun",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WATER",
+                "race": "Aqua",
+                "level": 2
+            },
+            "number": "025",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Flipping Feline",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "EARTH",
+                "race": "Beast",
+                "level": 2
+            },
+            "number": "026",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "L Magi Mergy",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "DARK",
+                "race": "Cyberse",
+                "level": 2
+            },
+            "number": "027",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Neverending Nightmare Absorber",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WATER",
+                "race": "Fairy",
+                "level": 2
+            },
+            "number": "028",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Newbee!",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "LIGHT",
+                "race": "Insect",
+                "level": 2
+            },
+            "number": "029",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Azamina Ilia Silvia",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "DARK",
+                "race": "Illusion",
+                "level": 6
+            },
+            "number": "030",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Azamina Mu Rcielago",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "DARK",
+                "race": "Illusion",
+                "level": 6
+            },
+            "number": "031",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Azamina Sol Erysichthon",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "DARK",
+                "race": "Illusion",
+                "level": 6
+            },
+            "number": "032",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Azamina Moa Regina",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "DARK",
+                "race": "Illusion",
+                "level": 8
+            },
+            "number": "033",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Khaos Starsource Dragon",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "LIGHT",
+                "race": "Dragon",
+                "level": 8
+            },
+            "number": "034",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Heosvarog the Mechanical Dawn",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "LIGHT",
+                "race": "Machine",
+                "level": 7
+            },
+            "number": "035",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Battlewasp - Grand Partisan the Revolution",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WIND",
+                "race": "Insect",
+                "level": 12
+            },
+            "number": "036",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Battlewasp - Sachi the Ceremonial Bow",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WIND",
+                "race": "Insect",
+                "level": 6
+            },
+            "number": "037",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Centur-Ion Primera Primus",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "LIGHT",
+                "race": "Spellcaster",
+                "level": 8
+            },
+            "number": "038",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Legendary Lord Six Samurai - Shi En",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "DARK",
+                "race": "Warrior",
+                "level": 6
+            },
+            "number": "039",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Legendary Lord Six Samurai - Enishi",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "LIGHT",
+                "race": "Warrior",
+                "level": 6
+            },
+            "number": "040",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Number C32: Shark Drake LeVeiss",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WATER",
+                "race": "Sea Serpent",
+                "level": 5
+            },
+            "number": "041",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "LeVirtue Dragon",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WATER",
+                "race": "Sea Serpent",
+                "level": 3
+            },
+            "number": "042",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Poseidra Abyss, the Atlantean Dragon Lord",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WATER",
+                "race": "Sea Serpent",
+                "level": 7
+            },
+            "number": "043",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Rubysapphirus, the Adamant Jewel",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "EARTH",
+                "race": "Rock",
+                "level": 9
+            },
+            "number": "044",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Fiendsmith's Agnumday",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "LIGHT",
+                "race": "Fiend"
+            },
+            "number": "045",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Mermail King - Neptabyss",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WATER",
+                "race": "Sea Serpent"
+            },
+            "number": "046",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Flying Mary, the Wandering Ghost Ship",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WATER",
+                "race": "Zombie"
+            },
+            "number": "047",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Aqua Jet Surface",
+            "card_type": "spell",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "048",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Reincarnation Unveiling Mail",
+            "card_type": "spell",
+            "traits": {
+                "race": "Equip"
+            },
+            "number": "049",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Incoming Machine!",
+            "card_type": "spell",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "050",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Armed Rebeellion",
+            "card_type": "spell",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "051",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Battlewasp Wind",
+            "card_type": "spell",
+            "traits": {
+                "race": "Continuous"
+            },
+            "number": "052",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "The Hallowed Azamina",
+            "card_type": "spell",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "053",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Azamina Debtors",
+            "card_type": "spell",
+            "traits": {
+                "race": "Quick-Play"
+            },
+            "number": "054",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Deception of the Sinful Spoils",
+            "card_type": "spell",
+            "traits": {
+                "race": "Continuous"
+            },
+            "number": "055",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Scourge of the White Forest",
+            "card_type": "spell",
+            "traits": {
+                "race": "Quick-Play"
+            },
+            "number": "056",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Goblin Biker Grand Breakout",
+            "card_type": "spell",
+            "traits": {
+                "race": "Quick-Play"
+            },
+            "number": "057",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Primite Lordly Lode",
+            "card_type": "spell",
+            "traits": {
+                "race": "Continuous"
+            },
+            "number": "058",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Primite Roar",
+            "card_type": "spell",
+            "traits": {
+                "race": "Quick-Play"
+            },
+            "number": "059",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Primite Drillbeam",
+            "card_type": "spell",
+            "traits": {
+                "race": "Quick-Play"
+            },
+            "number": "060",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Sangen Furo",
+            "card_type": "spell",
+            "traits": {
+                "race": "Continuous"
+            },
+            "number": "061",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Abyss-sting Triaina",
+            "card_type": "spell",
+            "traits": {
+                "race": "Equip"
+            },
+            "number": "062",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Six Strike - Double Assault",
+            "card_type": "spell",
+            "traits": {
+                "race": "Quick-Play"
+            },
+            "number": "063",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Final Bringer of the End Times",
+            "card_type": "spell",
+            "traits": {
+                "race": "Quick-Play"
+            },
+            "number": "064",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Succumbing-Song Morganite",
+            "card_type": "spell",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "065",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Firestorms Over Atlantis",
+            "card_type": "spell",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "066",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Token Support",
+            "card_type": "spell",
+            "traits": {
+                "race": "Continuous"
+            },
+            "number": "067",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Virtue Stream",
+            "card_type": "trap",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "068",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Xyz Poseidon Splash",
+            "card_type": "trap",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "069",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Puppet Shark",
+            "card_type": "trap",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "070",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Max Metalmorph",
+            "card_type": "trap",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "071",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Time Engine",
+            "card_type": "trap",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "072",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Azamina Determination",
+            "card_type": "trap",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "073",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Guilt of the Sinful Spoils",
+            "card_type": "trap",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "074",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Goblin Biker Grand Crisis",
+            "card_type": "trap",
+            "traits": {
+                "race": "Continuous"
+            },
+            "number": "075",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Primite Howl",
+            "card_type": "trap",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "076",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Ragnaraika Wisteria of Woe",
+            "card_type": "trap",
+            "traits": {
+                "race": "Continuous"
+            },
+            "number": "077",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Vaalmonica Ereditare",
+            "card_type": "trap",
+            "traits": {
+                "race": "Counter"
+            },
+            "number": "078",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Dominus Impulse",
+            "card_type": "trap",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "079",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Summer Schoolwork Successful!",
+            "card_type": "trap",
+            "traits": {
+                "race": "Continuous"
+            },
+            "number": "080",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Supply Soldier of the Indestructible Insects",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "EARTH",
+                "race": "Insect",
+                "level": 5
+            },
+            "number": "081",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Heavy Cavalry of the Indestructible Insects",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "EARTH",
+                "race": "Insect",
+                "level": 7
+            },
+            "number": "082",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Insect Invitation",
+            "card_type": "spell",
+            "traits": {
+                "race": "Continuous"
+            },
+            "number": "083",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Mantman the Ultrahuman",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "LIGHT",
+                "race": "Psychic",
+                "level": 7
+            },
+            "number": "084",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Phalaenop Sisters",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WIND",
+                "race": "Fairy",
+                "level": 1
+            },
+            "number": "085",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Release Brainwashing",
+            "card_type": "spell",
+            "traits": {
+                "race": "Quick-Play"
+            },
+            "number": "086",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Denial Deity Dotan",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "LIGHT",
+                "race": "Warrior",
+                "level": 10
+            },
+            "number": "087",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Butterfly Fish",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "WATER",
+                "race": "Fish",
+                "level": 3
+            },
+            "number": "088",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "QQ Enneagon",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "FIRE",
+                "race": "Dinosaur",
+                "level": 9
+            },
+            "number": "089",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Mimighoul Armor",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "EARTH",
+                "race": "Warrior",
+                "level": 1
+            },
+            "number": "090",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Mimighoul Fairy",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "EARTH",
+                "race": "Fairy",
+                "level": 1
+            },
+            "number": "091",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Mimighoul Slime",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "EARTH",
+                "race": "Aqua",
+                "level": 1
+            },
+            "number": "092",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Giant Mimighoul",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "EARTH",
+                "race": "Rock",
+                "level": 1
+            },
+            "number": "093",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Mimighoul Throne",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "EARTH",
+                "race": "Rock",
+                "level": 1
+            },
+            "number": "094",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Mimighoul Fork",
+            "card_type": "spell",
+            "traits": {
+                "race": "Normal"
+            },
+            "number": "095",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Mimighoul Charm",
+            "card_type": "spell",
+            "traits": {
+                "race": "Continuous"
+            },
+            "number": "096",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Rescue Hedgehog",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "EARTH",
+                "race": "Beast",
+                "level": 4
+            },
+            "number": "097",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Fire King Courtier Ulcanix",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "FIRE",
+                "race": "Winged Beast",
+                "level": 4
+            },
+            "number": "098",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Cursed Fire King Doom Burst",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "FIRE",
+                "race": "Fiend",
+                "level": 3
+            },
+            "number": "099",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Splitting Planarian",
+            "card_type": "monster",
+            "traits": {
+                "attribute": "DARK",
+                "race": "Insect",
+                "level": 4
+            },
+            "number": "100",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        }
+    ]
+}

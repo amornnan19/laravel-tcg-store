@@ -1,0 +1,3293 @@
+{
+    "game": {
+        "slug": "pokemon"
+    },
+    "set": {
+        "code": "sv3pt5",
+        "name_en": "151",
+        "name_th": null,
+        "released_on": "2023-09-22",
+        "card_count": 165
+    },
+    "cards": [
+        {
+            "name_en": "Ivysaur",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "2",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Bulbasaur",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "1",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Venusaur ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 2",
+                    "ex"
+                ]
+            },
+            "number": "3",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Squirtle",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "7",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Rattata",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "19",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Wartortle",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "8",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Ekans",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "23",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Blastoise ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 2",
+                    "ex"
+                ]
+            },
+            "number": "9",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Arbok ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Stage 1",
+                    "ex"
+                ]
+            },
+            "number": "24",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Butterfree",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 2"
+                ]
+            },
+            "number": "12",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Pikachu",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Lightning"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "25",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Pidgey",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "16",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Nidoran ♀",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "29",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Spearow",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "21",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Nidorino",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "33",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Nidorina",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "30",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Nidoking",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Stage 2"
+                ]
+            },
+            "number": "34",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Nidoran ♂",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "32",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Clefairy",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "35",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Clefable",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "36",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Gloom",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "44",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Vileplume",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 2"
+                ]
+            },
+            "number": "45",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Paras",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "46",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Dugtrio",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "51",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Parasect",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "47",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Diglett",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "50",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Charmander",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "4",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Kakuna",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "14",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Charmeleon",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "5",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Charizard ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Stage 2",
+                    "ex"
+                ]
+            },
+            "number": "6",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Caterpie",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "10",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Metapod",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "11",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Weedle",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "13",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Pidgeotto",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "17",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Pidgeot",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Stage 2"
+                ]
+            },
+            "number": "18",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Raichu",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Lightning"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "26",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Sandshrew",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "27",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Sandslash",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "28",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Nidoqueen",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Stage 2"
+                ]
+            },
+            "number": "31",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Jigglypuff",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "39",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Wigglytuff ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Stage 1",
+                    "ex"
+                ]
+            },
+            "number": "40",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Zubat",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "41",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Oddish",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "43",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Venomoth",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "49",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Beedrill",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 2"
+                ]
+            },
+            "number": "15",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Raticate",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "20",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Fearow",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "22",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Vulpix",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "37",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Ninetales ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Stage 1",
+                    "ex"
+                ]
+            },
+            "number": "38",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Golbat",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "42",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Venonat",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "48",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Meowth",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "52",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Persian",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "53",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Arcanine",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "59",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Psyduck",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "54",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Poliwag",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "60",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Poliwhirl",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "61",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Victreebel",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 2"
+                ]
+            },
+            "number": "71",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Rapidash",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "78",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Magneton",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Lightning"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "82",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Dodrio",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "85",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Gastly",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "92",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Gengar",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Stage 2"
+                ]
+            },
+            "number": "94",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Onix",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "95",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Growlithe",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "58",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Kadabra",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "64",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Machop",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "66",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Bellsprout",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "69",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Tentacool",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "72",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Tentacruel",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "73",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Golem ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Stage 2",
+                    "ex"
+                ]
+            },
+            "number": "76",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Ponyta",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "77",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Slowpoke",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "79",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Farfetch'd",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "83",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Doduo",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "84",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Mankey",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "56",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Abra",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "63",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Machoke",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "67",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Machamp",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Stage 2"
+                ]
+            },
+            "number": "68",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Weepinbell",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "70",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Graveler",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "75",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Magnemite",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Lightning"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "81",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Seel",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "86",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Grimer",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "88",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Haunter",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "93",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Golduck",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "55",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Primeape",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "57",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Poliwrath",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 2"
+                ]
+            },
+            "number": "62",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Alakazam ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Stage 2",
+                    "ex"
+                ]
+            },
+            "number": "65",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Geodude",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "74",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Slowbro",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "80",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Dewgong",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "87",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Muk",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "89",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Shellder",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "90",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Cloyster",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "91",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Hypno",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "97",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Cubone",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "104",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Marowak",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "105",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Hitmonlee",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "106",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Hitmonchan",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "107",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Rhydon",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "112",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Kangaskhan ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic",
+                    "ex"
+                ]
+            },
+            "number": "115",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Seadra",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "117",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Seaking",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "119",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Staryu",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "120",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Magmar",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "126",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Tauros",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "128",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Flareon",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "136",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Omanyte",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "138",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Omastar",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 2"
+                ]
+            },
+            "number": "139",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Aerodactyl",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "142",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Snorlax",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "143",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Voltorb",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Lightning"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "100",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Koffing",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "109",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Rhyhorn",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "111",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Horsea",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "116",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Pinsir",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "127",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Magikarp",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "129",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Gyarados",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "130",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Kabuto",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "140",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Kabutops",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Stage 2"
+                ]
+            },
+            "number": "141",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Articuno",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "144",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Drowzee",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "96",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Kingler",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "99",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Electrode",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Lightning"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "101",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Exeggutor",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "103",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Chansey",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "113",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Tangela",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "114",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Goldeen",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "118",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Mr. Mime",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "122",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Jynx ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic",
+                    "ex"
+                ]
+            },
+            "number": "124",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Electabuzz",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Lightning"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "125",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Jolteon",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Lightning"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "135",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Porygon",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "137",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Krabby",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "98",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Exeggcute",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "102",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Lickitung",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "108",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Weezing",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "110",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Starmie",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "121",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Scyther",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "123",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Lapras",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "131",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Ditto",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "132",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Eevee",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "133",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Vaporeon",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "134",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Dragonair",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Dragon"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "148",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Dragonite",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Dragon"
+                ],
+                "subtypes": [
+                    "Stage 2"
+                ]
+            },
+            "number": "149",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Bill's Transfer",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Supporter"
+                ]
+            },
+            "number": "156",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Cycling Road",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Stadium"
+                ]
+            },
+            "number": "157",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Grabber",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Item"
+                ]
+            },
+            "number": "162",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Leftovers",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Pokémon Tool"
+                ]
+            },
+            "number": "163",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Caterpie",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "172",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Pikachu",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Lightning"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "173",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Mewtwo",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "150",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Antique Dome Fossil",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Item"
+                ]
+            },
+            "number": "152",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Antique Helix Fossil",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Item"
+                ]
+            },
+            "number": "153",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Energy Sticker",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Item"
+                ]
+            },
+            "number": "159",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Erika's Invitation",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Supporter"
+                ]
+            },
+            "number": "160",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Protective Goggles",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Pokémon Tool"
+                ]
+            },
+            "number": "164",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Rigid Band",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Pokémon Tool"
+                ]
+            },
+            "number": "165",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Charmander",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "168",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Antique Old Amber",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Item"
+                ]
+            },
+            "number": "154",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Daisy's Help",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Supporter"
+                ]
+            },
+            "number": "158",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Bulbasaur",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "166",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Charmeleon",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "169",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Wartortle",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "171",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Zapdos ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Lightning"
+                ],
+                "subtypes": [
+                    "Basic",
+                    "ex"
+                ]
+            },
+            "number": "145",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Moltres",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "146",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Dratini",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Dragon"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "147",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Mew ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Basic",
+                    "ex"
+                ]
+            },
+            "number": "151",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Big Air Balloon",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Pokémon Tool"
+                ]
+            },
+            "number": "155",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Giovanni's Charisma",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Supporter"
+                ]
+            },
+            "number": "161",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Ivysaur",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "167",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Squirtle",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "170",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Machoke",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "177",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Golem ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fighting"
+                ],
+                "subtypes": [
+                    "Stage 2",
+                    "ex"
+                ]
+            },
+            "number": "189",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Mr. Mime",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "179",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Omanyte",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "180",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Arbok ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Stage 1",
+                    "ex"
+                ]
+            },
+            "number": "185",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Wigglytuff ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Stage 1",
+                    "ex"
+                ]
+            },
+            "number": "187",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Alakazam ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Stage 2",
+                    "ex"
+                ]
+            },
+            "number": "188",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Zapdos ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Lightning"
+                ],
+                "subtypes": [
+                    "Basic",
+                    "ex"
+                ]
+            },
+            "number": "192",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Mew ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Basic",
+                    "ex"
+                ]
+            },
+            "number": "193",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Nidoking",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Darkness"
+                ],
+                "subtypes": [
+                    "Stage 2"
+                ]
+            },
+            "number": "174",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Dragonair",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Dragon"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "181",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Venusaur ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 2",
+                    "ex"
+                ]
+            },
+            "number": "182",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Ninetales ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Stage 1",
+                    "ex"
+                ]
+            },
+            "number": "186",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Jynx ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic",
+                    "ex"
+                ]
+            },
+            "number": "191",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Psyduck",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "175",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Poliwhirl",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 1"
+                ]
+            },
+            "number": "176",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Tangela",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "178",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Charizard ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Stage 2",
+                    "ex"
+                ]
+            },
+            "number": "183",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Blastoise ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 2",
+                    "ex"
+                ]
+            },
+            "number": "184",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Kangaskhan ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Colorless"
+                ],
+                "subtypes": [
+                    "Basic",
+                    "ex"
+                ]
+            },
+            "number": "190",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Daisy's Help",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Supporter"
+                ]
+            },
+            "number": "195",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Erika's Invitation",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Supporter"
+                ]
+            },
+            "number": "196",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Giovanni's Charisma",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Supporter"
+                ]
+            },
+            "number": "197",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Bill's Transfer",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Supporter"
+                ]
+            },
+            "number": "194",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Venusaur ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Grass"
+                ],
+                "subtypes": [
+                    "Stage 2",
+                    "ex"
+                ]
+            },
+            "number": "198",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Charizard ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Fire"
+                ],
+                "subtypes": [
+                    "Stage 2",
+                    "ex"
+                ]
+            },
+            "number": "199",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Blastoise ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Water"
+                ],
+                "subtypes": [
+                    "Stage 2",
+                    "ex"
+                ]
+            },
+            "number": "200",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Alakazam ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Stage 2",
+                    "ex"
+                ]
+            },
+            "number": "201",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Switch",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Item"
+                ]
+            },
+            "number": "206",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Zapdos ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Lightning"
+                ],
+                "subtypes": [
+                    "Basic",
+                    "ex"
+                ]
+            },
+            "number": "202",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Erika's Invitation",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Supporter"
+                ]
+            },
+            "number": "203",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Giovanni's Charisma",
+            "card_type": "trainer",
+            "traits": {
+                "subtypes": [
+                    "Supporter"
+                ]
+            },
+            "number": "204",
+            "rarity_code": "sar",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Mew ex",
+            "card_type": "pokemon",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Basic",
+                    "ex"
+                ]
+            },
+            "number": "205",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Basic Psychic Energy",
+            "card_type": "energy",
+            "traits": {
+                "color": [
+                    "Psychic"
+                ],
+                "subtypes": [
+                    "Basic"
+                ]
+            },
+            "number": "207",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        }
+    ]
+}

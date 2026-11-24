@@ -75,9 +75,9 @@ component. Do not branch on `game.slug` in Blade.
 | name_en | string | the name customers search for |
 | name_ja, name_th | string, nullable | |
 | card_type | string, nullable | game-specific: `pokemon`, `trainer`, `leader`, `creature` |
-| attributes | json | colour, attribute, cost — whatever that game filters on |
+| traits | json | colour, attribute, cost — whatever that game filters on |
 
-`attributes` is a json column on purpose: five games with five different stat sets should not become
+`traits` is a json column on purpose (not `attributes`, which collides with Eloquent's internal `$attributes` property): five games with five different stat sets should not become
 five tables or forty nullable columns.
 
 ### `printings`
@@ -107,7 +107,7 @@ The sellable unit. One row per condition × finish that the shop actually stocks
 | condition | enum | `nm, lp, mp, hp, dmg` |
 | finish | enum | `normal`, `foil` |
 | sku | string, unique | |
-| price_satang | integer | |
+| price_satang | integer, nullable | null until priced |
 | compare_at_satang | integer, nullable | the struck-through price |
 | qty | integer | on hand, not counting reservations |
 | note_th | string, nullable | the shop's own line: "มุมขวาล่างขาวเล็กน้อย" |
@@ -334,7 +334,7 @@ An append-only ledger. `users.store_credit_satang` is a cache of its sum.
 - `printings (set_id, number)` — the set browser and the code jump
 - `printings (card_id, language)` — the language tabs on the card page
 - `variants (printing_id, condition, finish)` unique — the variant table
-- `variants (qty)` partial where `qty > 0` — "in stock only" is the most-used filter
+- `variants (qty)` — "in stock only" is the most-used filter. A plain index: a partial index (`where qty > 0`) is not portable across SQLite, MySQL and Postgres
 - `stock_reservations (expires_at)` — the release job
 - `orders (user_id, placed_at desc)` — the account page
 - `buylist_prices (printing_id, condition)` unique

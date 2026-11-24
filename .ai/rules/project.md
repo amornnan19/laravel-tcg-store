@@ -61,6 +61,8 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 
 ## Rules that are easy to break
 
+- **Catalogue models are `#[Unguarded]`.** Never pass `$request->all()` or any unvalidated array to
+  `create`, `fill` or `update`; pass `$request->validated()` or Filament form state only.
 - **Money is an integer of satang** in a column ending `_satang`. Never a float, never a decimal
   column, never a currency string in the database. Format at the edge only.
 - **A variant is the sellable unit for singles** — one printing, one condition, one finish. Never

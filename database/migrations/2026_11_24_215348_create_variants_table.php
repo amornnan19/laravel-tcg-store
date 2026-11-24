@@ -1,0 +1,39 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('variants', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('printing_id')->constrained();
+            $table->string('condition');
+            $table->string('finish');
+            $table->string('sku')->unique();
+            $table->integer('price_satang')->nullable();
+            $table->integer('compare_at_satang')->nullable();
+            $table->integer('qty')->default(0);
+            $table->string('note_th')->nullable();
+            $table->boolean('has_real_photo')->default(false);
+            $table->timestamps();
+
+            $table->unique(['printing_id', 'condition', 'finish']);
+            $table->index('qty');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('variants');
+    }
+};

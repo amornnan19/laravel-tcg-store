@@ -1,0 +1,1999 @@
+{
+    "game": {
+        "slug": "one-piece"
+    },
+    "set": {
+        "code": "OP-05",
+        "name_en": "Awakening of the New Era",
+        "name_th": null,
+        "released_on": null,
+        "card_count": 119
+    },
+    "cards": [
+        {
+            "name_en": "Sabo",
+            "card_type": "leader",
+            "traits": {
+                "color": [
+                    "Red",
+                    "Black"
+                ],
+                "attribute": "Special",
+                "power": "5000",
+                "sub_types": "Revolutionary Army"
+            },
+            "number": "001",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Belo Betty",
+            "card_type": "leader",
+            "traits": {
+                "color": [
+                    "Red",
+                    "Yellow"
+                ],
+                "attribute": "Special",
+                "power": "5000",
+                "sub_types": "Revolutionary Army"
+            },
+            "number": "002",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Inazuma",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Slash",
+                "cost": "3",
+                "power": "4000",
+                "sub_types": "Revolutionary Army"
+            },
+            "number": "003",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Emporio.Ivankov",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Special",
+                "cost": "4",
+                "power": "5000",
+                "sub_types": "Revolutionary Army"
+            },
+            "number": "004",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Karasu",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Special",
+                "cost": "4",
+                "power": "5000",
+                "sub_types": "Revolutionary Army"
+            },
+            "number": "005",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Koala",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Strike",
+                "cost": "2",
+                "power": "3000",
+                "sub_types": "Revolutionary Army"
+            },
+            "number": "006",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Sabo",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Special",
+                "cost": "6",
+                "power": "7000",
+                "sub_types": "Revolutionary Army"
+            },
+            "number": "007",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Chaka",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Slash",
+                "cost": "5",
+                "power": "6000",
+                "sub_types": "Alabasta"
+            },
+            "number": "008",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Toh-Toh",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Wisdom",
+                "cost": "1",
+                "power": "0",
+                "sub_types": "Alabasta"
+            },
+            "number": "009",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Nico Robin",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Strike",
+                "cost": "1",
+                "power": "2000",
+                "sub_types": "Straw Hat Crew"
+            },
+            "number": "010",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Bartholomew Kuma",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Strike",
+                "cost": "2",
+                "power": "2000",
+                "sub_types": "Revolutionary Army The Seven Warlords of the Sea"
+            },
+            "number": "011",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Hack",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Strike",
+                "cost": "3",
+                "power": "5000",
+                "sub_types": "Fish-Man Revolutionary Army"
+            },
+            "number": "012",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Bunny Joe",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Ranged",
+                "cost": "2",
+                "power": "2000",
+                "sub_types": "Revolutionary Army"
+            },
+            "number": "013",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Pell",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Slash",
+                "cost": "3",
+                "power": "4000",
+                "sub_types": "Alabasta"
+            },
+            "number": "014",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Belo Betty",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Special",
+                "cost": "1",
+                "power": "2000",
+                "sub_types": "Revolutionary Army"
+            },
+            "number": "015",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Morley",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Special",
+                "cost": "3",
+                "power": "5000",
+                "sub_types": "Giant Revolutionary Army"
+            },
+            "number": "016",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Lindbergh",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Special",
+                "cost": "4",
+                "power": "5000",
+                "sub_types": "Minks Revolutionary Army"
+            },
+            "number": "017",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Emporio Energy Hormone",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "cost": "3",
+                "sub_types": "Revolutionary Army"
+            },
+            "number": "018",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Fire Fist",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "cost": "2",
+                "sub_types": "Revolutionary Army"
+            },
+            "number": "019",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Four Thousand-Brick Fist",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "cost": "2",
+                "sub_types": "Fish-Man Revolutionary Army"
+            },
+            "number": "020",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Revolutionary Army HQ",
+            "card_type": "stage",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "NULL",
+                "cost": "1",
+                "power": "NULL",
+                "sub_types": "Revolutionary Army"
+            },
+            "number": "021",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Donquixote Rosinante",
+            "card_type": "leader",
+            "traits": {
+                "color": [
+                    "Blue",
+                    "Green"
+                ],
+                "attribute": "Special",
+                "power": "5000",
+                "sub_types": "Donquixote Pirates Navy"
+            },
+            "number": "022",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Vergo",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Strike",
+                "cost": "3",
+                "power": "4000",
+                "sub_types": "Donquixote Pirates Navy"
+            },
+            "number": "023",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Kuween",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Strike",
+                "cost": "2",
+                "power": "2000",
+                "sub_types": "Donquixote Pirates"
+            },
+            "number": "024",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Gladius",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Special",
+                "cost": "5",
+                "power": "6000",
+                "sub_types": "Donquixote Pirates"
+            },
+            "number": "025",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Sarquiss",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Slash",
+                "cost": "4",
+                "power": "4000",
+                "sub_types": "Bellamy Pirates"
+            },
+            "number": "026",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Trafalgar Law",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Wisdom",
+                "cost": "1",
+                "power": "2000",
+                "sub_types": "Donquixote Pirates"
+            },
+            "number": "027",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Donquixote Doflamingo",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Ranged",
+                "cost": "1",
+                "power": "2000",
+                "sub_types": "Donquixote Pirates"
+            },
+            "number": "028",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Donquixote Doflamingo",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Special",
+                "cost": "7",
+                "power": "8000",
+                "sub_types": "Donquixote Pirates"
+            },
+            "number": "029",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Donquixote Rosinante",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Special",
+                "cost": "2",
+                "power": "1000",
+                "sub_types": "Donquixote Pirates Navy"
+            },
+            "number": "030",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Buffalo",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Strike",
+                "cost": "3",
+                "power": "4000",
+                "sub_types": "Donquixote Pirates"
+            },
+            "number": "031",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Pica",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Strike",
+                "cost": "4",
+                "power": "6000",
+                "sub_types": "Donquixote Pirates"
+            },
+            "number": "032",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Baby 5",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Special",
+                "cost": "1",
+                "power": "1000",
+                "sub_types": "Donquixote Pirates"
+            },
+            "number": "033",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Baby 5",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Special",
+                "cost": "1",
+                "power": "1000",
+                "sub_types": "Donquixote Pirates"
+            },
+            "number": "034",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Bellamy",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Strike",
+                "cost": "3",
+                "power": "5000",
+                "sub_types": "Donquixote Pirates"
+            },
+            "number": "035",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Monet",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Special",
+                "cost": "3",
+                "power": "1000",
+                "sub_types": "Donquixote Pirates"
+            },
+            "number": "036",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Because the Side of Justice Will Be Whichever Side Wins!!",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "cost": "0",
+                "sub_types": "Donquixote Pirates"
+            },
+            "number": "037",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Charlestone",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "cost": "2",
+                "sub_types": "Donquixote Pirates"
+            },
+            "number": "038",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Stick-Stickem Meteora",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "cost": "2",
+                "sub_types": "Donquixote Pirates"
+            },
+            "number": "039",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Birdcage",
+            "card_type": "stage",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "NULL",
+                "cost": "5",
+                "power": "NULL",
+                "sub_types": "NULL"
+            },
+            "number": "040",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Sakazuki",
+            "card_type": "leader",
+            "traits": {
+                "color": [
+                    "Blue",
+                    "Black"
+                ],
+                "attribute": "Special",
+                "power": "5000",
+                "sub_types": "Navy"
+            },
+            "number": "041",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Issho",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Special",
+                "cost": "6",
+                "power": "6000",
+                "sub_types": "Navy"
+            },
+            "number": "042",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Ulti",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Strike",
+                "cost": "4",
+                "power": "5000",
+                "sub_types": "Animal Kingdom Pirates"
+            },
+            "number": "043",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "John Giant",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Slash",
+                "cost": "8",
+                "power": "10000",
+                "sub_types": "Giant Navy"
+            },
+            "number": "044",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Stainless",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Slash",
+                "cost": "4",
+                "power": "5000",
+                "sub_types": "Navy"
+            },
+            "number": "045",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Dalmatian",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Strike",
+                "cost": "4",
+                "power": "5000",
+                "sub_types": "Navy"
+            },
+            "number": "046",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Basil Hawkins",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Slash",
+                "cost": "4",
+                "power": "5000",
+                "sub_types": "Animal Kingdom Pirates Hawkins Pirates"
+            },
+            "number": "047",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Bastille",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Slash",
+                "cost": "5",
+                "power": "6000",
+                "sub_types": "Navy"
+            },
+            "number": "048",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Haccha",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Strike",
+                "cost": "6",
+                "power": "7000",
+                "sub_types": "Animal Kingdom Pirates Giant"
+            },
+            "number": "049",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Hina",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Special",
+                "cost": "3",
+                "power": "4000",
+                "sub_types": "Navy"
+            },
+            "number": "050",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Borsalino",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Special",
+                "cost": "7",
+                "power": "8000",
+                "sub_types": "Navy"
+            },
+            "number": "051",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Maynard",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Wisdom",
+                "cost": "2",
+                "power": "2000",
+                "sub_types": "Navy"
+            },
+            "number": "052",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Mozambia",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Slash",
+                "cost": "1",
+                "power": "2000",
+                "sub_types": "Navy"
+            },
+            "number": "053",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Monkey.D.Garp",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Strike",
+                "cost": "3",
+                "power": "3000",
+                "sub_types": "Navy"
+            },
+            "number": "054",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "X.Drake",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Slash",
+                "cost": "5",
+                "power": "6000",
+                "sub_types": "Animal Kingdom Pirates Drake Pirates Navy"
+            },
+            "number": "055",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "X.Barrels",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Strike",
+                "cost": "2",
+                "power": "2000",
+                "sub_types": "Former Navy"
+            },
+            "number": "056",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Hound Blaze",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "cost": "2",
+                "sub_types": "Navy"
+            },
+            "number": "057",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "It's a Waste of Human Life!!",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "cost": "8",
+                "sub_types": "Navy"
+            },
+            "number": "058",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Let Us Begin the World of Violence!!",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "cost": "5",
+                "sub_types": "Animal Kingdom Pirates The Four Emperors"
+            },
+            "number": "059",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Monkey.D.Luffy",
+            "card_type": "leader",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Strike",
+                "power": "5000",
+                "sub_types": "Straw Hat Crew"
+            },
+            "number": "060",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Uso-Hachi",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Ranged",
+                "cost": "3",
+                "power": "4000",
+                "sub_types": "Straw Hat Crew"
+            },
+            "number": "061",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "O-Nami",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Special",
+                "cost": "1",
+                "power": "1000",
+                "sub_types": "Straw Hat Crew"
+            },
+            "number": "062",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "O-Robi",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Strike",
+                "cost": "4",
+                "power": "5000",
+                "sub_types": "Straw Hat Crew"
+            },
+            "number": "063",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Killer",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Slash",
+                "cost": "1",
+                "power": "2000",
+                "sub_types": "Kid Pirates"
+            },
+            "number": "064",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "San-Gorou",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Strike",
+                "cost": "6",
+                "power": "8000",
+                "sub_types": "Straw Hat Crew"
+            },
+            "number": "065",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Jinbe",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Strike",
+                "cost": "5",
+                "power": "6000",
+                "sub_types": "Fish-Man Straw Hat Crew"
+            },
+            "number": "066",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Zoro-Juurou",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Slash",
+                "cost": "3",
+                "power": "4000",
+                "sub_types": "Straw Hat Crew"
+            },
+            "number": "067",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Chopa-Emon",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Wisdom",
+                "cost": "2",
+                "power": "3000",
+                "sub_types": "Animal Straw Hat Crew"
+            },
+            "number": "068",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Trafalgar Law",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Slash",
+                "cost": "3",
+                "power": "5000",
+                "sub_types": "Heart Pirates"
+            },
+            "number": "069",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Fra-Nosuke",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Strike",
+                "cost": "5",
+                "power": "4000",
+                "sub_types": "Straw Hat Crew"
+            },
+            "number": "070",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Bepo",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Strike",
+                "cost": "3",
+                "power": "5000",
+                "sub_types": "Heart Pirates Minks"
+            },
+            "number": "071",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Hone-Kichi",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Slash",
+                "cost": "4",
+                "power": "6000",
+                "sub_types": "Straw Hat Crew"
+            },
+            "number": "072",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Miss Doublefinger(Zala)",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Slash",
+                "cost": "4",
+                "power": "4000",
+                "sub_types": "Baroque Works"
+            },
+            "number": "073",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Eustass\"Captain\"Kid",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Special",
+                "cost": "5",
+                "power": "6000",
+                "sub_types": "Kid Pirates"
+            },
+            "number": "074",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Mr.1 (Daz.Bonez)",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Slash",
+                "cost": "1",
+                "power": "1000",
+                "sub_types": "Baroque Works"
+            },
+            "number": "075",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "When You're at Sea You Fight against Pirates!!",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "cost": "1",
+                "sub_types": "Land of Wano"
+            },
+            "number": "076",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Gamma Knife",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "cost": "2",
+                "sub_types": "Heart Pirates"
+            },
+            "number": "077",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Punk Rotten",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "cost": "2",
+                "sub_types": "Kid Pirates"
+            },
+            "number": "078",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Viola",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Special",
+                "cost": "2",
+                "power": "3000",
+                "sub_types": "Dressrosa"
+            },
+            "number": "079",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Elizabello II",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Strike",
+                "cost": "4",
+                "power": "5000",
+                "sub_types": "Dressrosa Kingdom of Prodence"
+            },
+            "number": "080",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "One-Legged Toy Soldier",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Strike",
+                "cost": "2",
+                "power": "0",
+                "sub_types": "Dressrosa"
+            },
+            "number": "081",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Shirahoshi",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Wisdom",
+                "cost": "1",
+                "power": "0",
+                "sub_types": "Merfolk"
+            },
+            "number": "082",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Sterry",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Wisdom",
+                "cost": "2",
+                "power": "4000",
+                "sub_types": "Goa Kingdom"
+            },
+            "number": "083",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Saint Charlos",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Ranged",
+                "cost": "3",
+                "power": "0",
+                "sub_types": "Celestial Dragons"
+            },
+            "number": "084",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Nefeltari Cobra",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Wisdom",
+                "cost": "2",
+                "power": "1000",
+                "sub_types": "Alabasta"
+            },
+            "number": "085",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Nefeltari Vivi",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Wisdom",
+                "cost": "1",
+                "power": "1000",
+                "sub_types": "Alabasta"
+            },
+            "number": "086",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Hakuba",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Slash",
+                "cost": "5",
+                "power": "6000",
+                "sub_types": "Beautiful Pirates Dressrosa"
+            },
+            "number": "087",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Mansherry",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Special",
+                "cost": "1",
+                "power": "0",
+                "sub_types": "Dressrosa The Tontattas"
+            },
+            "number": "088",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Saint Mjosgard",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Wisdom",
+                "cost": "5",
+                "power": "1000",
+                "sub_types": "Celestial Dragons"
+            },
+            "number": "089",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Riku Doldo III",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Wisdom",
+                "cost": "4",
+                "power": "5000",
+                "sub_types": "Dressrosa"
+            },
+            "number": "090",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Rebecca",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Wisdom",
+                "cost": "4",
+                "power": "0",
+                "sub_types": "Dressrosa"
+            },
+            "number": "091",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Saint Rosward",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Ranged",
+                "cost": "5",
+                "power": "0",
+                "sub_types": "Celestial Dragons"
+            },
+            "number": "092",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Rob Lucci",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Strike",
+                "cost": "4",
+                "power": "6000",
+                "sub_types": "CP0"
+            },
+            "number": "093",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Haute Couture Patch Work",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "cost": "1",
+                "sub_types": "Dressrosa The Tontattas"
+            },
+            "number": "094",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Dragon Claw",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "cost": "2",
+                "sub_types": "Revolutionary Army Dressrosa"
+            },
+            "number": "095",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "I Bid 500 Million!!",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "cost": "3",
+                "sub_types": ""
+            },
+            "number": "096",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Mary Geoise",
+            "card_type": "stage",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "NULL",
+                "cost": "1",
+                "power": "NULL",
+                "sub_types": "Mary Geoise"
+            },
+            "number": "097",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Enel",
+            "card_type": "leader",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Special",
+                "power": "5000",
+                "sub_types": "Sky Island"
+            },
+            "number": "098",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Amazon",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Wisdom",
+                "cost": "3",
+                "power": "0",
+                "sub_types": "Sky Island"
+            },
+            "number": "099",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Enel",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Special",
+                "cost": "7",
+                "power": "7000",
+                "sub_types": "Sky Island"
+            },
+            "number": "100",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Ohm",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Slash",
+                "cost": "4",
+                "power": "5000",
+                "sub_types": "Sky Island Vassals"
+            },
+            "number": "101",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Gedatsu",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Strike",
+                "cost": "5",
+                "power": "6000",
+                "sub_types": "Sky Island Vassals"
+            },
+            "number": "102",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Kotori",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Special",
+                "cost": "3",
+                "power": "3000",
+                "sub_types": "Sky Island"
+            },
+            "number": "103",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Conis",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Wisdom",
+                "cost": "1",
+                "power": "0",
+                "sub_types": "Sky Island"
+            },
+            "number": "104",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Satori",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Strike",
+                "cost": "5",
+                "power": "5000",
+                "sub_types": "Sky Island Vassals"
+            },
+            "number": "105",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Shura",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Slash",
+                "cost": "2",
+                "power": "2000",
+                "sub_types": "Sky Island Vassals"
+            },
+            "number": "106",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Lieutenant Spacey",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Ranged",
+                "cost": "3",
+                "power": "4000",
+                "sub_types": "The Moon"
+            },
+            "number": "107",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Nola",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Strike",
+                "cost": "5",
+                "power": "7000",
+                "sub_types": "Animal Sky Island"
+            },
+            "number": "108",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Pagaya",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Wisdom",
+                "cost": "1",
+                "power": "1000",
+                "sub_types": "Sky Island"
+            },
+            "number": "109",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Holly",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Strike",
+                "cost": "3",
+                "power": "5000",
+                "sub_types": "Animal Sky Island"
+            },
+            "number": "110",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Hotori",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Special",
+                "cost": "3",
+                "power": "3000",
+                "sub_types": "Sky Island"
+            },
+            "number": "111",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Captain McKinley",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Wisdom",
+                "cost": "3",
+                "power": "3000",
+                "sub_types": "Sky Island"
+            },
+            "number": "112",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Yama",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Slash",
+                "cost": "2",
+                "power": "2000",
+                "sub_types": "Sky Island"
+            },
+            "number": "113",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "El Thor",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "cost": "1",
+                "sub_types": "Sky Island"
+            },
+            "number": "114",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Two-Hundred Million Volts Amaru",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "cost": "2",
+                "sub_types": "Sky Island"
+            },
+            "number": "115",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Hino Bird Zap",
+            "card_type": "event",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "cost": "2",
+                "sub_types": "Sky Island"
+            },
+            "number": "116",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Upper Yard",
+            "card_type": "stage",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "NULL",
+                "cost": "1",
+                "power": "NULL",
+                "sub_types": "Sky Island"
+            },
+            "number": "117",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Kaido",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Special",
+                "cost": "10",
+                "power": "12000",
+                "sub_types": "Animal Kingdom Pirates The Four Emperors"
+            },
+            "number": "118",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Monkey.D.Luffy",
+            "card_type": "character",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Strike",
+                "cost": "10",
+                "power": "12000",
+                "sub_types": "Straw Hat Crew The Four Emperors"
+            },
+            "number": "119",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        }
+    ]
+}

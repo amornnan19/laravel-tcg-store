@@ -1,0 +1,1760 @@
+{
+    "game": {
+        "slug": "digimon"
+    },
+    "set": {
+        "code": "BT-16",
+        "name_en": "Booster Beginning Observer",
+        "name_th": null,
+        "released_on": null,
+        "card_count": 103
+    },
+    "cards": [
+        {
+            "name_en": "Poromon",
+            "card_type": "digi-egg",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "level": 2,
+                "digi_type": "Mini Bird"
+            },
+            "number": "001",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "DemiVeemon",
+            "card_type": "digi-egg",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "level": 2,
+                "digi_type": "Baby Dragon"
+            },
+            "number": "002",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Upamon",
+            "card_type": "digi-egg",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "level": 2,
+                "digi_type": "Amphibian"
+            },
+            "number": "003",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Minomon",
+            "card_type": "digi-egg",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "level": 2,
+                "digi_type": "Larva"
+            },
+            "number": "004",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Dorimon",
+            "card_type": "digi-egg",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "level": 2,
+                "digi_type": "Lesser"
+            },
+            "number": "005",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Cupimon",
+            "card_type": "digi-egg",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "level": 2,
+                "digi_type": "Mini Angel"
+            },
+            "number": "006",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Hawkmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Red",
+                    "Green"
+                ],
+                "attribute": "Free",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Avian"
+            },
+            "number": "007",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Aquilamon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Red",
+                    "Green"
+                ],
+                "attribute": "Free",
+                "level": 4,
+                "play_cost": 4,
+                "digi_type": "Giant Bird"
+            },
+            "number": "008",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Lynxmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Red",
+                    "Yellow"
+                ],
+                "attribute": "Free",
+                "level": 4,
+                "play_cost": 5,
+                "digi_type": "Beast"
+            },
+            "number": "009",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Helloogarmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Red",
+                    "Purple"
+                ],
+                "attribute": "Virus",
+                "level": 5,
+                "play_cost": 7,
+                "digi_type": "Dark Animal"
+            },
+            "number": "010",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Garudamon (X Antibody)",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Vaccine",
+                "level": 5,
+                "play_cost": 8,
+                "digi_type": "Birdkin"
+            },
+            "number": "011",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Silphymon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Red",
+                    "Yellow"
+                ],
+                "attribute": "Free",
+                "level": 5,
+                "play_cost": 8,
+                "digi_type": "Beastkin"
+            },
+            "number": "012",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Valkyrimon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Red",
+                    "Yellow"
+                ],
+                "attribute": "Free",
+                "level": 6,
+                "play_cost": 7,
+                "digi_type": "Warrior"
+            },
+            "number": "013",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Goldramon (X Antibody)",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Red",
+                    "Yellow"
+                ],
+                "attribute": "Vaccine",
+                "level": 6,
+                "play_cost": 13,
+                "digi_type": "Holy Dragon"
+            },
+            "number": "014",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Phoenixmon (X Antibody)",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Red"
+                ],
+                "attribute": "Vaccine",
+                "level": 6,
+                "play_cost": 13,
+                "digi_type": "Holy Beast"
+            },
+            "number": "015",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Patamon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Blue",
+                    "Yellow"
+                ],
+                "attribute": "Data",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Mammal"
+            },
+            "number": "016",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Veemon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Blue",
+                    "Red"
+                ],
+                "attribute": "Free",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Mini Dragon"
+            },
+            "number": "017",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "ExVeemon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Blue",
+                    "Red"
+                ],
+                "attribute": "Free",
+                "level": 4,
+                "play_cost": 4,
+                "digi_type": "Mythical Dragon"
+            },
+            "number": "018",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Angemon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Blue",
+                    "Yellow"
+                ],
+                "attribute": "Vaccine",
+                "level": 4,
+                "play_cost": 4,
+                "digi_type": "Angel"
+            },
+            "number": "019",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Gaogamon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Data",
+                "level": 4,
+                "play_cost": 5,
+                "digi_type": "Beast"
+            },
+            "number": "020",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Togemogumon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Blue",
+                    "Green"
+                ],
+                "attribute": "Free",
+                "level": 4,
+                "play_cost": 5,
+                "digi_type": "Mammal"
+            },
+            "number": "021",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Mantaraymon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Blue",
+                    "Yellow"
+                ],
+                "attribute": "Free",
+                "level": 4,
+                "play_cost": 5,
+                "digi_type": "Aquatic"
+            },
+            "number": "022",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Divemon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Blue"
+                ],
+                "attribute": "Data",
+                "level": 5,
+                "play_cost": 6,
+                "digi_type": "Aquatic"
+            },
+            "number": "023",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "MagnaAngemon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Blue",
+                    "Yellow"
+                ],
+                "attribute": "Vaccine",
+                "level": 5,
+                "play_cost": 6,
+                "digi_type": "Archangel"
+            },
+            "number": "024",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Paildramon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Blue",
+                    "Green"
+                ],
+                "attribute": "Free",
+                "level": 5,
+                "play_cost": 8,
+                "digi_type": "Dragonkin"
+            },
+            "number": "025",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Vikemon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Blue",
+                    "Black"
+                ],
+                "attribute": "Free",
+                "level": 6,
+                "play_cost": 7,
+                "digi_type": "Beastkin"
+            },
+            "number": "026",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Imperialdramon: Fighter Mode",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Blue",
+                    "Green"
+                ],
+                "attribute": "Free",
+                "level": 6,
+                "play_cost": 8,
+                "digi_type": "Ancient Dragonkin"
+            },
+            "number": "027",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Imperialdramon: Dragon Mode",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Blue",
+                    "Green"
+                ],
+                "attribute": "Free",
+                "level": 6,
+                "play_cost": 12,
+                "digi_type": "Ancient Dragon"
+            },
+            "number": "028",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Agumon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Vaccine",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Dinosaur"
+            },
+            "number": "029",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Salamon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Yellow",
+                    "Purple"
+                ],
+                "attribute": "Vaccine",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Mammal"
+            },
+            "number": "030",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Gatomon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Yellow",
+                    "Purple"
+                ],
+                "attribute": "Vaccine",
+                "level": 4,
+                "play_cost": 4,
+                "digi_type": "Holy Beast"
+            },
+            "number": "031",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Sheepmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Yellow",
+                    "Black"
+                ],
+                "attribute": "Free",
+                "level": 4,
+                "play_cost": 5,
+                "digi_type": "Mammal"
+            },
+            "number": "032",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Harpymon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Yellow",
+                    "Red"
+                ],
+                "attribute": "Free",
+                "level": 4,
+                "play_cost": 5,
+                "digi_type": "Mythical Beast"
+            },
+            "number": "033",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Tempomon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "attribute": "Data",
+                "level": 5,
+                "play_cost": 6,
+                "digi_type": "Birdkin"
+            },
+            "number": "034",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "SlashAngemon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Yellow",
+                    "Black"
+                ],
+                "attribute": "Vaccine",
+                "level": 6,
+                "play_cost": 11,
+                "digi_type": "Authority"
+            },
+            "number": "035",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Chaosmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Yellow",
+                    "Black"
+                ],
+                "attribute": "Vaccine",
+                "level": 7,
+                "play_cost": 15,
+                "digi_type": "Unique"
+            },
+            "number": "036",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "KoKabuterimon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Virus",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Insectoid"
+            },
+            "number": "037",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Terriermon (X Antibody)",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Vaccine",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Beast"
+            },
+            "number": "038",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Pulsemon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Vaccine",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Beastkin"
+            },
+            "number": "039",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Wormmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Green",
+                    "Purple"
+                ],
+                "attribute": "Free",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Larva"
+            },
+            "number": "040",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Stingmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Green",
+                    "Purple"
+                ],
+                "attribute": "Free",
+                "level": 4,
+                "play_cost": 4,
+                "digi_type": "Insectoid"
+            },
+            "number": "041",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "BladeKuwagamon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Virus",
+                "level": 4,
+                "play_cost": 4,
+                "digi_type": "Machine"
+            },
+            "number": "042",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Runnermon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Virus",
+                "level": 4,
+                "play_cost": 4,
+                "digi_type": "Beast"
+            },
+            "number": "043",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Pistmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Virus",
+                "level": 5,
+                "play_cost": 6,
+                "digi_type": "Vegetation"
+            },
+            "number": "044",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "MetallifeKuwagamon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Virus",
+                "level": 5,
+                "play_cost": 7,
+                "digi_type": "Insectoid"
+            },
+            "number": "045",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "GranKuwagamon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Green",
+                    "Purple"
+                ],
+                "attribute": "Free",
+                "level": 6,
+                "play_cost": 7,
+                "digi_type": "Insectoid"
+            },
+            "number": "046",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Achillesmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Virus",
+                "level": 6,
+                "play_cost": 11,
+                "digi_type": "Beastkin"
+            },
+            "number": "047",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "TyrantKabuterimon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "attribute": "Virus",
+                "level": 6,
+                "play_cost": 14,
+                "digi_type": "Insectoid"
+            },
+            "number": "048",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Armadillomon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black",
+                    "Yellow"
+                ],
+                "attribute": "Free",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Mammal"
+            },
+            "number": "049",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Commandramon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Virus",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Cyborg"
+            },
+            "number": "050",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Dorumon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black",
+                    "Purple"
+                ],
+                "attribute": "Data",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Beast"
+            },
+            "number": "051",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Hagurumon (X Antibody)",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Virus",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Machine"
+            },
+            "number": "052",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Ankylomon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black",
+                    "Yellow"
+                ],
+                "attribute": "Free",
+                "level": 4,
+                "play_cost": 4,
+                "digi_type": "Ankylosaur"
+            },
+            "number": "053",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Sealsdramon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Virus",
+                "level": 4,
+                "play_cost": 4,
+                "digi_type": "Cyborg"
+            },
+            "number": "054",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Namakemon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Virus",
+                "level": 4,
+                "play_cost": 4,
+                "digi_type": "Puppet"
+            },
+            "number": "055",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Publimon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Data",
+                "level": 4,
+                "play_cost": 4,
+                "digi_type": "Mutant"
+            },
+            "number": "056",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Mekanorimon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Virus",
+                "level": 4,
+                "play_cost": 4,
+                "digi_type": "Machine"
+            },
+            "number": "057",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Dorugamon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black",
+                    "Purple"
+                ],
+                "attribute": "Data",
+                "level": 4,
+                "play_cost": 5,
+                "digi_type": "Beast Dragon"
+            },
+            "number": "058",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Shootmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Vaccine",
+                "level": 5,
+                "play_cost": 6,
+                "digi_type": "Machine"
+            },
+            "number": "059",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Tankdramon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Virus",
+                "level": 5,
+                "play_cost": 7,
+                "digi_type": "Machine"
+            },
+            "number": "060",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "DoruGreymon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black",
+                    "Purple"
+                ],
+                "attribute": "Data",
+                "level": 5,
+                "play_cost": 7,
+                "digi_type": "Beast Dragon"
+            },
+            "number": "061",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Zanmetsumon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Virus",
+                "level": 5,
+                "play_cost": 8,
+                "digi_type": "Beast Dragon"
+            },
+            "number": "062",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Shakkoumon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black",
+                    "Yellow"
+                ],
+                "attribute": "Free",
+                "level": 5,
+                "play_cost": 8,
+                "digi_type": "Mutant"
+            },
+            "number": "063",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Dorugoramon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black",
+                    "Purple"
+                ],
+                "attribute": "Data",
+                "level": 6,
+                "play_cost": 12,
+                "digi_type": "Beast Dragon"
+            },
+            "number": "064",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Darkdramon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "attribute": "Virus",
+                "level": 6,
+                "play_cost": 13,
+                "digi_type": "Cyborg"
+            },
+            "number": "065",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Syakomon (X Antibody)",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple",
+                    "Blue"
+                ],
+                "attribute": "Virus",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Crustacean"
+            },
+            "number": "066",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Lopmon (X Antibody)",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple",
+                    "Green"
+                ],
+                "attribute": "Data",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Beast"
+            },
+            "number": "067",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Dobermon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Vaccine",
+                "level": 4,
+                "play_cost": 4,
+                "digi_type": "Dark Animal"
+            },
+            "number": "068",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Gesomon (X Antibody)",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple",
+                    "Blue"
+                ],
+                "attribute": "Virus",
+                "level": 4,
+                "play_cost": 5,
+                "digi_type": "Mollusk"
+            },
+            "number": "069",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Sethmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple",
+                    "Red"
+                ],
+                "attribute": "Free",
+                "level": 4,
+                "play_cost": 5,
+                "digi_type": "Dark Animal"
+            },
+            "number": "070",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "MadLeomon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple",
+                    "Green"
+                ],
+                "attribute": "Virus",
+                "level": 4,
+                "play_cost": 5,
+                "digi_type": "Undead"
+            },
+            "number": "071",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Arukenimon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Virus",
+                "level": 5,
+                "play_cost": 6,
+                "digi_type": "Dark Animal"
+            },
+            "number": "072",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Mummymon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Virus",
+                "level": 5,
+                "play_cost": 6,
+                "digi_type": "Undead"
+            },
+            "number": "073",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Climbmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Virus",
+                "level": 5,
+                "play_cost": 7,
+                "digi_type": "Insectoid"
+            },
+            "number": "074",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Cerberusmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Vaccine",
+                "level": 5,
+                "play_cost": 7,
+                "digi_type": "Dark Animal"
+            },
+            "number": "075",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Soloogarmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple",
+                    "Red"
+                ],
+                "attribute": "Virus",
+                "level": 5,
+                "play_cost": 7,
+                "digi_type": "Dark Animal"
+            },
+            "number": "076",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Dinobeemon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple",
+                    "Red"
+                ],
+                "attribute": "Free",
+                "level": 5,
+                "play_cost": 8,
+                "digi_type": "Mutant"
+            },
+            "number": "077",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Pharaohmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Virus",
+                "level": 6,
+                "play_cost": 12,
+                "digi_type": "Wizard"
+            },
+            "number": "078",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Cherubimon (X Antibody)",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple",
+                    "Green"
+                ],
+                "attribute": "Vaccine",
+                "level": 6,
+                "play_cost": 13,
+                "digi_type": "Cherub"
+            },
+            "number": "079",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Shroudmon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple",
+                    "Yellow"
+                ],
+                "attribute": "Virus",
+                "level": 6,
+                "play_cost": 13,
+                "digi_type": "Wizard"
+            },
+            "number": "080",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "MaloMyotismon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "attribute": "Virus",
+                "level": 6,
+                "play_cost": 13,
+                "digi_type": "Demon Lord"
+            },
+            "number": "081",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Ukkomon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "White"
+                ],
+                "attribute": "Free",
+                "level": 3,
+                "play_cost": 3,
+                "digi_type": "Ancient Fairy"
+            },
+            "number": "082",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "BigUkkomon",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "White"
+                ],
+                "attribute": "Free",
+                "level": 6,
+                "play_cost": 12,
+                "digi_type": "Ancient Fairy"
+            },
+            "number": "083",
+            "rarity_code": "rr",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Yolei Inoue & Kari Kamiya",
+            "card_type": "tamer",
+            "traits": {
+                "color": [
+                    "Red",
+                    "Yellow"
+                ],
+                "play_cost": 4
+            },
+            "number": "084",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Davis Motomiya & Ken Ichijoji",
+            "card_type": "tamer",
+            "traits": {
+                "color": [
+                    "Blue",
+                    "Green"
+                ],
+                "play_cost": 4
+            },
+            "number": "085",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Hacker Judge",
+            "card_type": "tamer",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "play_cost": 4,
+                "digi_type": "Abadin Electronics"
+            },
+            "number": "086",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Kosuke Kisakata",
+            "card_type": "tamer",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "play_cost": 4,
+                "digi_type": "SoC"
+            },
+            "number": "087",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Cody Hida & T.K. Takaishi",
+            "card_type": "tamer",
+            "traits": {
+                "color": [
+                    "Black",
+                    "Yellow"
+                ],
+                "play_cost": 4
+            },
+            "number": "088",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Arukenimon & Mummymon",
+            "card_type": "tamer",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "play_cost": 4
+            },
+            "number": "089",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Lui Ohwada",
+            "card_type": "tamer",
+            "traits": {
+                "color": [
+                    "White"
+                ],
+                "play_cost": 4
+            },
+            "number": "090",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Beastly Storm Dance of Affection",
+            "card_type": "option",
+            "traits": {
+                "color": [
+                    "Red",
+                    "Yellow"
+                ],
+                "play_cost": 3
+            },
+            "number": "091",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Invincible Dragon-Insect Fusion",
+            "card_type": "option",
+            "traits": {
+                "color": [
+                    "Blue",
+                    "Green"
+                ],
+                "play_cost": 3
+            },
+            "number": "092",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "The Sparkle of Fate!",
+            "card_type": "option",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "play_cost": 3
+            },
+            "number": "093",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Dragon's Breath",
+            "card_type": "option",
+            "traits": {
+                "color": [
+                    "Yellow"
+                ],
+                "play_cost": 4,
+                "digi_type": "Four Great Dragons"
+            },
+            "number": "094",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Shine of Bee",
+            "card_type": "option",
+            "traits": {
+                "color": [
+                    "Green"
+                ],
+                "play_cost": 7
+            },
+            "number": "095",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Metropolitan Police Department, Community Safety Bureau, Cyber Crime Division, Investigation Unit 11",
+            "card_type": "option",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "play_cost": 3,
+                "digi_type": "DigiPolice"
+            },
+            "number": "096",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Advent of the Ancient Steel Angel",
+            "card_type": "option",
+            "traits": {
+                "color": [
+                    "Black",
+                    "Yellow"
+                ],
+                "play_cost": 3
+            },
+            "number": "097",
+            "rarity_code": "u",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "DORU-Din",
+            "card_type": "option",
+            "traits": {
+                "color": [
+                    "Black"
+                ],
+                "play_cost": 6,
+                "digi_type": "X Antibody"
+            },
+            "number": "098",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "The Demon Wolf of the Castle of Nine Wolves",
+            "card_type": "option",
+            "traits": {
+                "color": [
+                    "Purple"
+                ],
+                "play_cost": 3,
+                "digi_type": "SoC"
+            },
+            "number": "099",
+            "rarity_code": "r",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Thunderflame Crusher",
+            "card_type": "option",
+            "traits": {
+                "color": [
+                    "Purple",
+                    "Yellow"
+                ],
+                "play_cost": 6
+            },
+            "number": "100",
+            "rarity_code": "c",
+            "language": "en",
+            "has_foil": false
+        },
+        {
+            "name_en": "Rapidmon (X Antibody)",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Yellow",
+                    "Green"
+                ],
+                "attribute": "Vaccine",
+                "level": 6,
+                "play_cost": 11,
+                "digi_type": "Holy Warrior"
+            },
+            "number": "101",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Magnamon (X Antibody)",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "Yellow",
+                    "Blue"
+                ],
+                "attribute": "Vaccine",
+                "level": 6,
+                "play_cost": 12,
+                "digi_type": "Holy Warrior"
+            },
+            "number": "102",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        },
+        {
+            "name_en": "Imperialdramon Paladin Mode",
+            "card_type": "digimon",
+            "traits": {
+                "color": [
+                    "White"
+                ],
+                "attribute": "Vaccine",
+                "level": 7,
+                "play_cost": 15,
+                "digi_type": "Ancient Holy Warrior"
+            },
+            "number": "112",
+            "rarity_code": "sec",
+            "language": "en",
+            "has_foil": true
+        }
+    ]
+}
