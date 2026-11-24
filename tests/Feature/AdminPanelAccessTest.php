@@ -14,7 +14,7 @@ test('the admin login page is reachable', function () {
 });
 
 test('a staff user can open the admin panel', function () {
-    $this->actingAs(User::factory()->staff()->create())
+    $this->actingAs(User::factory()->staff()->withAppAuthentication()->create())
         ->get('/admin')
         ->assertOk();
 });

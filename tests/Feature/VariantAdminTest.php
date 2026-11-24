@@ -22,7 +22,7 @@ use Livewire\Livewire;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->actingAs(User::factory()->staff()->create());
+    $this->actingAs(User::factory()->staff()->withAppAuthentication()->create());
 });
 
 test('the variants list renders for staff and is forbidden for a customer', function () {

@@ -82,6 +82,9 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
   `filled($this->columnMap[$name] ?? null)`: `$this->data` still holds the raw CSV row keyed by header, so an
   unmapped column is present but was never validated. Every admin edit page that saves stock or price refuses a
   stale save.**
+- **The admin panel's second factor is enforced only by Filament's login page.** Any other way of logging a user
+  in (LINE/Socialite, a storefront login, password-reset auto-login, impersonation) must refuse `is_staff` users,
+  or the panel must move to its own auth guard first. The panel shares the `web` guard today.
 
 ## Language
 

@@ -35,7 +35,7 @@ use Livewire\Livewire;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->staff = User::factory()->staff()->create();
+    $this->staff = User::factory()->staff()->withAppAuthentication()->create();
     $this->actingAs($this->staff);
 });
 

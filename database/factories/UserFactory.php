@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use PragmaRX\Google2FA\Google2FA;
 
 /**
  * @extends Factory<User>
@@ -51,6 +52,23 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_staff' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the user has set up app (TOTP) authentication with a fresh secret.
+     *
+     * Recovery codes are stored bcrypt-hashed, as Filament stores and checks them; the plain
+     * codes are `recovery-code-one` and `recovery-code-two`.
+     */
+    public function withAppAuthentication(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'app_authentication_secret' => (new Google2FA)->generateSecretKey(),
+            'app_authentication_recovery_codes' => [
+                Hash::make('recovery-code-one'),
+                Hash::make('recovery-code-two'),
+            ],
         ]);
     }
 }
