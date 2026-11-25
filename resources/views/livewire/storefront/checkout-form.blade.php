@@ -46,18 +46,26 @@
             <ul class="flex flex-col gap-2">
                 @foreach ($held as $line)
                     @php
-                        $variant = $line->purchasable;
-                        $printing = $variant->printing;
+                        $presentation = $line->purchasable->cartPresentation();
                     @endphp
                     <li wire:key="line-{{ $line->id }}" class="flex items-start gap-3 rounded-card border border-line bg-sunken p-3">
-                        <x-card-art :printing="$printing" size="w-10" />
+                        <x-line-art :presentation="$presentation" size="w-10" />
                         <div class="min-w-0 flex-1">
-                            <p class="truncate text-small font-medium">{{ $printing->display_name }}</p>
+                            <p class="truncate text-small font-medium">{{ $presentation->title }}</p>
                             <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-label text-faint">
-                                <span class="tabular-nums">{{ $printing->display_code }}</span>
-                                <x-language-badge :language="$printing->language" />
-                                <x-condition-badge :condition="$variant->condition" />
-                                <span>{{ $variant->finish->label() }}</span>
+                                <span class="tabular-nums">{{ $presentation->code }}</span>
+                                @if ($presentation->language !== null)
+                                    <x-language-badge :language="$presentation->language" />
+                                @endif
+                                @if ($presentation->condition !== null)
+                                    <x-condition-badge :condition="$presentation->condition" />
+                                @endif
+                                @if ($presentation->gradeBadge !== null)
+                                    <x-grade-badge :label="$presentation->gradeBadge" />
+                                @endif
+                                @foreach ($presentation->badges as $badge)
+                                    <span>{{ $badge }}</span>
+                                @endforeach
                             </p>
                         </div>
                         <div class="flex-none text-right">
@@ -125,13 +133,22 @@
                         @endforeach
                     </div>
 
-                    <label class="mt-3 flex cursor-pointer items-start gap-3 rounded-card border border-line bg-surface p-3 has-checked:border-accent has-checked:bg-accent/8 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent">
-                        <x-checkbox wire:model.live="form.protection" class="mt-0.5" />
-                        <span class="min-w-0 flex-1">
-                            <span class="block text-small font-medium">{{ __('storefront.checkout.protection') }} <span class="tabular-nums text-accent">+ <x-price :satang="(int) config('shipping.protection_satang')" /></span></span>
-                            <span class="mt-1 block text-small text-muted">{{ __('storefront.checkout.protection_hint', ['threshold' => $format((int) config('shipping.protection_threshold_satang'))]) }}</span>
-                        </span>
-                    </label>
+                    @if ($packable)
+                        <label class="mt-3 flex cursor-pointer items-start gap-3 rounded-card border border-line bg-surface p-3 has-checked:border-accent has-checked:bg-accent/8 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent">
+                            <x-checkbox wire:model.live="form.protection" class="mt-0.5" />
+                            <span class="min-w-0 flex-1">
+                                <span class="block text-small font-medium">{{ __('storefront.checkout.protection') }} <span class="tabular-nums text-accent">+ <x-price :satang="(int) config('shipping.protection_satang')" /></span></span>
+                                <span class="mt-1 block text-small text-muted">{{ $insuredCount > 0 ? __('storefront.checkout.protection_hint_mixed') : __('storefront.checkout.protection_hint', ['threshold' => $format((int) config('shipping.protection_threshold_satang'))]) }}</span>
+                            </span>
+                        </label>
+                    @endif
+
+                    @if ($insuredCount > 0)
+                        <p class="mt-3 flex items-baseline justify-between gap-4 rounded-card border border-line bg-surface p-3 text-small">
+                            <span class="min-w-0 font-medium">{{ __('storefront.checkout.insurance_row') }}</span>
+                            <x-price :satang="$insurance" class="flex-none text-ink" />
+                        </p>
+                    @endif
                 </section>
 
                 <section aria-labelledby="checkout-payment-heading">
@@ -159,6 +176,9 @@
                         <p class="flex items-baseline justify-between gap-4"><span>{{ __('storefront.checkout.shipping', ['courier' => $courier->label()]) }}</span><x-price :satang="$shipping" class="text-ink" /></p>
                         @if ($protection > 0)
                             <p class="flex items-baseline justify-between gap-4"><span>{{ __('storefront.checkout.protection') }}</span><x-price :satang="$protection" class="text-ink" /></p>
+                        @endif
+                        @if ($insuredCount > 0)
+                            <p class="flex items-baseline justify-between gap-4"><span>{{ __('storefront.checkout.insurance', ['n' => $insuredCount]) }}<span class="block text-label text-faint">{{ __('storefront.checkout.insurance_note') }}</span></span><x-price :satang="$insurance" class="text-ink" /></p>
                         @endif
                         <p class="mt-2 flex items-baseline justify-between gap-4 border-t border-line pt-3">
                             <span class="text-body font-medium text-ink">{{ __('storefront.checkout.total_due') }}</span>

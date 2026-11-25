@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\Variant;
 use App\Notifications\OrderCancelled;
 use App\Support\OrderRecipient;
+use App\Support\PurchasableTypes;
 use App\Support\VariantAlerts;
 use Closure;
 use Illuminate\Support\Facades\DB;
@@ -36,19 +37,14 @@ class CancelOrder
      */
     public function handle(Order $order, string $reason, ?Closure $guard = null): ?Order
     {
-        // The variants to lock are read before the transaction opens so its first statement is the locking read
-        // (project rule); the order row is locked right after and its status re-checked.
-        $variantIds = $order->items()
-            ->whereNotNull('purchasable_id')
-            ->where('purchasable_type', (new Variant)->getMorphClass())
-            ->orderBy('purchasable_id')
-            ->pluck('purchasable_id')
-            ->map(fn ($id): int => (int) $id)
-            ->unique()
-            ->values();
+        // The rows to lock are read before the transaction opens so its first statement is the locking read
+        // (project rule); the order row is locked right after and its status re-checked. Grouped by type: ids of
+        // different types may coincide.
+        $refs = PurchasableTypes::referencedBy($order->items()->get());
+        $variantIds = $refs[(new Variant)->getMorphClass()] ?? collect();
 
-        $cancelled = DB::transaction(function () use ($order, $reason, $guard, $variantIds): ?Order {
-            $variants = Variant::query()->whereIn('id', $variantIds)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+        $cancelled = DB::transaction(function () use ($order, $reason, $guard, $refs): ?Order {
+            $purchasables = PurchasableTypes::lockMany($refs);
 
             $locked = Order::query()->lockForUpdate()->findOrFail($order->getKey());
 
@@ -66,20 +62,19 @@ class CancelOrder
                 throw new PaymentRefused('slip_submitted');
             }
 
-            foreach ($locked->items()->get() as $item) {
-                $variant = $variants->get($item->purchasable_id);
-
-                if ($variant !== null && $item->purchasable_type === $variant->getMorphClass()) {
-                    $variant->qty += $item->qty;
-                    $variant->save();
-                }
-            }
-
             $locked->payments()
                 ->where('status', PaymentStatus::Pending->value)
                 ->update(['status' => PaymentStatus::Rejected->value, 'rejected_reason' => $reason, 'updated_at' => now()]);
 
             $locked->update(['status' => OrderStatus::Cancelled, 'cancelled_at' => now(), 'cancel_reason' => $reason]);
+
+            // After the status moved: a one-of-a-kind item checks that no other live order holds its sale.
+            foreach ($locked->items()->get() as $item) {
+                $purchasable = $purchasables[$item->purchasable_type][$item->purchasable_id] ?? null;
+
+                // A row that was deleted, or a line of an unknown type, has nothing to return.
+                $purchasable?->onReturned($item->qty);
+            }
 
             return $locked;
         });

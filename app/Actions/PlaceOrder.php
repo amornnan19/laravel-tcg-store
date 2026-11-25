@@ -13,11 +13,11 @@ use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\StockReservation;
 use App\Models\User;
-use App\Models\Variant;
 use App\Notifications\OrderPlaced;
 use App\Support\CartLines;
 use App\Support\OrderRecipient;
 use App\Support\PaymentQr;
+use App\Support\PurchasableTypes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -44,19 +44,15 @@ class PlaceOrder
             throw new InvalidArgumentException('That payment method is not offered.');
         }
 
-        // Which variants to lock is read before the transaction opens: the first statement inside it must be the
+        // Which rows to lock is read before the transaction opens: the first statement inside it must be the
         // locking read (project rule), and it cannot name rows it has not yet found. Anything that changed between
-        // this read and the lock is caught by the re-read of the lines below.
-        $variantIds = CartItem::query()
-            ->where('cart_id', $cart->getKey())
-            ->orderBy('purchasable_id')
-            ->pluck('purchasable_id')
-            ->map(fn ($id): int => (int) $id)
-            ->unique()
-            ->values();
+        // this read and the lock is caught by the re-read of the lines below. Ids are grouped by type: a graded
+        // item and a variant may share an id.
+        $refs = PurchasableTypes::referencedBy(CartItem::query()->where('cart_id', $cart->getKey())->get());
 
-        $order = DB::transaction(function () use ($cart, $data, $method, $courier, $variantIds, $user): Order {
-            $variants = Variant::query()->whereIn('id', $variantIds)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+        $order = DB::transaction(function () use ($cart, $data, $method, $courier, $refs, $user): Order {
+            // Variants first, then graded items, each by ascending id: every path that locks several types uses this order.
+            $locked = PurchasableTypes::lockMany($refs);
 
             $items = $cart->items()->orderBy('id')->get();
 
@@ -69,29 +65,35 @@ class PlaceOrder
                 ->get()
                 ->keyBy(fn (StockReservation $reservation): string => $reservation->purchasable_type.':'.$reservation->purchasable_id);
 
-            $purchasableIds = Variant::query()->purchasable()->whereIn('id', $variantIds)->pluck('id')->flip();
+            $purchasableIds = collect($refs)
+                ->map(fn ($ids, string $type) => PurchasableTypes::classFor($type)::purchasableIdsAmong($ids))
+                ->all();
 
             $heldReservationIds = [];
 
             foreach ($items as $item) {
-                $variant = $variants->get($item->purchasable_id);
+                $purchasable = $locked[$item->purchasable_type][$item->purchasable_id] ?? null;
                 $reservation = $reservations->get($item->purchasable_type.':'.$item->purchasable_id);
 
                 // The same rule the cart and checkout pages show: held in full, buyable, and in stock. The hold fitted the
                 // stock when it was made, but staff may have lowered the stock since.
-                if (! CartLines::canOrder($item, $variant, $reservation, $purchasableIds->has($item->purchasable_id))) {
+                if (! CartLines::canOrder($item, $purchasable, $reservation, isset($purchasableIds[$item->purchasable_type]) && $purchasableIds[$item->purchasable_type]->has($item->purchasable_id))) {
                     throw new CheckoutBlocked("Line {$item->id} can no longer be ordered as it stands.");
                 }
 
                 $heldReservationIds[] = $reservation->getKey();
             }
 
-            $variants->load(['printing.card', 'printing.set']);
-
             $subtotal = $items->sum(fn (CartItem $item): int => $item->unit_price_satang * $item->qty);
             $shipping = $courier->rateSatang();
-            $protection = $data->protection ? (int) config('shipping.protection_satang') : 0;
-            $total = $subtotal + $shipping + $protection;
+            // Protective packing is for singles: with no line outside a hard case there is nothing to pack, so a forced
+            // `protection` is not charged.
+            $packable = $items->contains(fn (CartItem $item): bool => ! $locked[$item->purchasable_type][$item->purchasable_id]->isInsured());
+            $protection = $data->protection && $packable ? (int) config('shipping.protection_satang') : 0;
+            // Mandatory hard case and parcel insurance, per insured item (a graded card), whatever the customer ticked.
+            $insured = $items->sum(fn (CartItem $item): int => $locked[$item->purchasable_type][$item->purchasable_id]->isInsured() ? $item->qty : 0);
+            $insurance = $insured * (int) config('shipping.graded_insurance_satang');
+            $total = $subtotal + $shipping + $protection + $insurance;
             $normalized = $data->normalized();
             $placedAt = now();
 
@@ -117,6 +119,7 @@ class PlaceOrder
                 'subtotal_satang' => $subtotal,
                 'shipping_satang' => $shipping,
                 'protection_satang' => $protection,
+                'insurance_satang' => $insurance,
                 'total_satang' => $total,
                 'payment_due_at' => $placedAt->copy()->addMinutes((int) config('shop.payment_window_minutes')),
                 'placed_at' => $placedAt,
@@ -124,25 +127,18 @@ class PlaceOrder
             $order->update(['number' => Order::numberFor($order->getKey())]);
 
             foreach ($items as $item) {
-                $variant = $variants->get($item->purchasable_id);
-                $printing = $variant->printing;
+                $purchasable = $locked[$item->purchasable_type][$item->purchasable_id];
 
                 $order->items()->create([
-                    'purchasable_type' => $variant->getMorphClass(),
-                    'purchasable_id' => $variant->getKey(),
-                    'card_name' => $printing->display_name,
-                    'set_code' => $printing->set->code,
-                    'number' => $printing->number,
-                    'language' => $printing->language->value,
-                    'condition' => $variant->condition->value,
-                    'finish' => $variant->finish->value,
+                    'purchasable_type' => $purchasable->getMorphClass(),
+                    'purchasable_id' => $purchasable->getKey(),
+                    ...$purchasable->snapshot(),
                     'unit_price_satang' => $item->unit_price_satang,
                     'qty' => $item->qty,
                     'line_total_satang' => $item->unit_price_satang * $item->qty,
                 ]);
 
-                $variant->qty -= $item->qty;
-                $variant->save();
+                $purchasable->onSold($item->qty);
             }
 
             $order->payments()->create([

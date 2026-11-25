@@ -2,10 +2,12 @@
 
 namespace App\Actions;
 
+use App\Contracts\Purchasable;
 use App\Enums\RenewOutcome;
 use App\Models\CartItem;
-use App\Models\StockReservation;
 use App\Models\Variant;
+use App\Support\PurchasableTypes;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -16,18 +18,26 @@ class RenewCartItem
     public function __construct(private ReserveStock $reserveStock) {}
 
     /**
-     * Holds `min(line qty, available)`, shrinks the line to it and re-prices the line at the variant's current price.
-     * With nothing available, nothing is held and the result carries the substitute on offer, if any. An item that
+     * Holds `min(line qty, holdable)`, shrinks the line to it and re-prices the line at the item's current price.
+     * With nothing available, nothing is held and the result carries the substitute on offer, if any (only a variant
+     * has substitutes). A line whose hold has run out first gives the item's release a chance, so a one-of-a-kind item
+     * that can no longer be bought does not stay `reserved`. An item that
      * can no longer be bought comes back `Gone` and the line is left as it was. A line that is already held is left alone.
      */
     public function handle(CartItem $item): RenewResult
     {
         return DB::transaction(function () use ($item): RenewResult {
             // The locking read comes first (see AddToCart); every read after it sees the holds committed while waiting.
-            $variant = Variant::query()->lockForUpdate()->find($item->purchasable_id);
+            // Found by the line's own type, never by id alone.
+            $class = PurchasableTypes::classFor($item->purchasable_type);
+            $purchasable = $class === null ? null : $class::lockForHold((int) $item->purchasable_id);
             $item->refresh();
 
-            if (! $this->isPurchasable($variant)) {
+            if ($purchasable !== null && ! $this->isHeld($item)) {
+                $purchasable->onReleased();
+            }
+
+            if (! $this->isPurchasable($purchasable)) {
                 return new RenewResult(RenewOutcome::Gone);
             }
 
@@ -35,20 +45,20 @@ class RenewCartItem
                 return new RenewResult(RenewOutcome::Renewed);
             }
 
-            $take = $this->takeable($item, $variant);
+            $take = $this->takeable($item, $purchasable);
 
             if ($take < 1) {
                 return new RenewResult(RenewOutcome::Taken, substitute: $this->substituteFor($item));
             }
 
-            $this->reserveStock->handle($item->cart, $variant, $take);
+            $this->reserveStock->handle($item->cart, $purchasable, $take);
 
             $qtyReduced = $take < $item->qty ? ['from' => $item->qty, 'to' => $take] : null;
-            $priceChanged = $variant->price_satang !== $item->unit_price_satang
-                ? ['from' => $item->unit_price_satang, 'to' => $variant->price_satang]
+            $priceChanged = $purchasable->unitPriceSatang() !== $item->unit_price_satang
+                ? ['from' => $item->unit_price_satang, 'to' => $purchasable->unitPriceSatang()]
                 : null;
 
-            $item->update(['qty' => $take, 'unit_price_satang' => $variant->price_satang]);
+            $item->update(['qty' => $take, 'unit_price_satang' => $purchasable->unitPriceSatang()]);
 
             return new RenewResult(RenewOutcome::Renewed, $qtyReduced, $priceChanged);
         });
@@ -61,6 +71,12 @@ class RenewCartItem
      */
     public function substituteFor(CartItem $item): ?Variant
     {
+        // Only a variant has a substitute: another condition of the same printing. Never read the id against `variants`
+        // for a line of another type.
+        if ($item->purchasable_type !== (new Variant)->getMorphClass()) {
+            return null;
+        }
+
         $variant = Variant::query()->find($item->purchasable_id);
 
         if (! $this->isPurchasable($variant) || $this->isHeld($item) || $this->takeable($item, $variant) > 0) {
@@ -82,9 +98,9 @@ class RenewCartItem
             ->first();
     }
 
-    private function isPurchasable(?Variant $variant): bool
+    private function isPurchasable((Model&Purchasable)|null $purchasable): bool
     {
-        return $variant !== null && $variant->isPurchasable();
+        return $purchasable !== null && $purchasable->isPurchasable();
     }
 
     private function isHeld(CartItem $item): bool
@@ -95,14 +111,8 @@ class RenewCartItem
     /**
      * How many of the line's copies can be held now, counting the live holds of every cart.
      */
-    private function takeable(CartItem $item, Variant $variant): int
+    private function takeable(CartItem $item, Model&Purchasable $purchasable): int
     {
-        $held = (int) StockReservation::query()
-            ->live()
-            ->where('purchasable_type', $variant->getMorphClass())
-            ->where('purchasable_id', $variant->getKey())
-            ->sum('qty');
-
-        return min($item->qty, max(0, $variant->qty - $held));
+        return min($item->qty, $purchasable->maxPerLine(), $purchasable->holdableQty());
     }
 }

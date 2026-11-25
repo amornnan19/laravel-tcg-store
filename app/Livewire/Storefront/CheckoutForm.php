@@ -43,8 +43,9 @@ class CheckoutForm extends Component
 
         $this->form->courier = Courier::Flash->value;
         $this->form->method = PaymentMethod::offered()[0]->value ?? '';
+        // Only a line that is not already in a hard case is worth packing: a graded card never turns this on.
         $this->form->protection = $this->heldLines->contains(
-            fn (CartItem $line): bool => $line->unit_price_satang >= (int) config('shipping.protection_threshold_satang'),
+            fn (CartItem $line): bool => ! $line->purchasable->isInsured() && $line->unit_price_satang >= (int) config('shipping.protection_threshold_satang'),
         );
     }
 
@@ -146,7 +147,10 @@ class CheckoutForm extends Component
     {
         $courier = Courier::tryFrom($this->form->courier) ?? Courier::Flash;
         $shipping = $courier->rateSatang();
-        $protection = $this->form->protection ? (int) config('shipping.protection_satang') : 0;
+        $packable = $this->cartLines->hasPackableLines();
+        $protection = $this->form->protection && $packable ? (int) config('shipping.protection_satang') : 0;
+        $insuredCount = $this->cartLines->insuredCount();
+        $insurance = $insuredCount * (int) config('shipping.graded_insurance_satang');
 
         return view('livewire.storefront.checkout-form', [
             'methods' => PaymentMethod::offered(),
@@ -154,7 +158,10 @@ class CheckoutForm extends Component
             'courier' => $courier,
             'shipping' => $shipping,
             'protection' => $protection,
-            'total' => $this->subtotal + $shipping + $protection,
+            'packable' => $packable,
+            'insuredCount' => $insuredCount,
+            'insurance' => $insurance,
+            'total' => $this->subtotal + $shipping + $protection + $insurance,
         ]);
     }
 }

@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Variant;
 use App\Notifications\OrderRefunded;
 use App\Support\OrderRecipient;
+use App\Support\PurchasableTypes;
 use App\Support\VariantAlerts;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -32,17 +33,11 @@ class RefundOrder
             throw new InvalidArgumentException('A reason is required to refund an order.');
         }
 
-        $variantIds = $order->items()
-            ->whereNotNull('purchasable_id')
-            ->where('purchasable_type', (new Variant)->getMorphClass())
-            ->orderBy('purchasable_id')
-            ->pluck('purchasable_id')
-            ->map(fn ($id): int => (int) $id)
-            ->unique()
-            ->values();
+        $refs = PurchasableTypes::referencedBy($order->items()->get());
+        $variantIds = $refs[(new Variant)->getMorphClass()] ?? collect();
 
-        $result = DB::transaction(function () use ($order, $reason, $variantIds): RefundResult {
-            $variants = Variant::query()->whereIn('id', $variantIds)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+        $result = DB::transaction(function () use ($order, $reason, $refs): RefundResult {
+            $purchasables = PurchasableTypes::lockMany($refs);
 
             $locked = Order::query()->lockForUpdate()->findOrFail($order->getKey());
 
@@ -51,15 +46,6 @@ class RefundOrder
             }
 
             $refundedSatang = $locked->receivedSatang();
-
-            foreach ($locked->items()->get() as $item) {
-                $variant = $variants->get($item->purchasable_id);
-
-                if ($variant !== null && $item->purchasable_type === $variant->getMorphClass()) {
-                    $variant->qty += $item->qty;
-                    $variant->save();
-                }
-            }
 
             $locked->payments()
                 ->where('status', PaymentStatus::Confirmed->value)
@@ -71,6 +57,14 @@ class RefundOrder
                 'refund_reason' => $reason,
                 'refunded_satang' => $locked->refunded_satang + $refundedSatang,
             ]);
+
+            // After the status moved: a one-of-a-kind item checks that no other live order holds its sale.
+            foreach ($locked->items()->get() as $item) {
+                $purchasable = $purchasables[$item->purchasable_type][$item->purchasable_id] ?? null;
+
+                // A row that was deleted, or a line of an unknown type, has nothing to return.
+                $purchasable?->onReturned($item->qty);
+            }
 
             return new RefundResult($locked, $refundedSatang);
         });

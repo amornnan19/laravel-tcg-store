@@ -45,18 +45,12 @@ class OrderSeeder extends Seeder
 
         foreach ($orders as $index => [$state, $courier, $protected, $slipWaiting]) {
             $variant = $variants[$index];
-            $printing = $variant->printing;
             $qty = $index % 3 === 0 ? 2 : 1;
 
             $factory = Order::factory()->{$state}()->has(OrderItem::factory()->state([
                 'purchasable_type' => $variant->getMorphClass(),
                 'purchasable_id' => $variant->getKey(),
-                'card_name' => $printing->display_name,
-                'set_code' => $printing->set->code,
-                'number' => $printing->number,
-                'language' => $printing->language->value,
-                'condition' => $variant->condition->value,
-                'finish' => $variant->finish->value,
+                ...$variant->snapshot(),
                 'unit_price_satang' => $variant->price_satang,
                 'qty' => $qty,
                 'line_total_satang' => $variant->price_satang * $qty,

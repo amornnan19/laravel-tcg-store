@@ -2,12 +2,15 @@
 
 namespace App\Support;
 
+use App\Contracts\Purchasable;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\GradedItem;
 use App\Models\StockReservation;
 use App\Models\Variant;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Collection;
 
@@ -20,29 +23,30 @@ class CartLines
     /** @var Collection<int, CartItem>|null */
     private ?Collection $lines = null;
 
-    /** @var Collection<int, int>|null */
+    /** @var Collection<string, int>|null */
     private ?Collection $purchasableIds = null;
 
     public function __construct(private readonly ?Cart $cart) {}
 
     /**
-     * Whether a line can become part of an order now: its variant exists and passes the purchasability rule, its hold is
-     * live and covers the whole line, and the variant has the stock the line asks for. `qty` is on-hand stock, so staff
-     * lowering it below a hold makes the line short even though the hold is live.
+     * Whether a line can become part of an order now: its purchasable exists and passes the purchasability rule, its
+     * hold is live and covers the whole line, and it has the stock the line asks for. A variant's `qty` is on-hand
+     * stock, so staff lowering it below a hold makes the line short even though the hold is live.
      */
-    public static function canOrder(CartItem $line, ?Variant $variant, ?StockReservation $reservation, bool $purchasable): bool
+    public static function canOrder(CartItem $line, (Model&Purchasable)|null $purchasable, ?StockReservation $reservation, bool $isPurchasable): bool
     {
-        return $variant !== null
-            && $purchasable
-            && $line->purchasable_type === $variant->getMorphClass()
+        return $purchasable !== null
+            && $isPurchasable
+            && $line->purchasable_type === $purchasable->getMorphClass()
             && $reservation !== null
             && $reservation->isLive()
             && $reservation->qty === $line->qty
-            && $variant->qty >= $line->qty;
+            && $purchasable->onHandQty() >= $line->qty
+            && $line->qty <= $purchasable->maxPerLine();
     }
 
     /**
-     * Every line of the cart, oldest first, each with its printing and the variant's availability loaded, and its
+     * Every line of the cart, oldest first, each with its printing and the purchasable's availability loaded, and its
      * hold (or null) set as the `reservation` relation from one read of the cart's reservations.
      *
      * @return Collection<int, CartItem>
@@ -62,7 +66,10 @@ class CartLines
         return $this->lines = $this->cart->items()
             ->with(['purchasable' => fn (MorphTo $morph) => $morph
                 ->constrain([Variant::class => fn (Builder $variants) => $variants->withReservedQty()])
-                ->morphWith([Variant::class => ['printing.card', 'printing.cardWithTrashed', 'printing.set']]),
+                ->morphWith([
+                    Variant::class => ['printing.card', 'printing.cardWithTrashed', 'printing.set'],
+                    GradedItem::class => ['printing.card', 'printing.cardWithTrashed', 'printing.set'],
+                ]),
             ])
             ->orderBy('id')
             ->get()
@@ -70,9 +77,9 @@ class CartLines
     }
 
     /**
-     * The ids of the cart's variants that still pass the purchasability rule, as keys, from one query.
+     * The cart's purchasables that still pass the purchasability rule, as `type:id` keys, one query per type.
      *
-     * @return Collection<int, int>
+     * @return Collection<string, int>
      */
     public function purchasableIds(): Collection
     {
@@ -80,21 +87,30 @@ class CartLines
             return $this->purchasableIds;
         }
 
-        $ids = $this->lines()
-            ->filter(fn (CartItem $line): bool => $line->purchasable instanceof Variant)
-            ->pluck('purchasable_id');
+        $passing = new Collection;
 
-        return $this->purchasableIds = $ids->isEmpty()
-            ? new Collection
-            : Variant::query()->purchasable()->whereIn('id', $ids)->pluck('id')->flip();
+        foreach ($this->lines()->filter(fn (CartItem $line): bool => $line->purchasable instanceof Purchasable)->groupBy('purchasable_type') as $type => $lines) {
+            $class = PurchasableTypes::classFor($type);
+
+            if ($class === null) {
+                continue;
+            }
+
+            foreach ($class::purchasableIdsAmong($lines->pluck('purchasable_id')->map(fn ($id): int => (int) $id)) as $id => $_) {
+                $passing->put($type.':'.$id, $id);
+            }
+        }
+
+        return $this->purchasableIds = $passing;
     }
 
     /**
-     * A line that fails the purchasability rule: no price, card or printing trashed, game inactive, variant deleted.
+     * A line that fails the purchasability rule: no price, card or printing trashed, game inactive, row deleted, a
+     * graded item withdrawn or sold.
      */
     public function isGone(CartItem $line): bool
     {
-        return ! $line->purchasable instanceof Variant || ! $this->purchasableIds()->has($line->purchasable_id);
+        return ! $line->purchasable instanceof Purchasable || ! $this->purchasableIds()->has($line->purchasable_type.':'.$line->purchasable_id);
     }
 
     /**
@@ -106,18 +122,18 @@ class CartLines
     }
 
     /**
-     * A held line whose variant has less stock than the line asks for.
+     * A held line whose purchasable has less stock than the line asks for.
      */
     public function isStockShort(CartItem $line): bool
     {
-        return $this->isHeld($line) && $line->purchasable->qty < $line->qty;
+        return $this->isHeld($line) && $line->purchasable->onHandQty() < $line->qty;
     }
 
     public function isOrderable(CartItem $line): bool
     {
         return self::canOrder(
             $line,
-            $line->purchasable instanceof Variant ? $line->purchasable : null,
+            $line->purchasable instanceof Purchasable ? $line->purchasable : null,
             $line->reservation,
             ! $this->isGone($line),
         );
@@ -141,6 +157,23 @@ class CartLines
         $lines = $this->lines();
 
         return $lines->isNotEmpty() && $lines->every(fn (CartItem $line): bool => $this->isOrderable($line));
+    }
+
+    /**
+     * How many held items travel insured (a graded card each), which checkout charges per item.
+     */
+    public function insuredCount(): int
+    {
+        return $this->heldLines()->sum(fn (CartItem $line): int => $line->purchasable->isInsured() ? $line->qty : 0);
+    }
+
+    /**
+     * Whether any held line is not already in a hard case, so the optional protective packing means something. A cart
+     * of graded cards only has nothing to pack.
+     */
+    public function hasPackableLines(): bool
+    {
+        return $this->heldLines()->contains(fn (CartItem $line): bool => ! $line->purchasable->isInsured());
     }
 
     /**

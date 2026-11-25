@@ -88,9 +88,24 @@
                 </p>
 
                 <x-trust-row :has-real-photo="$hasRealPhoto" class="mt-4" />
+
+                @if ($gradedItems->isNotEmpty())
+                    <a href="#graded-heading" class="mt-3 inline-flex min-h-11 items-center text-small text-accent hover:text-ink">{{ __('storefront.graded.card_link', ['n' => $gradedItems->count(), 'price' => \App\Support\Money::fromSatang($gradedItems->min('price_satang'))->format()]) }}</a>
+                @endif
             </div>
 
             <livewire:storefront.variant-table :card-id="$card->id" :printing-id="$printing->id" />
+
+            @if ($gradedItems->isNotEmpty())
+                <section aria-labelledby="graded-heading" class="min-w-0 lg:col-span-2">
+                    <h2 id="graded-heading" class="mb-3 font-display text-card font-medium lg:text-h3">{{ __('storefront.graded.section') }}</h2>
+                    <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                        @foreach ($gradedItems as $graded)
+                            <li><x-graded-tile :item="$graded" class="h-full" /></li>
+                        @endforeach
+                    </ul>
+                </section>
+            @endif
 
             @if ($otherPrintings->isNotEmpty())
                 <section aria-labelledby="other-cards-heading" class="min-w-0 lg:col-span-2">

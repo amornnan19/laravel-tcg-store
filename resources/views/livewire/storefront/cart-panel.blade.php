@@ -6,6 +6,8 @@
     $primaryButton = 'inline-flex min-h-11 items-center rounded-control bg-accent px-4 text-small font-medium text-accent-ink transition-transform duration-160 ease-ui active:scale-98 motion-reduce:transition-none';
     $secondaryButton = 'inline-flex min-h-11 items-center justify-center rounded-control border border-line-strong bg-surface px-4 text-small text-ink transition-[border-color] duration-160 ease-ui hover:border-accent motion-reduce:transition-none';
     $cartIcon = new \Illuminate\Support\HtmlString('<svg width="34" height="34" viewBox="0 0 20 20" fill="none"><path d="M3.5 5h13l-1.2 8.4H4.7L3.5 5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="7.4" cy="16.4" r="1.2" fill="currentColor"/><circle cx="12.8" cy="16.4" r="1.2" fill="currentColor"/></svg>');
+    $insuredCount = $this->cartLines->insuredCount();
+    $insuranceSatang = $insuredCount * (int) config('shipping.graded_insurance_satang');
     $anyExpired = $held->isEmpty() && $lines->contains(fn (\App\Models\CartItem $line): bool => ! $this->isGone($line));
     $format = fn (int $satang): string => \App\Support\Money::fromSatang($satang)->format();
 @endphp
@@ -40,38 +42,49 @@
         <ul class="flex flex-col gap-3">
             @foreach ($lines as $line)
                 @php
-                    $variant = $line->purchasable instanceof \App\Models\Variant ? $line->purchasable : null;
-                    $printing = $variant?->printing;
+                    $purchasable = $line->purchasable instanceof \App\Contracts\Purchasable ? $line->purchasable : null;
+                    $variant = $purchasable instanceof \App\Models\Variant ? $purchasable : null;
+                    $presentation = $purchasable?->cartPresentation();
                     $result = $results[$line->id] ?? null;
                     $outcome = $result['outcome'] ?? null;
                     $gone = $this->isGone($line);
                     $live = ! $gone && (bool) $line->reservation?->isLive();
                     $taken = ! $gone && ! $live && $outcome === 'taken';
                     $substitute = $taken && isset($result['substitute']) ? $this->substitutes->get($result['substitute']) : null;
-                    $cap = $variant === null ? 0 : $line->qty + $variant->availableQty();
+                    $cap = $purchasable === null ? 0 : min($line->qty + $purchasable->holdableQty(), $purchasable->maxPerLine());
                     $atMin = $line->qty <= 1;
                     $atMax = $line->qty >= $cap;
-                    $name = $gone ? $printing?->cardWithTrashed?->name_en : $printing->display_name;
-                    $variantLabel = $variant?->conditionFinishLabel();
+                    $oneOfAKind = $purchasable !== null && $purchasable->maxPerLine() === 1;
+                    $name = $presentation?->title;
+                    $variantLabel = $variant?->conditionFinishLabel() ?? ($presentation === null ? null : ($presentation->gradeBadge ?? implode(' · ', $presentation->badges)));
                 @endphp
                 <li wire:key="line-{{ $line->id }}" @class(['flex items-start gap-3 rounded-card border border-line bg-sunken p-3', 'opacity-60' => $gone])>
-                    <x-card-art :printing="$printing" size="w-12" />
+                    <x-line-art :presentation="$presentation" size="w-12" />
                     <div class="min-w-0 flex-1">
                         <div class="flex items-start justify-between gap-3">
-                            @if ($gone)
+                            @if ($gone || $presentation?->url === null)
                                 <p class="min-w-0 truncate text-card font-medium text-muted">{{ $name }}</p>
                             @else
-                                <a href="{{ route('card.show', ['card' => $printing->card, 'p' => $printing->id]) }}" class="min-w-0 truncate text-card font-medium hover:text-accent">{{ $name }}</a>
+                                <a href="{{ $presentation->url }}" class="min-w-0 truncate text-card font-medium hover:text-accent">{{ $name }}</a>
                                 <x-price :satang="$line->unit_price_satang * $line->qty" class="flex-none text-card font-medium {{ $live ? '' : 'text-faint' }}" />
                             @endif
                         </div>
 
                         @unless ($gone)
                             <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-label text-faint">
-                                <span class="tabular-nums">{{ $printing->display_code }}</span>
-                                <x-language-badge :language="$printing->language" />
-                                <x-condition-badge :condition="$variant->condition" />
-                                <span>{{ $variant->finish->label() }}</span>
+                                <span class="tabular-nums">{{ $presentation->code }}</span>
+                                @if ($presentation->language !== null)
+                                    <x-language-badge :language="$presentation->language" />
+                                @endif
+                                @if ($presentation->condition !== null)
+                                    <x-condition-badge :condition="$presentation->condition" />
+                                @endif
+                                @if ($presentation->gradeBadge !== null)
+                                    <x-grade-badge :label="$presentation->gradeBadge" />
+                                @endif
+                                @foreach ($presentation->badges as $badge)
+                                    <span>{{ $badge }}</span>
+                                @endforeach
                                 @if ($line->qty > 1)
                                     <span class="tabular-nums"><x-price :satang="$line->unit_price_satang" /> &times; {{ $line->qty }}</span>
                                 @endif
@@ -132,7 +145,9 @@
                             </div>
                         @else
                             <div class="mt-2 flex items-center gap-3">
-                                @if ($live)
+                                @if ($live && $oneOfAKind)
+                                    <span class="text-small text-muted">{{ __('storefront.cart.one_of_a_kind') }}</span>
+                                @elseif ($live)
                                     {{-- No overflow-hidden here: it would clip the focus ring. A button at its limit is aria-disabled, not disabled, so focus stays on it. --}}
                                     <span class="inline-flex flex-none items-center rounded-control border border-line-strong bg-surface">
                                         <button type="button" wire:click="decrement({{ $line->id }})" @if ($atMin) aria-disabled="true" @endif aria-label="{{ __('storefront.card.decrease') }}" @class([$stepperButton, 'rounded-l-control', 'text-faint' => $atMin, 'text-ink hover:bg-raised' => ! $atMin])>&minus;</button>
@@ -158,12 +173,18 @@
                     <span>{{ __('storefront.cart.items_total', ['n' => $held->count()]) }}</span>
                     <x-price :satang="$this->subtotal" class="text-ink" />
                 </p>
+                @if ($insuredCount > 0)
+                    <p class="mt-1 flex items-baseline justify-between gap-4 text-small text-muted">
+                        <span>{{ __('storefront.checkout.insurance', ['n' => $insuredCount]) }}</span>
+                        <x-price :satang="$insuranceSatang" class="text-ink" />
+                    </p>
+                @endif
                 @if ($lines->count() > $held->count())
                     <p class="mt-1 text-label text-muted">{{ __('storefront.cart.excluded', ['n' => $lines->count() - $held->count()]) }}</p>
                 @endif
                 <p class="mt-3 flex items-baseline justify-between gap-4 border-t border-line pt-3">
-                    <span class="text-card font-medium">{{ __('storefront.cart.total') }}</span>
-                    <x-price :satang="$this->subtotal" class="text-h3 font-medium text-accent" />
+                    <span class="text-card font-medium">{{ __('storefront.cart.total_before_shipping') }}</span>
+                    <x-price :satang="$this->subtotal + $insuranceSatang" class="text-h3 font-medium text-accent" />
                 </p>
                 @if ($this->canCheckout())
                     <a href="{{ route('checkout') }}" class="{{ $primaryButton }} mt-4 w-full justify-center">{{ __('storefront.cart.checkout') }}</a>

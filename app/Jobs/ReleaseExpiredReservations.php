@@ -4,14 +4,17 @@ namespace App\Jobs;
 
 use App\Models\StockReservation;
 use App\Models\Variant;
+use App\Support\PurchasableTypes;
 use App\Support\VariantAlerts;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 /**
  * Deletes the stock holds whose time ran out. Housekeeping only: availability filters on `expires_at`, so it is
  * correct whether or not this has run. It also tells the alerts that the variants those holds covered may be
- * available again, since nothing else notices a hold expiring.
+ * available again, since nothing else notices a hold expiring, and sends a one-of-a-kind item back to `listed`.
  */
 class ReleaseExpiredReservations implements ShouldQueue
 {
@@ -36,5 +39,25 @@ class ReleaseExpiredReservations implements ShouldQueue
         VariantAlerts::dispatchFor(
             $expired->where('purchasable_type', (new Variant)->getMorphClass())->pluck('purchasable_id')
         );
+
+        // Each release locks its row and re-checks for a live hold, so a cart that took the item again since the
+        // delete keeps it reserved.
+        $expired
+            ->reject(fn (StockReservation $reservation): bool => $reservation->purchasable_type === (new Variant)->getMorphClass())
+            ->unique(fn (StockReservation $reservation): string => $reservation->purchasable_type.':'.$reservation->purchasable_id)
+            ->each(function (StockReservation $reservation): void {
+                $class = PurchasableTypes::classFor($reservation->purchasable_type);
+
+                if ($class === null) {
+                    return;
+                }
+
+                // Each item on its own: one failing row is reported and the rest are still released.
+                try {
+                    DB::transaction(fn () => $class::lockForHold((int) $reservation->purchasable_id)?->onReleased());
+                } catch (Throwable $exception) {
+                    report($exception);
+                }
+            });
     }
 }

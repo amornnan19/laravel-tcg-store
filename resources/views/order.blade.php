@@ -57,14 +57,39 @@
             <ul class="flex flex-col gap-2">
                 @foreach ($order->items as $item)
                     <li class="flex items-start gap-3 rounded-card border border-line bg-sunken p-3">
-                        <x-card-art size="w-10" :foil="$item->finish === 'foil'" />
+                        @php
+                            $photo = $item->kind === 'graded' && $item->purchasable instanceof \App\Models\GradedItem ? $item->purchasable->photoUrl('front_path') : null;
+                        @endphp
+                        @if ($photo !== null)
+                            <img src="{{ $photo }}" alt="" loading="lazy" class="aspect-[3/4] w-10 flex-none rounded-tag border border-line bg-surface object-cover">
+                        @else
+                            <x-card-art size="w-10" :foil="$item->finish === 'foil'" />
+                        @endif
                         <div class="min-w-0 flex-1">
                             <p class="truncate text-small font-medium">{{ $item->card_name }}</p>
                             <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-label text-faint">
-                                <span class="tabular-nums">{{ strtoupper(str_replace('-', '', $item->set_code)) }}-{{ $item->number }}</span>
-                                <x-language-badge :language="$item->language" />
-                                <x-condition-badge :condition="$item->condition" />
-                                <span>{{ \App\Enums\Finish::from($item->finish)->label() }}</span>
+                                @if ($item->kind === 'single')
+                                    <span class="tabular-nums">{{ strtoupper(str_replace('-', '', $item->set_code)) }}-{{ $item->number }}</span>
+                                    @if ($item->language !== null)
+                                        <x-language-badge :language="$item->language" />
+                                    @endif
+                                    @if ($item->condition !== null)
+                                        <x-condition-badge :condition="$item->condition" />
+                                    @endif
+                                    @if ($item->finish !== null)
+                                        <span>{{ \App\Enums\Finish::from($item->finish)->label() }}</span>
+                                    @endif
+                                @else
+                                    @if ($item->number !== null)
+                                        <span class="tabular-nums">{{ strtoupper(str_replace('-', '', $item->set_code)) }}-{{ $item->number }}</span>
+                                    @endif
+                                    @if ($item->language !== null)
+                                        <x-language-badge :language="$item->language" />
+                                    @endif
+                                    @if (filled($item->detail))
+                                        <span>{{ $item->detail }}</span>
+                                    @endif
+                                @endif
                             </p>
                         </div>
                         <div class="flex-none text-right">
@@ -109,6 +134,9 @@
                 <p class="flex items-baseline justify-between gap-4"><span>{{ __('storefront.checkout.shipping', ['courier' => $order->courier->label()]) }}</span><x-price :satang="$order->shipping_satang" class="text-ink" /></p>
                 @if ($order->protection_satang > 0)
                     <p class="flex items-baseline justify-between gap-4"><span>{{ __('storefront.checkout.protection') }}</span><x-price :satang="$order->protection_satang" class="text-ink" /></p>
+                @endif
+                @if ($order->insurance_satang > 0)
+                    <p class="flex items-baseline justify-between gap-4"><span>{{ __('storefront.checkout.insurance', ['n' => $order->items->where('kind', 'graded')->sum('qty')]) }}<span class="block text-label text-faint">{{ __('storefront.checkout.insurance_note') }}</span></span><x-price :satang="$order->insurance_satang" class="text-ink" /></p>
                 @endif
                 <p class="mt-2 flex items-baseline justify-between gap-4 border-t border-line pt-3">
                     <span class="text-body font-medium text-ink">{{ __('storefront.checkout.total') }}</span>

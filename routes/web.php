@@ -13,6 +13,7 @@ use App\Http\Controllers\Storefront\CardController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\DeckController;
+use App\Http\Controllers\Storefront\GradedItemController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\OrderController;
 use App\Http\Controllers\Storefront\PaymentQrController;
@@ -29,6 +30,8 @@ Route::get('/g/{game:slug}', [ResultsController::class, 'game'])->name('game.sho
 Route::get('/c/{card:slug}', CardController::class)->name('card.show');
 
 Route::get('/s/{set:code}', SetController::class)->name('set.show');
+
+Route::get('/graded/{gradedItem}', GradedItemController::class)->name('graded.show');
 
 Route::get('/cart', CartController::class)->name('cart');
 

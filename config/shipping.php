@@ -48,4 +48,16 @@ return [
 
     'protection_threshold_satang' => (int) env('SHIPPING_PROTECTION_THRESHOLD_SATANG', 50000),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Graded cards
+    |--------------------------------------------------------------------------
+    |
+    | A graded card always ships in a hard case with insured parcel cover. This is the price of that, per graded item
+    | in an order, added to the total and shown as its own line.
+    |
+    */
+
+    'graded_insurance_satang' => (int) env('SHIPPING_GRADED_INSURANCE_SATANG', 20000),
+
 ];

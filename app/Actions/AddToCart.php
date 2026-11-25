@@ -2,39 +2,40 @@
 
 namespace App\Actions;
 
+use App\Contracts\Purchasable;
 use App\Exceptions\InsufficientStock;
 use App\Exceptions\NotPurchasable;
 use App\Models\Cart;
 use App\Models\CartItem;
-use App\Models\Variant;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 /**
- * Puts copies of a variant in a cart and locks their stock for the configured lock time.
+ * Puts copies of a purchasable in a cart and locks their stock for the configured lock time.
  */
 class AddToCart
 {
     public function __construct(private ReserveStock $reserveStock) {}
 
     /**
-     * One line per variant: adding again sums the quantity. The line's price is the variant's price when the
+     * One line per purchasable: adding again sums the quantity. The line's price is its price when the
      * line is created, and again when the line's hold had expired before this add; while a hold is live it never
      * changes, so a price edit cannot silently alter a held cart.
      *
-     * @throws NotPurchasable when the variant has no price, no longer exists or its card is hidden.
-     * @throws InsufficientStock when fewer than `$qty` can be reserved.
+     * @throws NotPurchasable when it has no price, no longer exists, is not for sale or its card is hidden.
+     * @throws InsufficientStock when fewer than `$qty` can be reserved, or `$qty` is more than one line may hold.
      */
-    public function handle(Cart $cart, Variant $variant, int $qty): CartItem
+    public function handle(Cart $cart, Model&Purchasable $purchasable, int $qty): CartItem
     {
         if ($qty < 1) {
             throw new InvalidArgumentException('Add at least one.');
         }
 
-        return DB::transaction(function () use ($cart, $variant, $qty): CartItem {
+        return DB::transaction(function () use ($cart, $purchasable, $qty): CartItem {
             // The locking read comes first: on MySQL's REPEATABLE READ any earlier plain read fixes the snapshot
             // before the lock is taken, and the reservation sum would miss holds committed while waiting.
-            $current = Variant::query()->lockForUpdate()->find($variant->getKey());
+            $current = $purchasable::lockForHold($purchasable->getKey());
 
             if ($current === null || ! $current->isPurchasable()) {
                 throw new NotPurchasable;
@@ -57,13 +58,13 @@ class AddToCart
                     'purchasable_type' => $current->getMorphClass(),
                     'purchasable_id' => $current->getKey(),
                     'qty' => $qty,
-                    'unit_price_satang' => $current->price_satang,
+                    'unit_price_satang' => $current->unitPriceSatang(),
                 ]);
             }
 
             // A line whose hold had expired starts over, so its quantity matches the new reservation.
             $item->update($startedOver
-                ? ['qty' => $qty, 'unit_price_satang' => $current->price_satang]
+                ? ['qty' => $qty, 'unit_price_satang' => $current->unitPriceSatang()]
                 : ['qty' => $reservation->qty]);
 
             return $item;

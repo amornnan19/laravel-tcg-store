@@ -123,6 +123,8 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **A guard that checks "what the customer saw is what we add" compares the full variant→quantity map (or a hash of it), never only a total; and pricing that sums several lines onto one variant allocates that variant's available stock across the lines, or the summed add can fail forever. Seeded users with a known password are created only when `app()->isLocal()`.**
 - **A control that is soft-disabled with `aria-disabled` must look disabled and must answer a click: either hide it in the state where it does nothing, or show the reason next to it. An action that returns early without a notice is a dead button.**
 - **A session value a guest leaves for "after login" is read with `pull()`, never `get()`, and only from the key `CustomerLogin` writes. Any other login (the Filament panel shares the web guard) leaves a guest's `put` value in place, and a `get()` replays it on every request.**
+- **A one-of-a-kind item's system states (`reserved`, `sold`) are written only by the hold and order actions; admin forms offer only `listed`/`withdrawn`, and every status the purchasable scope accepts must satisfy the listing rule. A state change made inside a release or return path falls back (to `withdrawn`) and logs; it never throws, or one bad row strands every hold after it.**
+- **Locking an admin status select on a system state does not protect the saving-hook rule: every field that rule reads must also be validated (or disabled) for each status the purchasable scope accepts, so a save surfaces as a form error, never a model exception.**
 
 ## Language
 

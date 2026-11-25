@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Storefront;
 
+use App\Enums\GradedStatus;
 use App\Enums\Language;
 use App\Http\Controllers\Controller;
 use App\Models\Card;
+use App\Models\GradedItem;
 use App\Models\Printing;
 use App\Models\Variant;
 use Illuminate\Contracts\View\View;
@@ -49,8 +51,27 @@ class CardController extends Controller
             'availableQty' => $available->sum(fn (Variant $variant): int => $variant->availableQty()),
             'lowSatang' => $availablePrices->min() ?? $anyPrices->min(),
             'highSatang' => $availablePrices->max() ?? $anyPrices->max(),
+            'gradedItems' => $this->gradedItems($printings),
             'otherPrintings' => $this->otherCards($printing),
         ]);
+    }
+
+    /**
+     * The graded copies of this card for sale, across its visible printings, cheapest first. Only `listed` ones: a
+     * reserved or sold slab is not offered here.
+     *
+     * @param  Collection<int, Printing>  $printings
+     * @return Collection<int, GradedItem>
+     */
+    private function gradedItems(Collection $printings): Collection
+    {
+        return GradedItem::query()
+            ->with('printing.set')
+            ->where('status', GradedStatus::Listed->value)
+            ->whereIn('printing_id', $printings->modelKeys())
+            ->orderBy('price_satang')
+            ->orderBy('id')
+            ->get();
     }
 
     /**

@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Contracts\Purchasable;
 use App\Enums\CardCondition;
 use App\Enums\Finish;
 use App\Observers\VariantSearchObserver;
+use App\Support\LinePresentation;
 use App\Support\VariantAlerts;
 use Database\Factories\VariantFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -15,11 +17,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Collection;
 use LogicException;
 
 #[ObservedBy(VariantSearchObserver::class)]
 #[Unguarded]
-class Variant extends Model
+class Variant extends Model implements Purchasable
 {
     /** @use HasFactory<VariantFactory> */
     use HasFactory;
@@ -96,6 +99,97 @@ class Variant extends Model
             'qty' => 'integer',
             'has_real_photo' => 'boolean',
         ];
+    }
+
+    public static function lockForHold(int $id): ?static
+    {
+        // A no-op on SQLite, which serialises writers; a row lock on MySQL and Postgres.
+        return static::query()->lockForUpdate()->find($id);
+    }
+
+    public static function purchasableIdsAmong(Collection $ids): Collection
+    {
+        return static::query()->purchasable()->whereIn('id', $ids)->pluck('id')->flip();
+    }
+
+    public function holdableQty(): int
+    {
+        return $this->availableQty();
+    }
+
+    public function onHandQty(): int
+    {
+        return $this->qty;
+    }
+
+    public function unitPriceSatang(): int
+    {
+        return (int) $this->price_satang;
+    }
+
+    public function maxPerLine(): int
+    {
+        return PHP_INT_MAX;
+    }
+
+    public function onHeld(): void
+    {
+        // A variant is counted from its reservations; nothing changes on the row.
+    }
+
+    public function onReleased(): void
+    {
+        // Same: the reservation going away is the release.
+    }
+
+    public function onSold(int $qty): void
+    {
+        $this->qty -= $qty;
+        $this->save();
+    }
+
+    public function onReturned(int $qty): void
+    {
+        $this->qty += $qty;
+        $this->save();
+    }
+
+    public function snapshot(): array
+    {
+        $this->loadMissing(['printing.card', 'printing.set']);
+        $printing = $this->printing;
+
+        return [
+            'card_name' => $printing->display_name,
+            'set_code' => $printing->set->code,
+            'number' => $printing->number,
+            'language' => $printing->language->value,
+            'condition' => $this->condition->value,
+            'finish' => $this->finish->value,
+            'kind' => 'single',
+            'detail' => null,
+        ];
+    }
+
+    public function cartPresentation(): LinePresentation
+    {
+        $printing = $this->printing;
+        $title = $printing?->card !== null ? $printing->display_name : ($printing?->cardWithTrashed?->name_en ?? '');
+
+        return new LinePresentation(
+            title: $title,
+            url: $printing?->card !== null ? route('card.show', ['card' => $printing->card, 'p' => $printing->id]) : null,
+            code: $printing?->display_code,
+            language: $printing?->language,
+            condition: $this->condition,
+            badges: [$this->finish->label()],
+            printing: $printing,
+        );
+    }
+
+    public function isInsured(): bool
+    {
+        return false;
     }
 
     /**

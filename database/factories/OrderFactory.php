@@ -72,7 +72,7 @@ class OrderFactory extends Factory
             $order->forceFill([
                 'number' => Order::numberFor($order->id),
                 'subtotal_satang' => $subtotal,
-                'total_satang' => $subtotal + $order->shipping_satang + $order->protection_satang,
+                'total_satang' => $subtotal + $order->shipping_satang + $order->protection_satang + $order->insurance_satang,
             ])->save();
 
             if (! $order->payments()->exists()) {

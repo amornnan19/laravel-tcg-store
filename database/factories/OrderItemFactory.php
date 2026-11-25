@@ -38,4 +38,34 @@ class OrderItemFactory extends Factory
             'line_total_satang' => $unit * $qty,
         ];
     }
+
+    /**
+     * A graded card line: no condition or finish, and the grade and masked certificate in `detail`.
+     */
+    public function graded(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'kind' => 'graded',
+            'condition' => null,
+            'finish' => null,
+            'qty' => 1,
+            'line_total_satang' => $attributes['unit_price_satang'],
+            'detail' => 'PSA 10 · cert •••• 4821',
+        ]);
+    }
+
+    /**
+     * A sealed product line: a name and a detail only.
+     */
+    public function sealed(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'kind' => 'sealed',
+            'number' => null,
+            'language' => null,
+            'condition' => null,
+            'finish' => null,
+            'detail' => 'Booster Box',
+        ]);
+    }
 }

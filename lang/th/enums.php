@@ -22,6 +22,12 @@ return [
         'partial' => 'มีไม่พอ',
         'missing' => 'ไม่มี',
     ],
+    'graded_status' => [
+        'listed' => 'วางขาย',
+        'reserved' => 'ถูกจอง',
+        'sold' => 'ขายแล้ว',
+        'withdrawn' => 'ถอนออกจากร้าน',
+    ],
     'order_status' => [
         'awaiting_payment' => 'รอชำระเงิน',
         'paid' => 'ชำระเงินแล้ว',

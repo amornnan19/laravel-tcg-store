@@ -6,6 +6,7 @@ use App\Exceptions\InsufficientStock;
 use App\Exceptions\NotPurchasable;
 use App\Models\CartItem;
 use App\Models\Variant;
+use App\Support\PurchasableTypes;
 use App\Support\VariantAlerts;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -22,7 +23,7 @@ class ChangeCartQuantity
      * Raising reserves the difference and restarts the lock time; lowering shrinks the line and its hold and keeps
      * the lock time. Removing a line is RemoveCartItem; an expired line goes through RenewCartItem.
      *
-     * @throws InsufficientStock when the difference is more than can be reserved.
+     * @throws InsufficientStock when the difference is more than can be reserved, or the line would pass what one line may hold.
      * @throws NotPurchasable when raising a line whose item can no longer be bought.
      * @throws LogicException when the line's hold has expired.
      */
@@ -33,8 +34,9 @@ class ChangeCartQuantity
         }
 
         return DB::transaction(function () use ($item, $qty): CartItem {
-            // Lock the variant before any other read (see AddToCart), then re-read the line it was loaded with.
-            $variant = Variant::query()->lockForUpdate()->findOrFail($item->purchasable_id);
+            // Lock the purchasable before any other read (see AddToCart), found by the line's own type and never by id
+            // alone, then re-read the line it was loaded with.
+            $purchasable = PurchasableTypes::lock($item->purchasable_type, (int) $item->purchasable_id);
             $item->refresh();
 
             $reservation = $item->reservation()->first();
@@ -44,16 +46,18 @@ class ChangeCartQuantity
             }
 
             if ($qty > $item->qty) {
-                if (! $variant->isPurchasable()) {
+                if (! $purchasable->isPurchasable()) {
                     throw new NotPurchasable;
                 }
 
-                $this->reserveStock->handle($item->cart, $variant, $qty - $item->qty);
+                $this->reserveStock->handle($item->cart, $purchasable, $qty - $item->qty);
             } elseif ($qty < $item->qty) {
                 $reservation->update(['qty' => $qty]);
 
                 // The difference is available to others again.
-                VariantAlerts::dispatchFor([$variant->id]);
+                if ($purchasable instanceof Variant) {
+                    VariantAlerts::dispatchFor([$purchasable->id]);
+                }
             }
 
             $item->update(['qty' => $qty]);

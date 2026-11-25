@@ -188,9 +188,9 @@ class CartPanel extends Component
     }
 
     /**
-     * The ids of the cart's variants that still pass the purchasability rule, as keys.
+     * The cart's purchasables that still pass the purchasability rule, as `type:id` keys.
      *
-     * @return Collection<int, int>
+     * @return Collection<string, int>
      */
     #[Computed]
     public function purchasableIds(): Collection
@@ -236,7 +236,7 @@ class CartPanel extends Component
     }
 
     /**
-     * A held line whose variant has less stock than the line asks for.
+     * A held line whose item has less stock than the line asks for.
      */
     public function isStockShort(CartItem $line): bool
     {
