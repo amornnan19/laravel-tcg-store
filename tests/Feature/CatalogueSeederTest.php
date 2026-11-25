@@ -6,13 +6,13 @@ use App\Models\Game;
 use App\Models\Printing;
 use App\Models\Variant;
 use Database\Seeders\CatalogueSeeder;
-use Database\Seeders\DatabaseSeeder;
+use Database\Seeders\GameSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
 test('the database seeder creates five games, five sets and a priced catalogue', function () {
-    $this->seed(DatabaseSeeder::class);
+    $this->seed([GameSeeder::class, CatalogueSeeder::class]);
 
     expect(Game::count())->toBe(5)
         ->and(CardSet::count())->toBe(5)
@@ -23,7 +23,7 @@ test('the database seeder creates five games, five sets and a priced catalogue',
 });
 
 test('each game declares the facets it filters on', function () {
-    $this->seed(DatabaseSeeder::class);
+    $this->seed([GameSeeder::class, CatalogueSeeder::class]);
 
     expect(Game::where('slug', 'pokemon')->first()->filters)->toBe(['rarity', 'card_type', 'language'])
         ->and(Game::where('slug', 'one-piece')->first()->filters)->toBe(['rarity', 'card_type', 'color', 'language'])
@@ -31,10 +31,10 @@ test('each game declares the facets it filters on', function () {
 });
 
 test('seeding twice does not duplicate anything', function () {
-    $this->seed(DatabaseSeeder::class);
+    $this->seed([GameSeeder::class, CatalogueSeeder::class]);
     $variants = Variant::count();
 
-    $this->seed(DatabaseSeeder::class);
+    $this->seed([GameSeeder::class, CatalogueSeeder::class]);
 
     expect(Variant::count())->toBe($variants)
         ->and(Game::count())->toBe(5);

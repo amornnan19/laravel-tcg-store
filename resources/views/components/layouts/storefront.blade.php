@@ -1,4 +1,4 @@
-@props(['title' => null, 'results' => false])
+@props(['title' => null, 'results' => false, 'bottomNav' => true])
 
 <!DOCTYPE html>
 <html lang="th">
@@ -63,6 +63,7 @@
             {{ $slot }}
         </main>
 
+        @if ($bottomNav)
         <nav aria-label="{{ __('storefront.nav.bottom') }}" class="fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-sunken px-1 pb-4 pt-2 lg:hidden">
             <a
                 href="{{ route('home') }}"
@@ -88,6 +89,7 @@
                 </button>
             </div>
         </nav>
+        @endif
 
         @livewireScripts
     </body>

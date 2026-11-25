@@ -90,6 +90,8 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **Card art is placeholder only, rendered by `<x-card-art>`. Never fetch, store, hotlink or seed official card images from any game; staff-uploaded variant photos are the only real photos.**
 - **A storefront count shown against `sets.card_count` counts distinct card numbers, never raw printings: printings include secret rares past the set size and every language.**
 - **Focus rings use `:focus-visible` (`focus-visible:` / `has-focus-visible:`), never `focus-within:`, and never stack on an element whose border already turns accent.**
+- **A Livewire action that changes state a `#[Computed]` property derives from must `unset()` every computed that depends on it; one request can carry several calls.**
+- **A wrapper with `overflow-hidden` must not contain focusable controls (it clips the focus ring); a control at a limit uses `aria-disabled`, not `disabled`, so focus is not dropped.**
 
 ## Language
 

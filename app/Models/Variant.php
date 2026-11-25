@@ -105,6 +105,15 @@ class Variant extends Model
     }
 
     /**
+     * How many a customer can put in a basket now: `qty` today, `qty` minus unexpired reservations from M4.
+     * The quantity stepper's cap reads this and never `qty`.
+     */
+    public function availableQty(): int
+    {
+        return max(0, $this->qty);
+    }
+
+    /**
      * @return BelongsTo<Printing, $this>
      */
     public function printing(): BelongsTo
