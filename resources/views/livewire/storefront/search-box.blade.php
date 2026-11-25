@@ -43,6 +43,7 @@
                 maxlength="{{ \App\Livewire\Storefront\SearchBox::MAX_QUERY_LENGTH }}"
                 autocomplete="off"
                 enterkeyhint="search"
+                data-search-url="{{ route('search') }}"
                 placeholder="{{ __('storefront.search.placeholder_narrow') }}"
                 data-narrow="{{ __('storefront.search.placeholder_narrow') }}"
                 data-wide="{{ __('storefront.search.placeholder_wide') }}"
@@ -103,7 +104,7 @@
             @endif
 
             @if ($hasResults)
-                <div id="search-listbox" role="listbox" data-query="{{ $query }}" aria-label="{{ __('storefront.search.results') }}">
+                <div id="search-listbox" role="listbox" data-query="{{ $query }}" @if ($enterUrl !== null) data-enter="{{ $enterUrl }}" @endif aria-label="{{ __('storefront.search.results') }}">
                     @foreach ($jumpSets as $set)
                         <a
                             role="option"
@@ -164,8 +165,8 @@
                                     <span class="mt-1 block truncate text-label text-faint">{{ $printing->display_code }} · <span class="{{ $rarityColour }}">{{ strtoupper($printing->rarity_code) }}</span> · {{ $languageCode }}</span>
                                 </span>
                                 <span class="flex-none text-right">
-                                    @if ($stock['from_satang'] !== null)
-                                        <x-price :satang="$stock['from_satang']" :class="trim('block text-body font-medium '.$priceColour)" />
+                                    @if (($stock['from_satang'] ?? $stock['from_satang_any']) !== null)
+                                        <x-price :satang="$stock['from_satang'] ?? $stock['from_satang_any']" :class="trim('block text-body font-medium '.$priceColour)" />
                                     @endif
                                     @if (! $stock['in_stock'])
                                         <span class="mt-1 block text-label text-faint">{{ __('storefront.search.out_of_stock') }}</span>

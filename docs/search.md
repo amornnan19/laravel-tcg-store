@@ -37,38 +37,51 @@ One index, `printings`:
 public function toSearchableArray(): array
 {
     return [
-        'id'            => $this->id,
-        'card_id'       => $this->card_id,
-        'name_en'       => $this->card->name_en,
-        'name_ja'       => $this->card->name_ja,
-        'name_th'       => $this->card->name_th,
-        'set_code'      => $this->set->code,          // SV4a
-        'set_name'      => $this->set->name_en,
-        'number'        => $this->number,             // 190/190
-        'number_plain'  => $this->numberPlain(),      // 190 — so "190" finds it
-        'game'          => $this->set->game->slug,
-        'rarity'        => $this->rarity_code,
-        'language'      => $this->language->value,
-        'card_type'     => $this->card->card_type,
-        'traits'        => $this->card->traits,   // colour, cost: filterable per game
-        'has_foil'      => $this->has_foil,
-        'in_stock'      => $this->variants()->available()->exists(),
-        'has_real_photo'=> $this->variants()->where('has_real_photo', true)->exists(),
-        'conditions'    => $this->variants()->available()->pluck('condition'),
-        'from_satang'   => $this->variants()->available()->min('price_satang'),
-        'image_path'    => $this->image_path,
+        'id'              => $this->id,
+        'card_id'         => $this->card_id,
+        'set_id'          => $this->set_id,
+        'name_en'         => $this->card->name_en,
+        'name_ja'         => $this->card->name_ja,
+        'name_th'         => $this->card->name_th,
+        'set_code'        => $this->set->code,          // SV4a
+        'set_name'        => $this->set->name_en,
+        'number'          => $this->number,             // 190/190
+        'number_plain'    => static::plainNumber($this->number),  // 190 — so "190" finds it
+        'game'            => $this->set->game->slug,
+        'rarity'          => $this->rarity_code,
+        'language'        => $this->language->value,
+        'card_type'       => $this->card->card_type,
+        'traits'          => $this->card->traits,       // colour, cost: filterable per game
+        'has_foil'        => $this->has_foil,
+        'in_stock'        => $stock['in_stock'],
+        'available_qty'   => $stock['available_qty'],
+        'has_real_photo'  => $stock['has_real_photo'],
+        'conditions'      => $stock['conditions'],      // of the available variants
+        'from_satang'     => $stock['from_satang'],     // lowest price of an available variant
+        'from_satang_any' => $stock['from_satang_any'], // lowest price of any variant, so a sold-out tile can show it
+        'image_path'      => $this->image_path,
+        'released_on'     => ($this->released_on ?? $this->set->released_on)?->toDateString(),
     ];
 }
 ```
 
-Index settings:
+The stock fields come from `Printing::stockSummary()`, the one place they are computed.
+
+Index settings (`config/scout.php`, applied by `php artisan scout:sync-index-settings`):
 
 ```php
 'searchableAttributes' => ['name_en', 'name_ja', 'name_th', 'set_code', 'number', 'number_plain', 'set_name'],
-'filterableAttributes' => ['game', 'set_code', 'rarity', 'language', 'card_type', 'traits', 'has_foil', 'in_stock', 'conditions', 'has_real_photo', 'from_satang'],
+'filterableAttributes' => ['game', 'set_id', 'set_code', 'rarity', 'language', 'card_type', 'traits', 'has_foil', 'in_stock', 'conditions', 'has_real_photo', 'from_satang'],
 'sortableAttributes'   => ['from_satang', 'number_plain', 'released_on'],
-'rankingRules'         => ['words', 'typo', 'proximity', 'attribute', 'exactness', 'in_stock:desc', 'from_satang:asc'],
+'rankingRules'         => ['sort', 'words', 'typo', 'proximity', 'attribute', 'exactness', 'in_stock:desc', 'from_satang:asc'],
+'faceting'             => ['maxValuesPerFacet' => 500],   // a set facet lists every set
+'pagination'           => ['maxTotalHits' => 10000],       // "load more" is exact past the default 1000
 ```
+
+`sort` comes first so that a price, number or date sort holds exactly even with a text query: Meilisearch
+refuses the `sort` parameter unless the rule is listed, and anywhere but first the text rules would split the
+results into buckets and sort only inside each. With no `sort` sent the rule does nothing and the rest ranks
+as before.
 
 `in_stock:desc` in the ranking rules is the whole difference between a shop and a database: what you
 can buy comes first, but what is sold out still appears, because a collector uses the catalogue to
@@ -156,6 +169,29 @@ filtered result set is a link someone can send.
 The sheet's button reads "ดูผล 124 รายการ" — run the facet count on every change so that number is
 true before the sheet closes. That is what stops a customer narrowing to nothing and concluding the
 shop is empty.
+
+### The results page
+
+`/search` and `/g/{game}` are one Livewire component, `Storefront\ResultGrid`, with `Storefront\FilterPanel`
+beside it (a sidebar on a desktop, the bottom sheet on a phone). `App\Search\CatalogueResults` asks the
+engine; `App\Search\ResultFilters` is the one place that turns the filters into a Meilisearch filter string.
+
+- **In stock only is a quiet default.** While on it has no chip and does not count in the filter badge. Switched
+  off it becomes the chip "รวมที่หมดแล้ว", and "ล้างทั้งหมด" returns to the default. The badge, the chip row and
+  both clear-all buttons read the same list of non-default filters.
+- **Facet counts are disjunctive.** A group with a filter on is counted against every other filter but its own
+  (one extra engine request per such group), or choosing one rarity would show every other rarity as zero. A
+  selected option stays listed at zero so it can be switched off.
+- **Which facets show** follows `games.filters` of the selected games (all of them must declare it); with no
+  game selected only the generic ones show.
+- **Sorting.** Best match only exists with a text; a listing without one is in card number order.
+- **The empty state** names the filter whose removal brings results back, with the count, and a button that
+  removes it. It tries the filter switched on last; on a page opened from a URL, where nothing was "last", it
+  tries the groups in `ResultFilters::GROUPS` order (the likeliest culprits first). A filter whose removal still
+  leaves nothing is skipped. With nothing to suggest, a default page shows the text hint and no button.
+- **When the engine is down** the database answers (text, game, set, language, in stock) with no facet counts and
+  a one-line notice; the suggestion counts then skip the engine, so a hanging engine costs one timeout, not one
+  per count.
 
 ## Fallbacks
 

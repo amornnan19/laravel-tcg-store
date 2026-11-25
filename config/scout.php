@@ -149,7 +149,9 @@ return [
                 'searchableAttributes' => ['name_en', 'name_ja', 'name_th', 'set_code', 'number', 'number_plain', 'set_name'],
                 'filterableAttributes' => ['game', 'set_id', 'set_code', 'rarity', 'language', 'card_type', 'traits', 'has_foil', 'in_stock', 'conditions', 'has_real_photo', 'from_satang'],
                 'sortableAttributes' => ['from_satang', 'number_plain', 'released_on'],
-                'rankingRules' => ['words', 'typo', 'proximity', 'attribute', 'exactness', 'in_stock:desc', 'from_satang:asc'],
+                'rankingRules' => ['sort', 'words', 'typo', 'proximity', 'attribute', 'exactness', 'in_stock:desc', 'from_satang:asc'],
+                'faceting' => ['maxValuesPerFacet' => 500],
+                'pagination' => ['maxTotalHits' => 10000],
             ],
             CardSet::class => [
                 'searchableAttributes' => ['code', 'name_en', 'name_th'],

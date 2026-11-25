@@ -138,25 +138,30 @@ card from a normal one across a grid without a badge, which is information, not 
   content: "";
   position: absolute; inset: 0;
   background: linear-gradient(115deg,
-    rgba(255,255,255,0) 43.2%, rgba(255,255,255,.16) 47.7%,
-    rgba(140,220,255,.13) 50.2%, rgba(255,180,220,.13) 52.3%,
-    rgba(255,255,255,0) 56.8%) no-repeat;
-  background-size: 400% 100%;
+    rgba(255,255,255,0) 31.7%, rgba(255,255,255,.16) 43.9%,
+    rgba(140,220,255,.13) 50.5%, rgba(255,180,220,.13) 56.1%,
+    rgba(255,255,255,0) 68.3%) repeat-x;
+  background-size: 150% 100%;
   mix-blend-mode: screen;
-  animation: sheen 8s linear infinite;
+  animation: sheen 4s linear infinite;
   pointer-events: none;
 }
-@keyframes sheen { 0% { background-position: 100% 0 } 70%, 100% { background-position: 0% 0 } }
+/* One tile is 1.5x the card wide; -300% moves the image by exactly one tile, so the last frame equals
+   the first and a band is always well on the card: a continuous aura, no seam. */
+@keyframes sheen { from { background-position: 0% 0 } to { background-position: -300% 0 } }
 @media (prefers-reduced-motion: reduce) { .foil::after { animation: none } }
 ```
 
-The band starts fully outside the card on the left and ends fully outside it on the right, then rests
-there for the last 30% of the cycle, so the restart happens while nothing is visible. Two earlier
-versions showed a seam: a `-38%` to `38%` transform left the band on the card at both ends, so each
-loop jumped back like a video restarting; a `-100%` to `100%` transform fixed the jump but moved the
-layer's own edge across the card, which cut the angled band with a hard vertical line. Moving the
-background inside a fixed layer has neither problem. The gradient stops are the original band,
-rescaled to sit in the middle of a 4×-wide image, so the band keeps its width on the card.
+The sheen is continuous by request: it never rests, so a foil card always seems to carry an aura. It
+stays seamless because the animation moves a repeating image by exactly one tile width per cycle, so
+the last frame equals the first and the band re-enters the moment it leaves. The tile is 1.5 cards
+wide, which keeps a band on the card in every frame. Do not narrow it: at 1.2 cards the 115° band,
+slanted across a card taller than it is wide, spills past the tile and is cut by a hard vertical
+line at the tile boundary (checked frame by frame). Moving the background
+inside a fixed layer (rather than moving the layer) also keeps the layer's own edge from crossing the
+card. Two earlier versions showed a seam: a `-38%` to `38%` transform left the band on the card at
+both ends, and a `-100%` to `100%` transform cut the angled band with the moving layer's hard vertical
+edge.
 
 It goes on foil printings only, and on a tile only when a foil copy is available to buy. Never on a
 normal card, never on a button, never on a panel.

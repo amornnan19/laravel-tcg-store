@@ -89,14 +89,36 @@ document.addEventListener('alpine:init', () => {
             });
         },
 
+        // Enter opens the highlighted row. With none highlighted it goes where the query points: the card or set a
+        // code names, otherwise the results page for the text.
         openActive(event) {
-            const options = this.options();
-            const target = options[this.active] ?? options[0];
-
-            if (target) {
-                event.preventDefault();
-                target.click();
+            if (event.isComposing) {
+                return;
             }
+
+            const options = this.options();
+
+            if (this.active >= 0 && options[this.active]) {
+                event.preventDefault();
+                options[this.active].click();
+
+                return;
+            }
+
+            const term = this.$refs.input.value.trim();
+
+            if (term === '') {
+                return;
+            }
+
+            event.preventDefault();
+
+            const listbox = this.$root.querySelector('[role="listbox"]');
+            const jump = listbox && listbox.dataset.query === term ? listbox.dataset.enter : '';
+
+            this.$wire.remember(term).finally(() => {
+                window.location.href = jump || `${this.$refs.input.dataset.searchUrl}?q=${encodeURIComponent(term)}`;
+            });
         },
 
         // Rows are real links. Remember the search first, then follow the link, so the request is not cancelled by the navigation.
@@ -129,6 +151,54 @@ document.addEventListener('alpine:init', () => {
                 event.preventDefault();
                 this.$refs.input.focus();
             }
+        },
+    }));
+});
+
+// The filter panel is a sidebar on a desktop and a bottom sheet on a phone. A choice applies as it is made, so
+// the sheet's button can say how many results it holds; "cancel" puts back what was there when the sheet opened.
+document.addEventListener('alpine:init', () => {
+    window.Alpine.data('filterSheet', () => ({
+        open: false,
+        wide: window.matchMedia('(min-width: 1024px)').matches,
+        snapshot: null,
+
+        init() {
+            const query = window.matchMedia('(min-width: 1024px)');
+
+            query.addEventListener('change', (event) => {
+                this.wide = event.matches;
+
+                if (event.matches) {
+                    this.open = false;
+                    this.snapshot = null;
+                }
+            });
+        },
+
+        show() {
+            const parent = this.$wire.$parent;
+
+            this.snapshot = Object.fromEntries(
+                JSON.parse(this.$root.dataset.keys).map((key) => [key, JSON.parse(JSON.stringify(parent.$get(key) ?? null))]),
+            );
+            this.open = true;
+            // The sheet takes focus itself, not its first field: a phone keyboard must not open over the filters.
+            this.$nextTick(() => this.$refs.dialog.focus());
+        },
+
+        confirm() {
+            this.open = false;
+            this.snapshot = null;
+        },
+
+        cancel() {
+            if (!this.open || this.wide) {
+                return;
+            }
+
+            this.$wire.$parent.restore(this.snapshot ?? {});
+            this.confirm();
         },
     }));
 });

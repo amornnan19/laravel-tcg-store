@@ -67,6 +67,10 @@
 @layer base {
   [x-cloak] { display: none !important; }
 
+  /* dark is the default, so native controls (select lists, scrollbars, date pickers) draw dark with it */
+  :root { color-scheme: dark; }
+  :root[data-theme="light"] { color-scheme: light; }
+
   /* visible 2px accent focus ring, never animated */
   :focus-visible {
     outline: 2px solid var(--color-accent);
@@ -101,18 +105,17 @@
   position: absolute;
   inset: 0;
   background: linear-gradient(115deg,
-    rgba(255, 255, 255, 0) 43.2%, rgba(255, 255, 255, .16) 47.7%,
-    rgba(140, 220, 255, .13) 50.2%, rgba(255, 180, 220, .13) 52.3%,
-    rgba(255, 255, 255, 0) 56.8%) no-repeat;
-  background-size: 400% 100%;
+    rgba(255, 255, 255, 0) 31.7%, rgba(255, 255, 255, .16) 43.9%,
+    rgba(140, 220, 255, .13) 50.5%, rgba(255, 180, 220, .13) 56.1%,
+    rgba(255, 255, 255, 0) 68.3%) repeat-x;
+  background-size: 150% 100%;
   mix-blend-mode: screen;
-  animation: sheen 8s linear infinite;
+  animation: sheen 4s linear infinite;
   pointer-events: none;
 }
-/* The layer stays on the card and only its background moves, so no layer edge ever crosses the card.
-   The band sits in the middle of a 4×-wide image: at both ends of the travel it is fully off-card,
-   and it rests there for the last 30%, so the loop point is invisible. */
-@keyframes sheen { 0% { background-position: 100% 0 } 70%, 100% { background-position: 0% 0 } }
+/* One tile is 1.5x the card wide; -300% moves the image by exactly one tile, so the last frame equals
+   the first and a band is always well on the card: a continuous aura, no seam. */
+@keyframes sheen { from { background-position: 0% 0 } to { background-position: -300% 0 } }
 @media (prefers-reduced-motion: reduce) { .foil::after { animation: none } }
 
 /* Loading placeholder: a block with a slow light sweep, still under reduced motion. */

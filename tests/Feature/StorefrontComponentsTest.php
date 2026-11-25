@@ -81,6 +81,14 @@ test('the filter chip is a link when it has an href and a toggle button when it 
         ->and($button)->toContain('<button type="button"')->toContain('aria-pressed="false"')->not->toContain('bg-accent');
 });
 
+test('a removable filter chip is a plain button with a cross, and a tone replaces its resting colours', function () {
+    $remove = Blade::render('<x-filter-chip :active="true" :remove="true" aria-label="ถอด NM">NM</x-filter-chip>');
+    $tone = Blade::render('<x-filter-chip tone="border-rarity-sar text-rarity-sar">SAR</x-filter-chip>');
+
+    expect($remove)->toContain('<button type="button"')->toContain('<svg')->toContain('aria-label="ถอด NM"')->not->toContain('aria-pressed')
+        ->and($tone)->toContain('border-rarity-sar')->toContain('aria-pressed="false"')->not->toContain('text-muted');
+});
+
 test('the trust row claims real photos only when there are some and never a number', function () {
     $without = Blade::render('<x-trust-row />');
     $with = Blade::render('<x-trust-row :has-real-photo="true" />');
@@ -122,14 +130,29 @@ test('the card tile shows name, code, language, price and stock and links with t
         ->not->toContain('opacity-55');
 });
 
-test('a sold-out card tile is dimmed and says so without a price', function () {
-    $printing = Printing::factory()->create();
-    Variant::factory()->for($printing)->create(['qty' => 0, 'price_satang' => 1000]);
+test('a sold-out card tile is dimmed, says so and shows its lowest price in faint ink', function () {
+    $printing = Printing::factory()->create(['rarity_code' => 'sar']);
+    Variant::factory()->for($printing)->create(['qty' => 0, 'price_satang' => 150000]);
+    Variant::factory()->for($printing)->create(['qty' => 0, 'price_satang' => 100000, 'condition' => CardCondition::Lp]);
     $printing = Printing::query()->withCheapestVariant()->findOrFail($printing->id);
 
     $html = Blade::render('<x-card-tile :printing="$printing" />', ['printing' => $printing]);
 
-    expect($html)->toContain('opacity-55')->toContain('หมด')->not->toContain('฿');
+    expect($html)->toContain('opacity-55')->toContain('หมด')->toContain('฿ 1,000')->toMatch('/text-card font-medium text-faint[^>]*>฿ 1,000/')
+        ->not->toContain('฿ 1,500')->not->toContain('text-accent');
+});
+
+test('the list row carries the same facts as the tile', function () {
+    $printing = Printing::factory()->withFoil()->create(['rarity_code' => 'rr', 'language' => Language::Ja, 'number' => '062']);
+    Variant::factory()->for($printing)->create(['price_satang' => 99000, 'qty' => 5, 'condition' => CardCondition::Lp]);
+    Variant::factory()->for($printing)->foil()->create(['price_satang' => 120000, 'qty' => 1]);
+    $printing = Printing::query()->withCheapestVariant()->findOrFail($printing->id);
+
+    $html = Blade::render('<x-card-row :printing="$printing" />', ['printing' => $printing]);
+
+    expect($html)->toContain($printing->display_name)->toContain($printing->display_code)
+        ->toContain('฿ 990')->toContain('มี 6')->toContain('p='.$printing->id)
+        ->toContain('text-rarity-rr')->toContain('>JP<')->toContain('>LP<')->toContain('foil');
 });
 
 test('the card tile grid costs the printings query plus card, set and variants however many tiles there are', function () {

@@ -20,6 +20,16 @@ class SearchBox extends Component
 
     public string $query = '';
 
+    /**
+     * On the results page the field starts with the text that was searched, as the design shows it.
+     */
+    public function mount(): void
+    {
+        if (request()->routeIs('search') && is_string(request()->query('q'))) {
+            $this->query = $this->cappedQuery(request()->query('q'));
+        }
+    }
+
     public function updatedQuery(): void
     {
         $this->query = $this->cappedQuery();
@@ -73,7 +83,8 @@ class SearchBox extends Component
 
         return view('livewire.storefront.search-box', [
             'result' => $result,
-            'jumpSets' => $this->jumpSets($result),
+            'jumpSets' => $jumpSets = $this->jumpSets($result),
+            'enterUrl' => $this->enterUrl($result, $jumpSets),
             'recent' => $query === '' ? $this->recentSearches() : [],
         ]);
     }
@@ -93,10 +104,27 @@ class SearchBox extends Component
     }
 
     /**
+     * Where Enter goes when no row is highlighted and the query names a destination: the card of a card code, or
+     * the first set of a set code. Plain text has none, and Enter opens the results page for it.
+     *
+     * @param  Collection<int, CardSet>  $jumpSets
+     */
+    private function enterUrl(?AutocompleteResult $result, Collection $jumpSets): ?string
+    {
+        return match ($result?->jump?->kind) {
+            QueryKind::Printing => ($printing = $result->printings->first()) === null
+                ? null
+                : route('card.show', ['card' => $printing->card, 'p' => $printing->id]),
+            QueryKind::Set => ($set = $jumpSets->first()) === null ? null : route('set.show', $set),
+            default => null,
+        };
+    }
+
+    /**
      * The length cap is enforced here as well as by `maxlength`, which a client can bypass.
      */
-    private function cappedQuery(): string
+    private function cappedQuery(?string $value = null): string
     {
-        return mb_substr($this->query, 0, self::MAX_QUERY_LENGTH);
+        return mb_substr($value ?? $this->query, 0, self::MAX_QUERY_LENGTH);
     }
 }

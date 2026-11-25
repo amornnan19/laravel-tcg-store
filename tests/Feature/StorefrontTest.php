@@ -41,16 +41,17 @@ test('the game chips list active games in sort order', function () {
         ->assertDontSee('Hidden Game');
 });
 
-test('the search, card and set routes resolve and are not built yet', function () {
+test('the search and game routes resolve and the card and set routes are not built yet', function () {
     $game = Game::factory()->create();
     $set = CardSet::factory()->for($game)->create(['code' => 'OP-05']);
     $card = Card::factory()->for($game)->create(['name_en' => 'Monkey D. Luffy']);
 
     expect(route('search', absolute: false))->toBe('/search')
         ->and(route('card.show', $card, absolute: false))->toBe('/c/'.$card->slug)
-        ->and(route('set.show', $set, absolute: false))->toBe('/s/OP-05');
+        ->and(route('set.show', $set, absolute: false))->toBe('/s/OP-05')
+        ->and(route('game.show', $game, absolute: false))->toBe('/g/'.$game->slug);
 
-    $this->get(route('search'))->assertNotFound();
+    $this->get(route('search'))->assertOk();
     $this->get(route('card.show', $card))->assertNotFound();
     $this->get(route('set.show', $set))->assertNotFound();
 });

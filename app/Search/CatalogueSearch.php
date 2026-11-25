@@ -79,13 +79,7 @@ class CatalogueSearch
 
         $term = '%'.$parsed->text.'%';
 
-        $matching = Printing::query()
-            ->searchVisible()
-            ->where(function (Builder $builder) use ($term): void {
-                $builder->whereHas('card', fn (Builder $card) => $card
-                    ->whereLike('name_en', $term)->orWhereLike('name_ja', $term)->orWhereLike('name_th', $term))
-                    ->orWhereHas('set', fn (Builder $set) => $set->whereLike('code', $term));
-            });
+        $matching = Printing::query()->searchVisible()->matchingText($parsed->text);
 
         $total = $matching->count();
         $printings = $matching->with(['card', 'set', 'variants'])->orderBy('id')->limit(self::PRINTING_LIMIT)->get();
@@ -98,6 +92,15 @@ class CatalogueSearch
             ->get();
 
         return [$printings, $sets, $total];
+    }
+
+    /**
+     * The printing a card code names (`OP05-119`), in stock first and then cheapest: where Enter goes. Null for
+     * anything that is not a card code.
+     */
+    public function printingJump(string $query): ?Printing
+    {
+        return $this->jumpPrintings($this->parser->parse($query))->first();
     }
 
     /**

@@ -57,6 +57,7 @@ test('a printing is indexed with its derived stock fields', function () {
         'in_stock' => true,
         'available_qty' => 9,
         'from_satang' => 359000,
+        'from_satang_any' => 100,
         'has_real_photo' => true,
         'released_on' => '2024-05-01',
     ])->and($document['conditions'])->toEqualCanonicalizing(['nm', 'lp', 'mp']);
@@ -70,6 +71,7 @@ test('a printing with no available variant is out of stock with no price', funct
         'in_stock' => false,
         'available_qty' => 0,
         'from_satang' => null,
+        'from_satang_any' => 5000,
         'conditions' => [],
     ]);
 });

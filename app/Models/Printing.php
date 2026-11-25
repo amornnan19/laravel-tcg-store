@@ -94,6 +94,24 @@ class Printing extends Model
     }
 
     /**
+     * The database stand-in for a text search, used when the engine is down: a card name in any script or a set
+     * code contains the text.
+     *
+     * @param  Builder<Printing>  $query
+     * @return Builder<Printing>
+     */
+    public function scopeMatchingText(Builder $query, string $text): Builder
+    {
+        $term = '%'.$text.'%';
+
+        return $query->where(function (Builder $builder) use ($term): void {
+            $builder->whereHas('card', fn (Builder $card) => $card
+                ->whereLike('name_en', $term)->orWhereLike('name_ja', $term)->orWhereLike('name_th', $term))
+                ->orWhereHas('set', fn (Builder $set) => $set->whereLike('code', $term));
+        });
+    }
+
+    /**
      * @param  Builder<Printing>  $query
      * @return Builder<Printing>
      */
@@ -116,7 +134,10 @@ class Printing extends Model
      * Stock facts derived from the variants, the one place they are computed (search index and results).
      * Uses the loaded `variants` relation when there is one, so a bulk import runs no per-printing query.
      *
-     * @return array{in_stock: bool, available_qty: int, from_satang: ?int, conditions: list<string>, has_real_photo: bool}
+     * `from_satang` is the lowest price of an available variant; `from_satang_any` the lowest price of any variant,
+     * sold out or not, so a sold-out tile can still show what it cost.
+     *
+     * @return array{in_stock: bool, available_qty: int, from_satang: ?int, from_satang_any: ?int, conditions: list<string>, has_real_photo: bool}
      */
     public function stockSummary(): array
     {
@@ -127,6 +148,7 @@ class Printing extends Model
             'in_stock' => $available->isNotEmpty(),
             'available_qty' => (int) $available->sum('qty'),
             'from_satang' => $available->whereNotNull('price_satang')->min('price_satang'),
+            'from_satang_any' => $variants->whereNotNull('price_satang')->min('price_satang'),
             'conditions' => $available->map(fn (Variant $variant): string => $variant->condition->value)->unique()->values()->all(),
             'has_real_photo' => $variants->contains(fn (Variant $variant): bool => $variant->has_real_photo),
         ];
@@ -161,6 +183,7 @@ class Printing extends Model
             'has_real_photo' => $stock['has_real_photo'],
             'conditions' => $stock['conditions'],
             'from_satang' => $stock['from_satang'],
+            'from_satang_any' => $stock['from_satang_any'],
             'image_path' => $this->image_path,
             'released_on' => ($this->released_on ?? $this->set->released_on)?->toDateString(),
         ];

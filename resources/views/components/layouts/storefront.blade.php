@@ -1,4 +1,4 @@
-@props(['title' => null])
+@props(['title' => null, 'results' => false])
 
 <!DOCTYPE html>
 <html lang="th">
@@ -16,8 +16,19 @@
     </head>
     <body class="min-h-screen bg-bg pb-24 font-sans text-body text-ink antialiased lg:pb-0">
         <header class="relative z-40 border-b border-line">
-            <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-5 gap-y-3 px-4 pb-3 pt-4 lg:min-h-20 lg:px-8 lg:py-4">
-                <a href="{{ route('home') }}" class="-mx-2 flex min-h-11 flex-none items-center gap-2 rounded-control px-2 text-ink">
+            <div @class(['mx-auto flex max-w-7xl flex-wrap items-center gap-x-5 gap-y-3 px-4 pb-3 pt-4 lg:min-h-20 lg:px-8 lg:py-4', 'max-lg:flex-nowrap max-lg:gap-x-2' => $results])>
+                @if ($results)
+                    <a
+                        href="{{ route('home') }}"
+                        x-data
+                        x-on:click="if (history.length > 1) { $event.preventDefault(); history.back(); }"
+                        aria-label="{{ __('storefront.search.back') }}"
+                        class="-ml-2 flex size-11 flex-none items-center justify-center rounded-control text-ink transition-[color,background-color] duration-160 ease-ui hover:bg-surface motion-reduce:transition-none lg:hidden"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12.5 4 6.5 10l6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </a>
+                @endif
+                <a href="{{ route('home') }}" @class(['-mx-2 flex min-h-11 flex-none items-center gap-2 rounded-control px-2 text-ink', 'max-lg:hidden' => $results])>
                     <span aria-hidden="true" class="text-card leading-none text-accent lg:text-h3">&#9670;</span>
                     <span class="font-display text-card font-medium lg:text-h3">{{ config('app.name') }}</span>
                 </a>
@@ -26,10 +37,22 @@
             </div>
 
             @if ($games->isNotEmpty())
-                <nav aria-label="{{ __('storefront.nav.games') }}" class="lg:border-t lg:border-line">
+                <nav aria-label="{{ __('storefront.nav.games') }}" @class(['lg:border-t lg:border-line', 'max-lg:hidden' => $results])>
                     <ul class="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-4 pb-3 lg:px-8 lg:py-4">
+                        @php $currentGame = request()->route('game'); @endphp
                         @foreach ($games as $game)
-                            <li class="inline-flex h-10 flex-none items-center rounded-control border border-line bg-sunken px-4 text-small text-muted lg:rounded-full">{{ $game->name_en }}</li>
+                            @php $isCurrent = $currentGame instanceof \App\Models\Game && $currentGame->is($game); @endphp
+                            <li class="flex-none">
+                                <a
+                                    href="{{ route('game.show', $game) }}"
+                                    @if ($isCurrent) aria-current="page" @endif
+                                    @class([
+                                        'inline-flex min-h-11 items-center rounded-control border px-4 text-small transition-[color,border-color] duration-160 ease-ui motion-reduce:transition-none lg:rounded-full',
+                                        'border-line-strong bg-raised text-ink' => $isCurrent,
+                                        'border-line bg-sunken text-muted hover:text-ink' => ! $isCurrent,
+                                    ])
+                                >{{ $game->name_en }}</a>
+                            </li>
                         @endforeach
                     </ul>
                 </nav>
