@@ -29,60 +29,66 @@ class CatalogueSearch
         $jump = $parsed->kind === QueryKind::Text ? null : $parsed;
 
         try {
-            [$printings, $sets] = $this->fromEngine($parsed);
+            [$printings, $sets, $total] = $this->fromEngine($parsed);
             $limited = false;
         } catch (Throwable $exception) {
             report($exception);
 
-            [$printings, $sets] = $this->fromDatabase($parsed);
+            [$printings, $sets, $total] = $this->fromDatabase($parsed);
             $limited = true;
         }
 
         $printings = $this->jumpPrintings($parsed)->concat($printings)->unique('id')->take(self::PRINTING_LIMIT)->values();
 
-        return new AutocompleteResult($jump, $printings, $sets, $limited);
+        return new AutocompleteResult($jump, $printings, $sets, $limited, max($total, $printings->count()));
     }
 
     /**
-     * @return array{Collection<int, Printing>, Collection<int, CardSet>}
+     * Hits come back from the engine without the visibility rules, so they are hydrated through `searchVisible()`:
+     * a trashed card or an inactive game never reaches a view before the queued re-index runs.
+     *
+     * @return array{Collection<int, Printing>, Collection<int, CardSet>, int}
      */
     private function fromEngine(ParsedQuery $parsed): array
     {
         // Nothing typed means the SearchBox shows recent searches, not results.
         if ($parsed->text === '') {
-            return [new Collection, new Collection];
+            return [new Collection, new Collection, 0];
         }
 
-        $printings = Printing::search($parsed->text)
-            ->query(fn (Builder $builder) => $builder->with(['card', 'set', 'variants']))
-            ->take(self::PRINTING_LIMIT)
+        $page = Printing::search($parsed->text)
+            ->query(fn (Builder $builder) => $builder->searchVisible()->with(['card', 'set', 'variants']))
+            ->paginate(self::PRINTING_LIMIT, 'page', 1);
+
+        $sets = CardSet::search($parsed->text)
+            ->query(fn (Builder $builder) => $builder->searchVisible())
+            ->take(self::SET_LIMIT)
             ->get();
 
-        return [$printings, CardSet::search($parsed->text)->take(self::SET_LIMIT)->get()];
+        return [new Collection($page->items()), $sets, $page->total()];
     }
 
     /**
-     * @return array{Collection<int, Printing>, Collection<int, CardSet>}
+     * @return array{Collection<int, Printing>, Collection<int, CardSet>, int}
      */
     private function fromDatabase(ParsedQuery $parsed): array
     {
         if ($parsed->text === '') {
-            return [new Collection, new Collection];
+            return [new Collection, new Collection, 0];
         }
 
         $term = '%'.$parsed->text.'%';
 
-        $printings = Printing::query()
+        $matching = Printing::query()
             ->searchVisible()
-            ->with(['card', 'set', 'variants'])
             ->where(function (Builder $builder) use ($term): void {
                 $builder->whereHas('card', fn (Builder $card) => $card
                     ->whereLike('name_en', $term)->orWhereLike('name_ja', $term)->orWhereLike('name_th', $term))
                     ->orWhereHas('set', fn (Builder $set) => $set->whereLike('code', $term));
-            })
-            ->orderBy('id')
-            ->limit(self::PRINTING_LIMIT)
-            ->get();
+            });
+
+        $total = $matching->count();
+        $printings = $matching->with(['card', 'set', 'variants'])->orderBy('id')->limit(self::PRINTING_LIMIT)->get();
 
         $sets = CardSet::query()
             ->searchVisible()
@@ -91,7 +97,7 @@ class CatalogueSearch
             ->limit(self::SET_LIMIT)
             ->get();
 
-        return [$printings, $sets];
+        return [$printings, $sets, $total];
     }
 
     /**

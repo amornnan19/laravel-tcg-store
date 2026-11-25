@@ -7,6 +7,7 @@ use App\Enums\Language;
 use Database\Factories\PrintingFactory;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -31,6 +32,16 @@ class Printing extends Model
             'has_foil' => 'boolean',
             'released_on' => 'date',
         ];
+    }
+
+    /**
+     * The code printed on the card, as shown in lists: the set code without its dash, upper-case, then the number.
+     *
+     * @return Attribute<string, never>
+     */
+    protected function displayCode(): Attribute
+    {
+        return Attribute::get(fn (): string => strtoupper(str_replace('-', '', $this->set->code)).'-'.$this->number);
     }
 
     /**

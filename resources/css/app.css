@@ -54,11 +54,24 @@
   --text-h1:      32px;   --text-h1--line-height: 1.2;
   --text-display: 48px;   --text-display--line-height: 1.1;
 
+  /* motion: one easing curve, durations are the duration-160 / 220 / 400 utilities */
+  --ease-ui: cubic-bezier(.22, 1, .36, 1);
+
   /* radius */
   --radius-tag:    6px;
   --radius-control:10px;
   --radius-card:   14px;
   --radius-sheet:  20px;
+}
+
+@layer base {
+  [x-cloak] { display: none !important; }
+
+  /* visible 2px accent focus ring, never animated */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
 }
 
 /* light mode — only these change */

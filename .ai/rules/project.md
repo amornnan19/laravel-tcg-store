@@ -86,6 +86,9 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **The admin panel's second factor is enforced only by Filament's login page.** Any other way of logging a user
   in (LINE/Socialite, a storefront login, password-reset auto-login, impersonation) must refuse `is_staff` users,
   or the panel must move to its own auth guard first. The panel shares the `web` guard today.
+- **Search hits come back from Meilisearch without `searchVisible()`; hydrate them through `->query(fn ($b) => $b->searchVisible())` so a trashed card or inactive game never reaches a view before the queued re-index runs.**
+- **Card art is placeholder only, rendered by `<x-card-art>`. Never fetch, store, hotlink or seed official card images from any game; staff-uploaded variant photos are the only real photos.**
+- **Focus rings use `:focus-visible` (`focus-visible:` / `has-focus-visible:`), never `focus-within:`, and never stack on an element whose border already turns accent.**
 
 ## Language
 

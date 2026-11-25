@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\Game;
 use App\Search\QueryParser;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Scout\Scout;
 use Meilisearch\Client as MeilisearchClient;
@@ -44,5 +47,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Event::listen(SocialiteWasCalled::class, [LineExtendSocialite::class, 'handle']);
+
+        View::composer('components.layouts.storefront', function (ViewContract $view): void {
+            $view->with('games', Game::query()->where('is_active', true)->orderBy('sort')->get());
+        });
     }
 }

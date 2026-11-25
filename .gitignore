@@ -33,3 +33,5 @@ Thumbs.db
 # Per-agent memory written by subagents; local only
 /.claude/agent-memory/
 /.playwright-mcp/
+/storage/canvas-ref/
+/storage/screens/

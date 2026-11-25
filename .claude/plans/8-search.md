@@ -25,7 +25,7 @@ Scout or Livewire 4 APIs; skills `scout-development`, `livewire-development`,
 dependency. Pint before finishing. No commits by the agent.
 
 Canvas reference (the user's own design, saved locally; read-only):
-`/private/tmp/claude-501/-Users-amornnan-Documents-project-amornnan-laravel-tcg-store/43df2bc9-684c-4d85-8da6-49bc4d06a7f5/scratchpad/artifact-files/0b136fb8-eb17-402f-be5b-4b82e8326359/project/`
+`storage/canvas-ref/project/` (gitignored; re-fetch from the canvas if missing)
 — `MHome.dc.html` (mobile header + bottom nav), `DHome.dc.html` (desktop header),
 `MSearchFilter.dc.html` (M02a autocomplete overlay — the source for the result rows),
 `Components.dc.html`, `States.dc.html` (empty/error states). Values come from
