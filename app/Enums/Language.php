@@ -15,6 +15,18 @@ enum Language: string implements HasLabel
         return __('enums.language.'.$this->value);
     }
 
+    /**
+     * The short code shown on badges and card meta lines.
+     */
+    public function shortCode(): string
+    {
+        return match ($this) {
+            self::Ja => 'JP',
+            self::En => 'EN',
+            self::Th => 'TH',
+        };
+    }
+
     public function getLabel(): string
     {
         return $this->label();

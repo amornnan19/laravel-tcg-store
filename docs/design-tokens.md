@@ -136,27 +136,38 @@ card from a normal one across a grid without a badge, which is information, not 
 ```css
 .foil::after {
   content: "";
-  position: absolute; inset: -20%;
+  position: absolute; inset: 0;
   background: linear-gradient(115deg,
-    rgba(255,255,255,0) 32%, rgba(255,255,255,.16) 45%,
-    rgba(140,220,255,.13) 52%, rgba(255,180,220,.13) 58%,
-    rgba(255,255,255,0) 71%);
+    rgba(255,255,255,0) 43.2%, rgba(255,255,255,.16) 47.7%,
+    rgba(140,220,255,.13) 50.2%, rgba(255,180,220,.13) 52.3%,
+    rgba(255,255,255,0) 56.8%) no-repeat;
+  background-size: 400% 100%;
   mix-blend-mode: screen;
-  animation: sheen 5s linear infinite;
+  animation: sheen 8s linear infinite;
   pointer-events: none;
 }
-@keyframes sheen { 0% { transform: translateX(-38%) } 100% { transform: translateX(38%) } }
+@keyframes sheen { 0% { background-position: 100% 0 } 70%, 100% { background-position: 0% 0 } }
 @media (prefers-reduced-motion: reduce) { .foil::after { animation: none } }
 ```
 
-It goes on foil printings only. Never on a normal card, never on a button, never on a panel.
+The band starts fully outside the card on the left and ends fully outside it on the right, then rests
+there for the last 30% of the cycle, so the restart happens while nothing is visible. Two earlier
+versions showed a seam: a `-38%` to `38%` transform left the band on the card at both ends, so each
+loop jumped back like a video restarting; a `-100%` to `100%` transform fixed the jump but moved the
+layer's own edge across the card, which cut the angled band with a hard vertical line. Moving the
+background inside a fixed layer has neither problem. The gradient stops are the original band,
+rescaled to sit in the middle of a 4×-wide image, so the band keeps its width on the card.
+
+It goes on foil printings only, and on a tile only when a foil copy is available to buy. Never on a
+normal card, never on a button, never on a panel.
 
 ## Everything else that moves
 
 One easing curve, `cubic-bezier(.22, 1, .36, 1)`, and three durations: 160 ms for hover and press,
 220 ms for a sheet, 400 ms for an entrance. Hover changes colour or a surface step; press scales to
-0.98. Nothing loops except the sheen, nothing moves on scroll, and every animation stops under
-`prefers-reduced-motion`.
+0.98. Two things loop: the foil sheen, and the skeleton shimmer (a slow light sweep across a loading
+placeholder, drawn on the canvas States artboard; loading only). Nothing else loops, nothing moves on
+scroll, and every animation, both loops included, stops under `prefers-reduced-motion`.
 
 ## Accessibility, as drawn
 

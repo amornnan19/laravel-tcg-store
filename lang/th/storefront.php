@@ -27,5 +27,40 @@ return [
     'nav' => [
         'games' => 'เกม',
         'bottom' => 'เมนูหลัก',
+        'home' => 'หน้าแรก',
+        'search' => 'ค้นหา',
+    ],
+
+    'price' => [
+        'was' => 'ราคาเดิม',
+    ],
+
+    'stock' => [
+        'in_stock' => 'มี :n',
+        'low_stock' => 'เหลือ :n',
+        'out_of_stock' => 'หมด',
+    ],
+
+    'tile' => [
+        'foil' => 'foil',
+    ],
+
+    'trust' => [
+        'real_photo' => 'ภาพจริง',
+        'authentic' => 'ของแท้',
+        'protective_packing' => 'ส่งพร้อมแผ่นกันการ์ด',
+    ],
+
+    'home' => [
+        'latest_set' => 'เซ็ตล่าสุด · :game',
+        'browse_set' => 'ไล่ดูทั้งเซ็ต',
+        'released' => 'วางจำหน่าย :date',
+        'set_cards' => ':count ใบ',
+        'set_extras' => '+ :n ใบพิเศษ',
+        'set_in_stock' => 'ร้านมีของ :n ใบ',
+        'new_singles' => 'ซิงเกิลมาใหม่',
+        'see_all' => 'ดูทั้งหมด',
+        'latest_sets' => 'เซ็ตล่าสุด',
+        'empty' => 'ร้านยังไม่มีสินค้าให้แสดง',
     ],
 ];

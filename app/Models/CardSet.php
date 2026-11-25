@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,6 +41,16 @@ class CardSet extends Model
     }
 
     /**
+     * The code as shown to customers: upper-case (`OP-05`, `SV3PT5`). URLs keep the stored code.
+     *
+     * @return Attribute<string, never>
+     */
+    protected function displayCode(): Attribute
+    {
+        return Attribute::get(fn (): string => strtoupper($this->code));
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function toSearchableArray(): array
@@ -51,6 +63,37 @@ class CardSet extends Model
             'game' => $this->game->slug,
             'card_count' => $this->card_count,
         ];
+    }
+
+    /**
+     * Set the `in_stock_numbers` and `extra_numbers` attributes on every set in one query, for counts shown
+     * against `card_count`. Both count distinct card numbers across all languages, never raw printings:
+     * in-stock numbers have an available variant, extra numbers are printed past `card_count` (secret rares).
+     * Trashed printings and printings of a trashed card are not counted.
+     *
+     * @param  Collection<int, CardSet>  $sets
+     */
+    public static function loadNumberCounts(Collection $sets): void
+    {
+        $inStock = Variant::query()->available()->selectRaw('1')->whereColumn('variants.printing_id', 'printings.id')->limit(1);
+
+        $numbersBySet = Printing::query()
+            ->whereIn('set_id', $sets->modelKeys())
+            ->whereHas('card')
+            ->select(['set_id', 'number'])
+            ->selectSub($inStock, 'in_stock')
+            ->get()
+            ->groupBy('set_id');
+
+        foreach ($sets as $set) {
+            $printings = $numbersBySet->get($set->id, collect());
+            $key = fn (Printing $printing): string => (string) (Printing::plainNumber($printing->number) ?? $printing->number);
+
+            $set->setAttribute('in_stock_numbers', $printings->filter(fn (Printing $printing): bool => (bool) $printing->in_stock)->map($key)->unique()->count());
+            $set->setAttribute('extra_numbers', $set->card_count > 0
+                ? $printings->map(fn (Printing $printing): ?int => Printing::plainNumber($printing->number))->filter(fn (?int $number): bool => $number !== null && $number > $set->card_count)->unique()->count()
+                : 0);
+        }
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CardCondition;
+use App\Enums\Finish;
 use App\Enums\Language;
 use Database\Factories\PrintingFactory;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
@@ -42,6 +43,42 @@ class Printing extends Model
     protected function displayCode(): Attribute
     {
         return Attribute::get(fn (): string => strtoupper(str_replace('-', '', $this->set->code)).'-'.$this->number);
+    }
+
+    /**
+     * The card name in the printing's own language, falling back to English.
+     *
+     * @return Attribute<string, never>
+     */
+    protected function displayName(): Attribute
+    {
+        return Attribute::get(fn (): string => match ($this->language) {
+            Language::Ja => $this->card->name_ja,
+            Language::Th => $this->card->name_th,
+            default => null,
+        } ?: $this->card->name_en);
+    }
+
+    /**
+     * Whether a foil copy can be bought now. `has_foil` only says the printing exists in foil.
+     */
+    public function hasAvailableFoil(): bool
+    {
+        $variants = $this->relationLoaded('variants') ? $this->variants : $this->variants()->get();
+
+        return $variants->contains(fn (Variant $variant): bool => $variant->finish === Finish::Foil && $variant->isAvailable());
+    }
+
+    /**
+     * Printings a storefront grid shows as tiles, with everything a tile reads loaded in three queries
+     * besides this one (card, set, variants) however many tiles there are.
+     *
+     * @param  Builder<Printing>  $query
+     * @return Builder<Printing>
+     */
+    public function scopeWithCheapestVariant(Builder $query): Builder
+    {
+        return $query->with(['card', 'set', 'variants']);
     }
 
     /**

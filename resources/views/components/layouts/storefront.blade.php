@@ -40,16 +40,30 @@
             {{ $slot }}
         </main>
 
-        <nav aria-label="{{ __('storefront.nav.bottom') }}" class="fixed inset-x-0 bottom-0 z-30 flex justify-center border-t border-line bg-sunken px-1 pb-4 pt-2 lg:hidden">
-            <button
-                type="button"
-                x-data
-                x-on:click.stop="$dispatch('open-search')"
-                aria-label="{{ __('storefront.search.open') }}"
-                class="-mt-5 flex size-14 items-center justify-center rounded-full bg-accent text-accent-ink transition-transform duration-160 ease-ui active:scale-98 motion-reduce:transition-none"
+        <nav aria-label="{{ __('storefront.nav.bottom') }}" class="fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-sunken px-1 pb-4 pt-2 lg:hidden">
+            <a
+                href="{{ route('home') }}"
+                @if (request()->routeIs('home')) aria-current="page" @endif
+                @class([
+                    'flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-control text-label',
+                    'font-medium text-accent' => request()->routeIs('home'),
+                    'text-faint' => ! request()->routeIs('home'),
+                ])
             >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.4" stroke="currentColor" stroke-width="2"/><path d="M15.4 15.4 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            </button>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 8.6 10 3.2l7 5.4V17H3V8.6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                {{ __('storefront.nav.home') }}
+            </a>
+            <div class="flex flex-1 justify-center">
+                <button
+                    type="button"
+                    x-data
+                    x-on:click.stop="$dispatch('open-search')"
+                    aria-label="{{ __('storefront.search.open') }}"
+                    class="-mt-5 flex size-14 items-center justify-center rounded-full bg-accent text-accent-ink transition-transform duration-160 ease-ui active:scale-98 motion-reduce:transition-none"
+                >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.4" stroke="currentColor" stroke-width="2"/><path d="M15.4 15.4 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+            </div>
         </nav>
 
         @livewireScripts

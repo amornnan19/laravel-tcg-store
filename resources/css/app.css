@@ -94,3 +94,34 @@
     --color-info:        #1F5FA8;
   }
 }
+
+/* The one continuous motion in the interface: tells a foil printing from a normal one across a grid. */
+.foil::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg,
+    rgba(255, 255, 255, 0) 43.2%, rgba(255, 255, 255, .16) 47.7%,
+    rgba(140, 220, 255, .13) 50.2%, rgba(255, 180, 220, .13) 52.3%,
+    rgba(255, 255, 255, 0) 56.8%) no-repeat;
+  background-size: 400% 100%;
+  mix-blend-mode: screen;
+  animation: sheen 8s linear infinite;
+  pointer-events: none;
+}
+/* The layer stays on the card and only its background moves, so no layer edge ever crosses the card.
+   The band sits in the middle of a 4×-wide image: at both ends of the travel it is fully off-card,
+   and it rests there for the last 30%, so the loop point is invisible. */
+@keyframes sheen { 0% { background-position: 100% 0 } 70%, 100% { background-position: 0% 0 } }
+@media (prefers-reduced-motion: reduce) { .foil::after { animation: none } }
+
+/* Loading placeholder: a block with a slow light sweep, still under reduced motion. */
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, .055) 50%, rgba(255, 255, 255, 0) 80%);
+  animation: shimmer 1.6s linear infinite;
+}
+@keyframes shimmer { 0% { transform: translateX(-100%) } 100% { transform: translateX(100%) } }
+@media (prefers-reduced-motion: reduce) { .skeleton::after { animation: none } }

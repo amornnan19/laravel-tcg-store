@@ -23,8 +23,9 @@ test('the home page renders the storefront layout with the brand and the search 
         ->assertSee('maxlength="100"', false);
 });
 
-test('the bottom bar holds only the search button', function () {
+test('the bottom bar holds only home and search', function () {
     $this->get(route('home'))
+        ->assertSee('aria-current="page"', false)
         ->assertSee('aria-label="'.__('storefront.search.open').'"', false)
         ->assertDontSee('/cart')
         ->assertDontSee('/account');
