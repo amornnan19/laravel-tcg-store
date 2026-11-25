@@ -82,4 +82,16 @@ return [
         'action' => 'ยืนยันอีเมล',
         'ignore' => 'ถ้าคุณไม่ได้สมัครสมาชิก ไม่ต้องทำอะไร',
     ],
+
+    'restock_alert' => [
+        'subject' => 'มีของแล้ว: :card',
+        'action' => 'ดูการ์ด',
+        'line_text' => 'มีของแล้ว: :card (:meta) ราคา :price',
+    ],
+
+    'price_alert' => [
+        'subject' => 'ราคาลดแล้ว: :card',
+        'action' => 'ดูการ์ด',
+        'line_text' => 'ราคาลดแล้ว: :card (:meta) เหลือ :price ถึงราคาที่คุณตั้งไว้ :target',
+    ],
 ];

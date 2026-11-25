@@ -260,5 +260,11 @@ return [
         'pending_slips' => 'สลิปรอตรวจ',
         'orders_to_pack' => 'ออเดอร์รอแพ็กวันนี้',
         'shortfall_orders' => 'ค้างส่วนที่ขาด',
+        'restock_alerts_fired' => 'แจ้งเตือนของเข้าที่ส่งเมื่อคืน',
+        'restock_alerts_count' => 'ส่งแล้ว :n ครั้ง',
+        'restock_card' => 'การ์ด',
+        'restock_variant' => 'สภาพและพิมพ์',
+        'restock_count' => 'จำนวนที่แจ้ง',
+        'restock_empty' => 'เมื่อคืนยังไม่มีการแจ้งเตือนของเข้า',
     ],
 ];

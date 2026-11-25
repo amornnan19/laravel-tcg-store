@@ -40,6 +40,7 @@
             <div class="min-w-0 lg:col-start-2 lg:row-start-1">
                 <div class="flex items-start gap-2">
                     <h1 class="min-w-0 flex-1 font-display text-h2 font-medium lg:text-h1">{{ $printing->display_name }}</h1>
+                    <livewire:storefront.alert-toggle :printing-id="$printing->id" />
                     <div
                         x-data="{ canShare: !!(navigator.share || (navigator.clipboard && navigator.clipboard.writeText)), copied: false }"
                         x-show="canShare"

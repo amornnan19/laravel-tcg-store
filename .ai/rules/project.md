@@ -112,6 +112,10 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **A screen has at most one gold (`bg-accent`) primary button; every other action on it uses the secondary button (`border border-line-strong bg-surface text-ink`).**
 - **Promoting a user to staff must rotate their `remember_token` and end their sessions: a session made before `is_staff` was set reaches `/admin` without the second-factor challenge.**
 - **Jobs and queued notifications get one attempt unless the class sets `$tries` (the worker default is `--tries=1`). A job that calls an external API sets `$tries` and `backoff()`, sends an idempotency key when the API supports one, and a customer message that cannot be delivered on its channel falls back to email rather than being dropped.**
+- **A job that deletes `stock_reservations` keeps the expiry condition on the DELETE itself (`where('expires_at', '<=', $now)`), never only on an earlier SELECT: `ReserveStock` renews an expired row in place with the same id.**
+- **A queued job that re-reads current state to act on it (`CheckVariantAlerts`) uses `ShouldBeUniqueUntilProcessing`, not `ShouldBeUnique`; and a queued notification snapshots what it says at the moment it is sent for, rather than re-reading models that may be trashed or changed before it runs.**
+- **An action that belongs to one row (restock, price watch, remove) sits inside that row's bordered container, and its result or error renders next to that action, never in a region shared with another control.**
+- **A unique re-read job is dispatched with `DB::afterCommit(fn () => Job::dispatch(...))`, not `->afterCommit()`: the latter takes the unique lock inside the open transaction, so a check that starts before the commit swallows the change.**
 
 ## Language
 

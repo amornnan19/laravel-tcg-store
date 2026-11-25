@@ -44,4 +44,8 @@ return [
         'jt' => 'J&T Express',
         'thaipost' => 'ไปรษณีย์ไทย',
     ],
+    'alert_channel' => [
+        'line' => 'LINE',
+        'email' => 'อีเมล',
+    ],
 ];

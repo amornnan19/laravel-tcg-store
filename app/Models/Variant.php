@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\CardCondition;
 use App\Enums\Finish;
 use App\Observers\VariantSearchObserver;
+use App\Support\VariantAlerts;
 use Database\Factories\VariantFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
@@ -28,6 +29,18 @@ class Variant extends Model
         // Delete photos through Eloquent so each one removes its file; the FK cascade alone would orphan them.
         static::deleting(function (Variant $variant): void {
             $variant->photos()->get()->each->delete();
+        });
+
+        // An alert waits for more stock or a lower price, so only those changes ask for a check. `getOriginal()` still
+        // holds the old value inside `updated`; the job reads the variant as it is after commit.
+        static::updated(function (Variant $variant): void {
+            $moreStock = $variant->wasChanged('qty') && $variant->qty > (int) $variant->getOriginal('qty');
+            $lowerPrice = $variant->wasChanged('price_satang') && $variant->price_satang !== null
+                && ($variant->getOriginal('price_satang') === null || $variant->price_satang < (int) $variant->getOriginal('price_satang'));
+
+            if ($moreStock || $lowerPrice) {
+                VariantAlerts::dispatchFor([$variant->id]);
+            }
         });
 
         static::updating(VariantSearchObserver::rememberPreviousPrinting(...));
@@ -213,6 +226,22 @@ class Variant extends Model
     public function photos(): HasMany
     {
         return $this->hasMany(VariantPhoto::class);
+    }
+
+    /**
+     * @return HasMany<RestockAlert, $this>
+     */
+    public function restockAlerts(): HasMany
+    {
+        return $this->hasMany(RestockAlert::class);
+    }
+
+    /**
+     * @return HasMany<PriceAlert, $this>
+     */
+    public function priceAlerts(): HasMany
+    {
+        return $this->hasMany(PriceAlert::class);
     }
 
     /**

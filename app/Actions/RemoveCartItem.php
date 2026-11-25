@@ -4,6 +4,8 @@ namespace App\Actions;
 
 use App\Models\CartItem;
 use App\Models\StockReservation;
+use App\Models\Variant;
+use App\Support\VariantAlerts;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -22,5 +24,9 @@ class RemoveCartItem
 
             $item->delete();
         });
+
+        if ($item->purchasable_type === (new Variant)->getMorphClass()) {
+            VariantAlerts::dispatchFor([$item->purchasable_id]);
+        }
     }
 }

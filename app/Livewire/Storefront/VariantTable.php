@@ -3,19 +3,29 @@
 namespace App\Livewire\Storefront;
 
 use App\Actions\AddToCart;
+use App\Actions\RemovePriceAlert;
+use App\Actions\RemoveRestockAlert;
+use App\Actions\SetPriceAlert;
+use App\Actions\SetRestockAlerts;
 use App\Enums\Language;
+use App\Exceptions\AlertRefused;
 use App\Exceptions\InsufficientStock;
 use App\Exceptions\NotPurchasable;
+use App\Models\Card;
 use App\Models\Cart;
+use App\Models\PriceAlert;
 use App\Models\PricePoint;
 use App\Models\Printing;
+use App\Models\RestockAlert;
 use App\Models\StockReservation;
 use App\Models\Variant;
 use App\Support\CurrentCart;
+use App\Support\Money;
 use App\Support\PriceChart;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -53,6 +63,22 @@ class VariantTable extends Component
     /** Whether the notice reports a successful add (and offers the link to the cart) rather than an error. */
     public bool $noticeOk = false;
 
+    /** What the price watch's baht field holds. Bound with a plain `wire:model`, so it is only sent on submit. */
+    public string $priceTarget = '';
+
+    /** Whether the price watch's form is open for the selected row. */
+    public bool $watching = false;
+
+    /** What the price watch's form refused, shown inside that form. */
+    public ?string $priceWatchError = null;
+
+    /**
+     * What the last restock action said about the row it acted on, `variant id => message`, shown in that row's footer.
+     *
+     * @var array<int, string>
+     */
+    public array $restockNotices = [];
+
     /**
      * @param  int  $printingId  The printing the page header shows: its language is the first tab, its own rows are preferred.
      */
@@ -81,6 +107,7 @@ class VariantTable extends Component
 
         $this->language = $chosen->value;
         $this->clearNotice();
+        $this->closePriceWatch();
         $this->forgetSelection(withRows: true);
 
         $this->variantId = $this->cheapest($this->rows)?->id;
@@ -98,6 +125,7 @@ class VariantTable extends Component
         $this->variantId = $variant->id;
         $this->qty = min($this->qty, $variant->availableQty());
         $this->clearNotice();
+        $this->closePriceWatch();
         $this->forgetSelection();
     }
 
@@ -159,6 +187,148 @@ class VariantTable extends Component
         }
 
         $this->refreshStock();
+    }
+
+    /**
+     * Asks to be told when a sold-out row can be bought again. A guest is sent to log in and returns to this card.
+     */
+    public function notifyRestock(int $variantId, SetRestockAlerts $setRestockAlerts): void
+    {
+        $this->restockNotices = [];
+        $this->closePriceWatch();
+
+        if ($this->sendGuestToLogin()) {
+            return;
+        }
+
+        if ($this->rows->firstWhere('id', $variantId) === null) {
+            return;
+        }
+
+        try {
+            if ($setRestockAlerts->handle(auth()->user(), [$variantId]) === 0) {
+                $this->restockNotices[$variantId] = (new AlertRefused('unavailable'))->message();
+            }
+        } catch (AlertRefused $refused) {
+            $this->restockNotices[$variantId] = $refused->message();
+        }
+
+        unset($this->alerts);
+    }
+
+    public function cancelRestock(int $variantId, RemoveRestockAlert $removeRestockAlert): void
+    {
+        $this->restockNotices = [];
+
+        $alert = RestockAlert::query()->where('user_id', auth()->id())->where('variant_id', $variantId)->first();
+
+        if ($alert !== null) {
+            $removeRestockAlert->handle(auth()->user(), $alert);
+        }
+
+        unset($this->alerts);
+    }
+
+    public function openPriceWatch(): void
+    {
+        $this->priceWatchError = null;
+        $this->restockNotices = [];
+
+        if ($this->sendGuestToLogin()) {
+            return;
+        }
+
+        // The form names the row `selected` falls back to; make that the row the submit acts on.
+        $this->variantId = $this->selected?->id;
+        $this->priceTarget = '';
+        $this->watching = true;
+    }
+
+    public function closePriceWatch(): void
+    {
+        $this->watching = false;
+        $this->priceWatchError = null;
+    }
+
+    /**
+     * Watches the selected row's price. The baht field is read into a local variable, never written back.
+     */
+    public function setPriceWatch(SetPriceAlert $setPriceAlert): void
+    {
+        $this->priceWatchError = null;
+
+        if ($this->sendGuestToLogin()) {
+            return;
+        }
+
+        // Exactly the row the customer chose, as addToCart does: `selected` may have fallen back to another one.
+        $variant = $this->rows->firstWhere('id', $this->variantId);
+
+        if ($variant === null || ! $this->isSelectable($variant)) {
+            $this->priceWatchError = (new AlertRefused('unavailable'))->message();
+            $this->refreshStock();
+            $this->variantId = $this->cheapest($this->rows)?->id;
+
+            return;
+        }
+
+        try {
+            $baht = str_replace([',', ' ', '฿'], '', trim($this->priceTarget));
+
+            try {
+                $target = Money::fromBaht($baht)->satang();
+            } catch (InvalidArgumentException) {
+                throw new AlertRefused('invalid_target');
+            }
+
+            $setPriceAlert->handle(auth()->user(), $variant, $target);
+
+            $this->watching = false;
+            $this->priceTarget = '';
+        } catch (AlertRefused $refused) {
+            $this->priceWatchError = $refused->message();
+
+            // The row sold out between the click and the check: show the one that can be bought now.
+            if ($refused->reason === 'unavailable') {
+                $this->refreshStock();
+                $this->variantId = $this->cheapest($this->rows)?->id;
+            }
+        }
+
+        unset($this->alerts);
+    }
+
+    public function cancelPriceWatch(int $variantId, RemovePriceAlert $removePriceAlert): void
+    {
+        $this->priceWatchError = null;
+
+        $alert = PriceAlert::query()->where('user_id', auth()->id())->where('variant_id', $variantId)->first();
+
+        if ($alert !== null) {
+            $removePriceAlert->handle(auth()->user(), $alert);
+        }
+
+        unset($this->alerts);
+    }
+
+    /**
+     * For a guest: remember this card and go to the login page. Returns whether it did.
+     */
+    private function sendGuestToLogin(): bool
+    {
+        if (auth()->check()) {
+            return false;
+        }
+
+        $card = Card::query()->find($this->cardId);
+
+        if ($card !== null) {
+            session()->put('url.intended', route('card.show', ['card' => $card, 'p' => $this->headerPrintingId]));
+        }
+
+        $this->redirectRoute('login');
+
+        return true;
     }
 
     private function refreshStock(): void
@@ -256,6 +426,32 @@ class VariantTable extends Component
             ->pluck('qty', 'purchasable_id')
             ->map(fn (mixed $qty): int => (int) $qty)
             ->all();
+    }
+
+    /**
+     * The signed-in visitor's active alerts on this card's variants, from two queries per render: the variant ids with
+     * a restock alert, and `variant id => target satang` for price alerts. Empty for a guest.
+     *
+     * @return array{restock: array<int, true>, price: array<int, int>}
+     */
+    #[Computed]
+    public function alerts(): array
+    {
+        $userId = auth()->id();
+        $variantIds = $this->printings->flatMap(fn (Printing $printing): Collection => $printing->variants)->pluck('id');
+
+        if ($userId === null || $variantIds->isEmpty()) {
+            return ['restock' => [], 'price' => []];
+        }
+
+        return [
+            'restock' => RestockAlert::query()
+                ->where('user_id', $userId)->where('is_active', true)->whereIn('variant_id', $variantIds)
+                ->pluck('variant_id')->mapWithKeys(fn (mixed $id): array => [(int) $id => true])->all(),
+            'price' => PriceAlert::query()
+                ->where('user_id', $userId)->where('is_active', true)->whereIn('variant_id', $variantIds)
+                ->pluck('target_satang', 'variant_id')->map(fn (mixed $target): int => (int) $target)->all(),
+        ];
     }
 
     #[Computed]

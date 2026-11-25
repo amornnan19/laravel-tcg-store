@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\Variant;
 use App\Notifications\OrderCancelled;
 use App\Support\OrderRecipient;
+use App\Support\VariantAlerts;
 use Closure;
 use Illuminate\Support\Facades\DB;
 
@@ -86,6 +87,8 @@ class CancelOrder
         if ($cancelled === null) {
             return null;
         }
+
+        VariantAlerts::dispatchFor($variantIds);
 
         OrderRecipient::notify($cancelled, new OrderCancelled($cancelled));
 

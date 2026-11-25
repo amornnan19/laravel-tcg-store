@@ -229,7 +229,7 @@ describe('freshness', function () {
             ->and(Queue::pushed(RemoveFromSearch::class)->contains(fn (object $queued) => $queued->models->first() instanceof CardSet))->toBeTrue();
     });
 
-    test('nothing is queued per row inside withoutSyncingToSearch', function () {
+    test('a stock drop inside withoutSyncingToSearch queues no search job and no alert check', function () {
         $printing = indexedPrinting();
         $variant = Variant::factory()->for($printing)->create(['qty' => 1]);
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\LineController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Storefront\AccountAlertController;
 use App\Http\Controllers\Storefront\AccountController;
 use App\Http\Controllers\Storefront\CardController;
 use App\Http\Controllers\Storefront\CartController;
@@ -63,6 +64,9 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/account/line/unlink', [LineController::class, 'unlink'])->name('line.unlink');
     Route::get('/account', AccountController::class)->name('account');
     Route::post('/account/notifications', [AccountController::class, 'notifications'])->name('account.notifications');
+    Route::delete('/account/wishlist/{wishlistItem}', [AccountAlertController::class, 'destroyWishlistItem'])->name('account.wishlist.destroy');
+    Route::delete('/account/alerts/price/{priceAlert}', [AccountAlertController::class, 'destroyPriceAlert'])->name('account.alerts.price.destroy');
+    Route::delete('/account/alerts/restock/{restockAlert}', [AccountAlertController::class, 'destroyRestockAlert'])->name('account.alerts.restock.destroy');
 });
 
 Route::get('/auth/line', [LineController::class, 'redirect'])->name('line.redirect');

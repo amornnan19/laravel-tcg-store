@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -19,6 +21,22 @@ class AccountController extends Controller
         return view('account', [
             'user' => $user,
             'orders' => $user->orders()->latest('placed_at')->paginate(10),
+            // Only what the storefront still shows: a card that left the shop or an inactive game drops off the list.
+            'wishlist' => $user->wishlistItems()
+                ->whereHas('printing', fn (Builder $printing) => $printing->withoutTrashed()->searchVisible())
+                ->with(['printing' => fn (Relation $printing) => $printing->withCheapestVariant()])
+                ->orderByDesc('id')
+                ->get(),
+            'priceAlerts' => $user->priceAlerts()
+                ->whereHas('variant.printing', fn (Builder $printing) => $printing->searchVisible())
+                ->with(['variant.printing.card', 'variant.printing.set'])
+                ->orderByDesc('id')
+                ->get(),
+            'restockAlerts' => $user->restockAlerts()
+                ->whereHas('variant.printing', fn (Builder $printing) => $printing->searchVisible())
+                ->with(['variant.printing.card', 'variant.printing.set'])
+                ->orderByDesc('id')
+                ->get(),
             'lineConfigured' => filled(config('services.line.client_id')),
             'lineMessagingConfigured' => filled(config('services.line.messaging_token')),
         ]);

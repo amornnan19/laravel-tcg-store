@@ -11,6 +11,10 @@
     $atMax = $quantity >= $cap;
     $inCart = $this->inCart;
     $minutes = config('shop.reservation_minutes');
+    $alerts = $this->alerts;
+    $smallButton = 'inline-flex min-h-11 items-center justify-center rounded-control border border-line-strong bg-surface px-4 text-small text-ink transition-[border-color] duration-160 ease-ui hover:border-accent motion-reduce:transition-none';
+    $watchTarget = $selected === null ? null : ($alerts['price'][$selected->id] ?? null);
+    $rowLabel = fn (\App\Models\Variant $variant): string => strtoupper($variant->condition->value).' · '.$variant->printing->language->shortCode().' · '.$variant->finish->label();
     $addButton = 'flex-none items-center justify-center gap-2 bg-accent font-medium text-accent-ink transition-transform duration-160 ease-ui active:scale-98 motion-reduce:transition-none';
 @endphp
 
@@ -72,6 +76,7 @@
                 @php
                     $selectable = $row->isAvailable() && $row->price_satang !== null;
                     $isSelected = $selected !== null && $selected->is($row);
+                    $restockable = ! $selectable && $row->price_satang !== null;
                 @endphp
 
                 @if ($multiplePrintings && ($loop->first || $this->rows[$loop->index - 1]->printing_id !== $row->printing_id))
@@ -81,6 +86,8 @@
                     </p>
                 @endif
 
+                {{-- One bordered unit for a sold-out priced row: the dimmed radio and its own restock footer. No overflow-hidden on it, which would clip the focus ring of the footer's button. --}}
+                <div wire:key="row-wrap-{{ $row->id }}" @class(['flex flex-col', 'rounded-control border border-line bg-surface' => $restockable])>
                 <button
                     type="button"
                     role="radio"
@@ -90,11 +97,14 @@
                     tabindex="{{ $isSelected ? 0 : -1 }}"
                     @disabled(! $selectable)
                     @class([
-                        'relative grid min-h-14 w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 overflow-hidden rounded-control border px-3 py-2 text-left transition-[border-color,background-color] duration-160 ease-ui motion-reduce:transition-none',
+                        'relative grid min-h-14 w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 overflow-hidden px-3 py-2 text-left transition-[border-color,background-color] duration-160 ease-ui motion-reduce:transition-none',
                         $columns,
+                        'rounded-control border' => ! $restockable,
+                        'rounded-none border-0' => $restockable,
                         'border-line-strong bg-raised ring-1 ring-accent/40 before:absolute before:inset-y-2 before:left-0 before:w-1 before:rounded-r-tag before:bg-accent' => $isSelected,
                         'border-line bg-surface hover:border-line-strong hover:bg-raised' => ! $isSelected && $selectable,
-                        'cursor-not-allowed border-line bg-surface opacity-55' => ! $selectable,
+                        'cursor-not-allowed bg-surface opacity-55' => ! $selectable,
+                        'border-line' => ! $selectable && ! $restockable,
                     ])
                 >
                     <x-condition-badge :condition="$row->condition" />
@@ -115,9 +125,36 @@
                             @if (($inCart[$row->id] ?? 0) > 0)
                                 <span class="block text-label tabular-nums text-accent">{{ __('storefront.card.in_cart', ['n' => $inCart[$row->id]]) }}</span>
                             @endif
+                            @if (isset($alerts['price'][$row->id]))
+                                <span class="block text-label tabular-nums text-accent">{{ __('storefront.alerts.price_watch_marker', ['target' => \App\Support\Money::fromSatang($alerts['price'][$row->id])->format()]) }}</span>
+                            @endif
                         </span>
                     </span>
                 </button>
+                {{-- A restock refusal for a row that is in stock again (a hold expired between render and click) shows under its radio. --}}
+                @if (! $restockable && isset($this->restockNotices[$row->id]))
+                    <p role="status" class="px-3 pb-2 text-small text-low">{{ $this->restockNotices[$row->id] }}</p>
+                @endif
+                {{-- Outside the row's radio: a button cannot sit inside a button. Its result renders here, in this row. --}}
+                @if ($restockable)
+                    @php
+                        $restockSet = isset($alerts['restock'][$row->id]);
+                        $restockNotice = $this->restockNotices[$row->id] ?? null;
+                    @endphp
+                    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-line px-3 py-2">
+                        <p class="text-label text-muted max-lg:basis-full">{{ __('storefront.alerts.restock_hint') }}</p>
+                        <button
+                            type="button"
+                            wire:key="restock-action-{{ $row->id }}"
+                            id="restock-action-{{ $row->id }}"
+                            wire:click="{{ $restockSet ? 'cancelRestock' : 'notifyRestock' }}({{ $row->id }})"
+                            aria-label="{{ __($restockSet ? 'storefront.alerts.restock_cancel_label' : 'storefront.alerts.notify_restock_label', ['variant' => $rowLabel($row)]) }}"
+                            class="{{ $smallButton }} max-lg:w-full"
+                        >{{ $restockSet ? __('storefront.alerts.restock_cancel') : __('storefront.alerts.notify_restock') }}</button>
+                        <p role="status" @class(['basis-full text-small', 'text-stock' => $restockSet && $restockNotice === null, 'text-low' => $restockNotice !== null, 'hidden' => ! $restockSet && $restockNotice === null])>{{ $restockNotice ?? ($restockSet ? __('storefront.alerts.restock_set') : '') }}</p>
+                    </div>
+                @endif
+                </div>
             @endforeach
         </div>
 
@@ -143,6 +180,48 @@
                         {{ __('storefront.card.add') }}
                     @endif
                 </button>
+            </div>
+            <div class="mt-3 flex flex-col gap-2">
+                @if ($watchTarget !== null)
+                    <p class="flex flex-wrap items-center gap-3 text-small">
+                        <span class="text-stock">{{ __('storefront.alerts.price_watch_set', ['variant' => $selectedLabel, 'target' => \App\Support\Money::fromSatang($watchTarget)->format()]) }}</span>
+                        <button type="button" wire:click="cancelPriceWatch({{ $selected->id }})" class="{{ $smallButton }}">{{ __('storefront.alerts.price_watch_cancel') }}</button>
+                    </p>
+                @elseif ($this->watching)
+                    @php
+                        $example = max(1, intdiv(intdiv($selected->price_satang * 9, 10), 100));
+                        $priceError = $this->priceWatchError;
+                    @endphp
+                    <form wire:submit="setPriceWatch" class="flex flex-col gap-2">
+                        <div>
+                            <label for="price-target" class="mb-1 block text-small text-muted">{{ __('storefront.alerts.price_target_label', ['variant' => $selectedLabel]) }}</label>
+                            <input
+                                id="price-target"
+                                type="text"
+                                inputmode="decimal"
+                                wire:model="priceTarget"
+                                data-text-input
+                                autocomplete="off"
+                                placeholder="{{ __('storefront.alerts.price_target_placeholder', ['example' => $example]) }}"
+                                aria-describedby="{{ $priceError !== null ? 'price-target-error price-target-hint' : 'price-target-hint' }}"
+                                @if ($priceError !== null) aria-invalid="true" @endif
+                                @class(['block min-h-11 w-full rounded-control border bg-surface px-3 text-body text-ink tabular-nums placeholder:text-faint aria-invalid:focus-visible:outline-danger', 'border-danger' => $priceError !== null, 'border-line-strong' => $priceError === null])
+                            >
+                        </div>
+                        @if ($priceError !== null)
+                            <p id="price-target-error" role="alert" class="basis-full text-small text-danger">{{ $priceError }}</p>
+                        @endif
+                        <p id="price-target-hint" class="basis-full text-label text-faint">{{ __('storefront.alerts.price_target_hint') }}</p>
+                        <div class="flex gap-3 max-lg:w-full max-lg:*:flex-1">
+                            <button type="submit" class="{{ $smallButton }}">{{ __('storefront.alerts.price_target_submit') }}</button>
+                            <button type="button" wire:click="closePriceWatch" class="{{ $smallButton }}">{{ __('storefront.alerts.price_target_close') }}</button>
+                        </div>
+                    </form>
+                @else
+                    <div>
+                        <button type="button" wire:click="openPriceWatch" class="{{ $smallButton }}">{{ __('storefront.alerts.price_watch') }}</button>
+                    </div>
+                @endif
             </div>
             {{-- The one live region of the table: the add result and the cap sentence are announced from here. --}}
             <p role="status" class="mt-2 text-small">

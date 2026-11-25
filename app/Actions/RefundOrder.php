@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Variant;
 use App\Notifications\OrderRefunded;
 use App\Support\OrderRecipient;
+use App\Support\VariantAlerts;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -73,6 +74,8 @@ class RefundOrder
 
             return new RefundResult($locked, $refundedSatang);
         });
+
+        VariantAlerts::dispatchFor($variantIds);
 
         OrderRecipient::notify($result->order, new OrderRefunded($result->order, $result->refundedSatang));
 

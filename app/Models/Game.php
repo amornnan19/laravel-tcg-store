@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use App\Observers\GameSearchObserver;
+use App\Support\VariantAlerts;
 use Database\Factories\GameFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,6 +22,16 @@ class Game extends Model
 
     protected static function booted(): void
     {
+        // Switching a game on makes its variants visible again, which can be what an alert waits for.
+        static::updated(function (Game $game): void {
+            if ($game->wasChanged('is_active') && $game->is_active) {
+                VariantAlerts::dispatchForWaiting(Variant::query()->whereIn(
+                    'printing_id',
+                    Printing::query()->whereHas('set', fn (Builder $sets) => $sets->where('game_id', $game->id))->select('id'),
+                ));
+            }
+        });
+
         static::creating(function (Game $game): void {
             if (blank($game->slug)) {
                 $game->slug = static::uniqueSlug($game->name_en);

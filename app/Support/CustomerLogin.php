@@ -4,7 +4,9 @@ namespace App\Support;
 
 use App\Exceptions\StaffLoginRefused;
 use App\Models\Order;
+use App\Models\Printing;
 use App\Models\User;
+use App\Models\WishlistItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -33,6 +35,34 @@ final class CustomerLogin
             ->whereKey((array) session()->get('orders_placed', []))
             ->whereNull('user_id')
             ->update(['user_id' => $user->getKey()]);
+
+        self::replayPendingWishlist($user);
+    }
+
+    /**
+     * A guest pressed a card's heart and was sent to log in: add that printing now, once. The key is consumed whatever
+     * happens, and the add never removes (an item already on the list stays).
+     */
+    private static function replayPendingWishlist(User $user): void
+    {
+        $printingId = session()->pull('wishlist.pending');
+
+        if (! is_int($printingId) && ! ctype_digit((string) $printingId)) {
+            return;
+        }
+
+        $printing = Printing::query()->searchVisible()->find((int) $printingId);
+
+        if ($printing === null) {
+            return;
+        }
+
+        WishlistItem::query()->insertOrIgnore([
+            'user_id' => $user->getKey(),
+            'printing_id' => $printing->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     /**

@@ -13,6 +13,10 @@
 
         <x-auth.status />
 
+        @if (session()->has('wishlist.pending'))
+            <p class="text-small text-muted">{{ __('storefront.alerts.wishlist_login_note') }}</p>
+        @endif
+
         @if ($lineConfigured)
             <div class="flex flex-col gap-2">
                 <x-auth.line-button>{{ __('storefront.auth.line_login') }}</x-auth.line-button>

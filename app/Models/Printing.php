@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\CardCondition;
 use App\Enums\Finish;
 use App\Enums\Language;
+use App\Support\VariantAlerts;
 use Database\Factories\PrintingFactory;
 use Illuminate\Database\Eloquent\Attributes\Unguarded;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,6 +23,14 @@ class Printing extends Model
 {
     /** @use HasFactory<PrintingFactory> */
     use HasFactory, Searchable, SoftDeletes;
+
+    protected static function booted(): void
+    {
+        // A restored printing is buyable again, which can be what an alert waits for.
+        static::restored(function (Printing $printing): void {
+            VariantAlerts::dispatchForWaiting(Variant::query()->where('printing_id', $printing->id));
+        });
+    }
 
     /**
      * @return array<string, string>

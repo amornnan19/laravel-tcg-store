@@ -57,6 +57,30 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     }
 
     /**
+     * @return HasMany<WishlistItem, $this>
+     */
+    public function wishlistItems(): HasMany
+    {
+        return $this->hasMany(WishlistItem::class);
+    }
+
+    /**
+     * @return HasMany<PriceAlert, $this>
+     */
+    public function priceAlerts(): HasMany
+    {
+        return $this->hasMany(PriceAlert::class);
+    }
+
+    /**
+     * @return HasMany<RestockAlert, $this>
+     */
+    public function restockAlerts(): HasMany
+    {
+        return $this->hasMany(RestockAlert::class);
+    }
+
+    /**
      * Email addresses are stored and looked up trimmed and lower-case, so `Mixed@Example.com` and `mixed@example.com`
      * are one account.
      */

@@ -6,6 +6,7 @@ use App\Exceptions\InsufficientStock;
 use App\Exceptions\NotPurchasable;
 use App\Models\CartItem;
 use App\Models\Variant;
+use App\Support\VariantAlerts;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use LogicException;
@@ -50,6 +51,9 @@ class ChangeCartQuantity
                 $this->reserveStock->handle($item->cart, $variant, $qty - $item->qty);
             } elseif ($qty < $item->qty) {
                 $reservation->update(['qty' => $qty]);
+
+                // The difference is available to others again.
+                VariantAlerts::dispatchFor([$variant->id]);
             }
 
             $item->update(['qty' => $qty]);
