@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             GameSeeder::class,
             CatalogueSeeder::class,
             PricePointSeeder::class,
+            OrderSeeder::class,
         ]);
     }
 }

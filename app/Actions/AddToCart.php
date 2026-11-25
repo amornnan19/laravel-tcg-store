@@ -6,7 +6,6 @@ use App\Exceptions\InsufficientStock;
 use App\Exceptions\NotPurchasable;
 use App\Models\Cart;
 use App\Models\CartItem;
-use App\Models\StockReservation;
 use App\Models\Variant;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -41,14 +40,10 @@ class AddToCart
                 throw new NotPurchasable;
             }
 
-            $wasLive = StockReservation::query()
-                ->live()
-                ->where('cart_id', $cart->getKey())
-                ->where('purchasable_type', $current->getMorphClass())
-                ->where('purchasable_id', $current->getKey())
-                ->exists();
-
-            $this->reserveStock->handle($cart, $current, $qty);
+            // What ReserveStock actually wrote decides whether the line adds up or starts over: a hold that expired
+            // between a separate liveness read and the write would otherwise leave the line and its hold apart.
+            $reservation = $this->reserveStock->handle($cart, $current, $qty);
+            $startedOver = $reservation->qty === $qty;
 
             $item = CartItem::query()
                 ->where('cart_id', $cart->getKey())
@@ -67,9 +62,9 @@ class AddToCart
             }
 
             // A line whose hold had expired starts over, so its quantity matches the new reservation.
-            $item->update($wasLive
-                ? ['qty' => $item->qty + $qty]
-                : ['qty' => $qty, 'unit_price_satang' => $current->price_satang]);
+            $item->update($startedOver
+                ? ['qty' => $qty, 'unit_price_satang' => $current->price_satang]
+                : ['qty' => $reservation->qty]);
 
             return $item;
         });

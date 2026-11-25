@@ -26,4 +26,41 @@ return [
 
     'reservation_minutes' => 15,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Payment
+    |--------------------------------------------------------------------------
+    |
+    | `payment_window_minutes` is how long an order waits for money before it is cancelled and its stock returned;
+    | `qr_minutes` how long one PromptPay QR is valid inside that window. PromptPay and the bank account are the
+    | shop's own: a method whose details are empty is not offered at checkout, and nothing here is ever printed from
+    | a template literal.
+    |
+    */
+
+    'payment_window_minutes' => 30,
+
+    'qr_minutes' => 15,
+
+    'promptpay_id' => env('SHOP_PROMPTPAY_ID'),
+
+    'bank' => [
+        'name' => env('SHOP_BANK_NAME'),
+        'account_name' => env('SHOP_BANK_ACCOUNT_NAME'),
+        'account_number' => env('SHOP_BANK_ACCOUNT_NUMBER'),
+    ],
+
+    'slip_max_kb' => 5120,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Display timezone
+    |--------------------------------------------------------------------------
+    |
+    | The application stores UTC; dates a customer reads (the order timeline, "paid at") are shown in the shop's own.
+    |
+    */
+
+    'timezone' => env('SHOP_TIMEZONE', 'Asia/Bangkok'),
+
 ];

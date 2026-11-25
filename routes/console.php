@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\CancelUnpaidOrders;
 use App\Jobs\ReleaseExpiredReservations;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -10,3 +11,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::job(new ReleaseExpiredReservations)->everyMinute()->withoutOverlapping();
+Schedule::job(new CancelUnpaidOrders)->everyMinute()->withoutOverlapping();

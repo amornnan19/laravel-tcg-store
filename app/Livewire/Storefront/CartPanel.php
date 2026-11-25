@@ -12,11 +12,10 @@ use App\Exceptions\NotPurchasable;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Variant;
+use App\Support\CartLines;
 use App\Support\CurrentCart;
 use Carbon\CarbonInterface;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
@@ -159,7 +158,7 @@ class CartPanel extends Component
      */
     private function changed(): void
     {
-        unset($this->cart, $this->lines, $this->purchasableIds, $this->heldLines, $this->expiresAt, $this->subtotal, $this->substitutes);
+        unset($this->cart, $this->cartLines, $this->lines, $this->purchasableIds, $this->heldLines, $this->expiresAt, $this->subtotal, $this->substitutes);
 
         $this->dispatch('cart-updated');
     }
@@ -171,49 +170,32 @@ class CartPanel extends Component
     }
 
     /**
-     * Every line of the cart, oldest first, each with its printing and the variant's availability loaded, and its
-     * hold (or null) set as the `reservation` relation from one read of the cart's reservations.
-     *
+     * The cart's lines and the rules about them, shared with checkout and PlaceOrder.
+     */
+    #[Computed]
+    public function cartLines(): CartLines
+    {
+        return new CartLines($this->cart);
+    }
+
+    /**
      * @return Collection<int, CartItem>
      */
     #[Computed]
     public function lines(): Collection
     {
-        $cart = $this->cart;
-
-        if ($cart === null) {
-            return new Collection;
-        }
-
-        $reservations = $cart->reservations()->get()->keyBy(fn ($reservation): string => $reservation->purchasable_type.':'.$reservation->purchasable_id);
-
-        return $cart->items()
-            ->with(['purchasable' => fn (MorphTo $morph) => $morph
-                ->constrain([Variant::class => fn (Builder $variants) => $variants->withReservedQty()])
-                ->morphWith([Variant::class => ['printing.card', 'printing.cardWithTrashed', 'printing.set']]),
-            ])
-            ->orderBy('id')
-            ->get()
-            ->each(fn (CartItem $line) => $line->setRelation('reservation', $reservations->get($line->purchasable_type.':'.$line->purchasable_id)));
+        return $this->cartLines->lines();
     }
 
     /**
-     * The ids of the cart's variants that still pass the purchasability rule, as keys, from one query.
+     * The ids of the cart's variants that still pass the purchasability rule, as keys.
      *
      * @return Collection<int, int>
      */
     #[Computed]
     public function purchasableIds(): Collection
     {
-        $ids = $this->lines
-            ->filter(fn (CartItem $line): bool => $line->purchasable instanceof Variant)
-            ->pluck('purchasable_id');
-
-        if ($ids->isEmpty()) {
-            return new Collection;
-        }
-
-        return Variant::query()->purchasable()->whereIn('id', $ids)->pluck('id')->flip();
+        return $this->cartLines->purchasableIds();
     }
 
     /**
@@ -224,7 +206,7 @@ class CartPanel extends Component
     #[Computed]
     public function heldLines(): Collection
     {
-        return $this->lines->filter(fn (CartItem $line): bool => ! $this->isGone($line) && (bool) $line->reservation?->isLive())->values();
+        return $this->lines->filter(fn (CartItem $line): bool => ! $this->isGone($line) && $this->cartLines->isHeld($line))->values();
     }
 
     /**
@@ -243,6 +225,22 @@ class CartPanel extends Component
     public function subtotal(): int
     {
         return $this->heldLines->sum(fn (CartItem $line): int => $line->unit_price_satang * $line->qty);
+    }
+
+    /**
+     * Whether every line can be ordered, so the page offers checkout.
+     */
+    public function canCheckout(): bool
+    {
+        return $this->lines->isNotEmpty() && $this->lines->every(fn (CartItem $line): bool => ! $this->isGone($line) && $this->cartLines->isOrderable($line));
+    }
+
+    /**
+     * A held line whose variant has less stock than the line asks for.
+     */
+    public function isStockShort(CartItem $line): bool
+    {
+        return ! $this->isGone($line) && $this->cartLines->isStockShort($line);
     }
 
     /**
@@ -269,8 +267,7 @@ class CartPanel extends Component
     public function isGone(CartItem $line): bool
     {
         return ($this->results[$line->id]['outcome'] ?? null) === RenewOutcome::Gone->value
-            || ! $line->purchasable instanceof Variant
-            || ! $this->purchasableIds->has($line->purchasable_id);
+            || $this->cartLines->isGone($line);
     }
 
     public function render(): View

@@ -5,7 +5,6 @@
     $stepperButton = 'size-11 text-card transition-[background-color] duration-160 ease-ui motion-reduce:transition-none';
     $primaryButton = 'inline-flex min-h-11 items-center rounded-control bg-accent px-4 text-small font-medium text-accent-ink transition-transform duration-160 ease-ui active:scale-98 motion-reduce:transition-none';
     $secondaryButton = 'inline-flex min-h-11 items-center justify-center rounded-control border border-line-strong bg-surface px-4 text-small text-ink transition-[border-color] duration-160 ease-ui hover:border-accent motion-reduce:transition-none';
-    $secondsLeft = $expiresAt === null ? 0 : max(0, (int) ceil(now()->diffInSeconds($expiresAt, false)));
     $cartIcon = new \Illuminate\Support\HtmlString('<svg width="34" height="34" viewBox="0 0 20 20" fill="none"><path d="M3.5 5h13l-1.2 8.4H4.7L3.5 5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="7.4" cy="16.4" r="1.2" fill="currentColor"/><circle cx="12.8" cy="16.4" r="1.2" fill="currentColor"/></svg>');
     $anyExpired = $held->isEmpty() && $lines->contains(fn (\App\Models\CartItem $line): bool => ! $this->isGone($line));
     $format = fn (int $satang): string => \App\Support\Money::fromSatang($satang)->format();
@@ -25,42 +24,7 @@
         </x-empty-state>
     @else
         @if ($expiresAt !== null)
-            {{-- Keyed on the deadline: a morph keeps a matching element's Alpine state, so a new deadline needs a new element. --}}
-            <div
-                wire:key="lock-{{ $expiresAt->timestamp }}"
-                x-data="{
-                    ends: Date.parse(@js($expiresAt->toIso8601String())),
-                    skew: Date.parse(@js(now()->toIso8601String())) - Date.now(),
-                    left: {{ $secondsLeft }},
-                    ended: false,
-                    timer: null,
-                    init() {
-                        this.tick();
-                        this.timer = setInterval(() => this.tick(), 1000);
-                    },
-                    destroy() {
-                        clearInterval(this.timer);
-                    },
-                    tick() {
-                        this.left = Math.max(0, Math.ceil((this.ends - (Date.now() + this.skew)) / 1000));
-
-                        if (this.left === 0 && ! this.ended) {
-                            this.ended = true;
-                            clearInterval(this.timer);
-                            $wire.$refresh();
-                        }
-                    },
-                    get label() {
-                        return String(Math.floor(this.left / 60)).padStart(2, '0') + ':' + String(this.left % 60).padStart(2, '0');
-                    },
-                }"
-                class="flex items-center gap-3 rounded-control border border-low/40 bg-low/10 px-4 py-3 text-small font-medium text-low"
-            >
-                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true" class="flex-none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.6"/><path d="M10 5.8V10l2.8 1.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                {{-- Not a live region: it ticks every second. The sentence below is the one thing announced, once, when time is up. --}}
-                <p>{!! __('storefront.cart.lock', ['time' => '<span class="tabular-nums" x-text="label">'.sprintf('%02d:%02d', intdiv($secondsLeft, 60), $secondsLeft % 60).'</span>']) !!}</p>
-                <p class="sr-only" aria-live="polite" x-text="ended ? @js(__('storefront.cart.lock_ended')) : ''"></p>
-            </div>
+            <x-lock-banner :expires-at="$expiresAt" />
         @endif
 
         @if ($anyExpired)
@@ -115,6 +79,8 @@
                             <p class="mt-2 text-small text-muted">{{ __('storefront.cart.gone') }}</p>
                         @elseif (! $live && ! $taken)
                             <p class="mt-2 text-small font-medium text-low">{{ __('storefront.cart.expired') }}</p>
+                        @elseif ($this->isStockShort($line))
+                            <p class="mt-2 text-small font-medium text-low">{{ __('storefront.cart.stock_short') }}</p>
                         @endif
 
                         @if (! $gone && ! $taken && in_array($outcome, ['renewed', 'at_cap', 'failed', 'swapped'], true))
@@ -196,6 +162,11 @@
                     <span class="text-card font-medium">{{ __('storefront.cart.total') }}</span>
                     <x-price :satang="$this->subtotal" class="text-h3 font-medium text-accent" />
                 </p>
+                @if ($this->canCheckout())
+                    <a href="{{ route('checkout') }}" class="{{ $primaryButton }} mt-4 w-full justify-center">{{ __('storefront.cart.checkout') }}</a>
+                @else
+                    <p class="mt-4 text-small text-muted">{{ __('storefront.cart.checkout_blocked') }}</p>
+                @endif
             </section>
         @endif
     @endif
