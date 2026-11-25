@@ -37,6 +37,15 @@ final class CustomerLogin
             ->update(['user_id' => $user->getKey()]);
 
         self::replayPendingWishlist($user);
+
+        // The deck list a guest was holding when they were sent here: moved to its own key and kept for the next request
+        // only, so the page they land on restores it once. `deck.pending` is only what a guest left; any other login
+        // (the Filament panel shares this guard) leaves it behind, and the importer discards it.
+        $deck = session()->pull('deck.pending');
+
+        if ($deck !== null) {
+            session()->flash('deck.restore', $deck);
+        }
     }
 
     /**

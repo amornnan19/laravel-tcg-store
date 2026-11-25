@@ -13,6 +13,10 @@
 
         <x-auth.status />
 
+        @if (session()->has('deck.pending'))
+            <p class="text-small text-muted">{{ __('storefront.deck.login_note') }}</p>
+        @endif
+
         @if (session()->has('wishlist.pending'))
             <p class="text-small text-muted">{{ __('storefront.alerts.wishlist_login_note') }}</p>
         @endif

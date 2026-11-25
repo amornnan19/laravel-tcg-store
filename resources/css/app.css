@@ -128,3 +128,6 @@
 }
 @keyframes shimmer { 0% { transform: translateX(-100%) } 100% { transform: translateX(100%) } }
 @media (prefers-reduced-motion: reduce) { .skeleton::after { animation: none } }
+
+/* The deck page's fixed add-all bar covers the bottom of the screen on a phone: keep a focused control clear of it. */
+@media (width < 64rem) { html:has(#deck-add-bar) { scroll-padding-bottom: 7rem; } }

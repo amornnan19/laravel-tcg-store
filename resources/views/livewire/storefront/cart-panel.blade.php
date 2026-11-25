@@ -18,9 +18,12 @@
         @endif
     </div>
 
+    <x-auth.status />
+
     @if ($lines->isEmpty())
-        <x-empty-state :title="__('storefront.cart.empty')" :icon="$cartIcon">
-            <a href="{{ route('search') }}" class="{{ $primaryButton }}">{{ __('storefront.cart.search') }}</a>
+        <x-empty-state :title="__('storefront.cart.empty')" :hint="__('storefront.cart.deck_hint')" :icon="$cartIcon">
+            <a href="{{ route('deck.import') }}" class="{{ $primaryButton }}">{{ __('storefront.cart.deck') }}</a>
+            <a href="{{ route('search') }}" class="{{ $secondaryButton }}">{{ __('storefront.cart.search') }}</a>
         </x-empty-state>
     @else
         @if ($expiresAt !== null)

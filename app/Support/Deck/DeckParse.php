@@ -74,4 +74,37 @@ final readonly class DeckParse
     {
         return array_sum(array_map(fn (DeckLine $line): int => $line->addQty() * ($line->chosenVariant()?->priceSatang ?? 0), $this->lines));
     }
+
+    /**
+     * What adding the list would put in the cart, `variant id => copies`, lines on one variant summed.
+     *
+     * @return array<int, int>
+     */
+    public function variantQty(): array
+    {
+        $map = [];
+
+        foreach ($this->lines as $line) {
+            $qty = $line->addQty();
+
+            if ($qty > 0 && $line->defaultVariantId !== null) {
+                $map[$line->defaultVariantId] = ($map[$line->defaultVariantId] ?? 0) + $qty;
+            }
+        }
+
+        ksort($map);
+
+        return $map;
+    }
+
+    /**
+     * A fingerprint of exactly what adding the list would do: the game, every variant with its copies, and the total.
+     * The page shows it and "add all" sends it back, so a list that changed underneath is never added unseen.
+     */
+    public function signature(?int $gameId): string
+    {
+        $pairs = array_map(fn (int $id, int $qty): string => $id.':'.$qty, array_keys($this->variantQty()), $this->variantQty());
+
+        return sha1(implode('|', [(string) $gameId, $this->totalSatang(), ...$pairs]));
+    }
 }

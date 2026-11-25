@@ -81,6 +81,14 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     }
 
     /**
+     * @return HasMany<SavedDeckList, $this>
+     */
+    public function savedDeckLists(): HasMany
+    {
+        return $this->hasMany(SavedDeckList::class);
+    }
+
+    /**
      * Email addresses are stored and looked up trimmed and lower-case, so `Mixed@Example.com` and `mixed@example.com`
      * are one account.
      */

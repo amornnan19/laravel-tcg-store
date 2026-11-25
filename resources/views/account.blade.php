@@ -171,6 +171,33 @@
             @endif
         </section>
 
+        <section aria-labelledby="account-decks-heading">
+            <h2 id="account-decks-heading" class="mb-3 font-display text-card font-medium">{{ __('storefront.account.decks.title') }}</h2>
+
+            @if ($savedDecks->isEmpty())
+                <x-empty-state :title="__('storefront.account.decks.empty')" :hint="__('storefront.account.decks.empty_hint')">
+                    <a href="{{ route('deck.import') }}" class="{{ $secondaryButton }}">{{ __('storefront.account.decks.paste') }}</a>
+                </x-empty-state>
+            @else
+                <ul class="flex flex-col gap-2">
+                    @foreach ($savedDecks as $deck)
+                        <li class="flex items-center gap-3 rounded-card border border-line bg-sunken p-3">
+                            <span class="min-w-0 flex-1">
+                                <span class="block truncate text-small font-medium">{{ $deck->name }}</span>
+                                <span class="block truncate text-label text-faint tabular-nums">{{ __('storefront.account.decks.meta', ['n' => $deck->requestedCards(), 'game' => $deck->game->name_en]) }}</span>
+                            </span>
+                            <a href="{{ route('deck.import', ['list' => $deck->id]) }}" aria-label="{{ __('storefront.account.decks.recheck_label', ['name' => $deck->name]) }}" class="{{ $linkButton }} flex-none">{{ __('storefront.account.decks.recheck') }}</a>
+                            <form method="POST" action="{{ route('account.decks.destroy', $deck) }}" class="flex-none" x-data x-on:submit="if (! confirm(@js(__('storefront.account.decks.confirm_remove', ['name' => $deck->name])))) { $event.preventDefault() }">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" aria-label="{{ __('storefront.account.decks.remove_label', ['name' => $deck->name]) }}" class="{{ $linkButton }}">{{ __('storefront.account.decks.remove') }}</button>
+                            </form>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </section>
+
         @if ($user->hasLine() || ($lineConfigured && ! $user->is_staff))
             <section aria-labelledby="account-line-heading" class="flex flex-col items-start gap-3 rounded-card border border-line bg-sunken p-4">
                 <h2 id="account-line-heading" class="font-display text-card font-medium">{{ __('storefront.account.line_section') }}</h2>

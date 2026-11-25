@@ -35,6 +35,15 @@
 
                 <livewire:storefront.search-box />
 
+                <a
+                    href="{{ route('deck.import') }}"
+                    @if (request()->routeIs('deck.import')) aria-current="page" @endif
+                    class="inline-flex min-h-11 flex-none items-center gap-2 rounded-control border border-line-strong bg-surface px-4 text-small text-ink transition-[border-color] duration-160 ease-ui hover:border-accent motion-reduce:transition-none max-lg:hidden"
+                >
+                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="4" y="2.8" width="12" height="14.4" rx="1.6" stroke="currentColor" stroke-width="1.6"/><path d="M7.2 7h5.6M7.2 10h5.6M7.2 13h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                    {{ __('storefront.nav.deck') }}
+                </a>
+
                 <livewire:storefront.cart-link variant="header" />
 
                 <a
@@ -87,6 +96,18 @@
             >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 8.6 10 3.2l7 5.4V17H3V8.6Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
                 {{ __('storefront.nav.home') }}
+            </a>
+            <a
+                href="{{ route('deck.import') }}"
+                @if (request()->routeIs('deck.import')) aria-current="page" @endif
+                @class([
+                    'flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-control text-label',
+                    'font-medium text-accent' => request()->routeIs('deck.import'),
+                    'text-faint' => ! request()->routeIs('deck.import'),
+                ])
+            >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="4" y="2.8" width="12" height="14.4" rx="1.6" stroke="currentColor" stroke-width="1.5"/><path d="M7.2 7h5.6M7.2 10h5.6M7.2 13h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                {{ __('storefront.nav.deck') }}
             </a>
             <div class="flex flex-1 justify-center">
                 <button

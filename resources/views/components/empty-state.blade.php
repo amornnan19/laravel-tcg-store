@@ -11,6 +11,6 @@
         <p class="text-label text-muted">{{ $hint }}</p>
     @endif
     @if (! $slot->isEmpty())
-        <div class="mt-1 flex flex-col items-center gap-1">{{ $slot }}</div>
+        <div class="mt-1 flex flex-wrap justify-center gap-2">{{ $slot }}</div>
     @endif
 </div>

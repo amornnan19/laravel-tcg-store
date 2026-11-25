@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Storefront\AccountAlertController;
 use App\Http\Controllers\Storefront\AccountController;
+use App\Http\Controllers\Storefront\AccountDeckController;
 use App\Http\Controllers\Storefront\CardController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CheckoutController;
@@ -70,6 +71,7 @@ Route::middleware('auth')->group(function (): void {
     Route::delete('/account/wishlist/{wishlistItem}', [AccountAlertController::class, 'destroyWishlistItem'])->name('account.wishlist.destroy');
     Route::delete('/account/alerts/price/{priceAlert}', [AccountAlertController::class, 'destroyPriceAlert'])->name('account.alerts.price.destroy');
     Route::delete('/account/alerts/restock/{restockAlert}', [AccountAlertController::class, 'destroyRestockAlert'])->name('account.alerts.restock.destroy');
+    Route::delete('/account/decks/{savedDeckList}', [AccountDeckController::class, 'destroy'])->name('account.decks.destroy');
 });
 
 Route::get('/auth/line', [LineController::class, 'redirect'])->name('line.redirect');

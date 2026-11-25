@@ -23,6 +23,10 @@ final readonly class DeckLine
      * @param  int  $otherLanguagesAvailable  Available variants the language preference left out.
      * @param  string  $body  The line without its quantity.
      * @param  bool  $qtyZero  Whether the line asked for 0 copies, which is not a card line.
+     * @param  int  $allocatedQty  How many of the line's copies the chosen variant can still give once the lines before it that share the variant have taken theirs.
+     * @param  bool  $sumCapped  Whether the line is short only because the lines sharing its variant would add more than `deck.max_qty` of it.
+     * @param  bool  $takenByEarlierLines  Whether the line is missing only because the lines before it took the stock of every variant it could use.
+     * @param  array<int, int>  $remaining  `variant id => copies` still free for this line after the lines before it; the variants it can be switched to.
      */
     public function __construct(
         public int $number,
@@ -42,6 +46,10 @@ final readonly class DeckLine
         public int $otherLanguagesAvailable = 0,
         public string $body = '',
         public bool $qtyZero = false,
+        public int $allocatedQty = 0,
+        public bool $sumCapped = false,
+        public bool $takenByEarlierLines = false,
+        public array $remaining = [],
     ) {}
 
     /**
@@ -76,18 +84,28 @@ final readonly class DeckLine
      */
     public function addQty(): int
     {
-        $available = $this->chosenVariant()?->availableQty ?? 0;
-
         return match ($this->bucket) {
             DeckBucket::Full => $this->qty,
-            DeckBucket::Partial => $this->takePartial ? min($this->qty, $available) : 0,
+            DeckBucket::Partial => $this->takePartial ? $this->allocatedQty : 0,
             default => 0,
         };
     }
 
-    public function withChoice(?int $variantId, ?DeckBucket $bucket): self
+    /**
+     * @param  array<int, int>  $remaining
+     */
+    public function withChoice(?int $variantId, ?DeckBucket $bucket, ?int $allocatedQty = null, bool $sumCapped = false, bool $takenByEarlierLines = false, array $remaining = []): self
     {
-        return $this->copy(['defaultVariantId' => $variantId, 'bucket' => $bucket]);
+        $allocated = $allocatedQty ?? ($variantId === null ? 0 : min($this->qty, $this->variants[$variantId]->availableQty ?? 0));
+
+        return $this->copy([
+            'defaultVariantId' => $variantId,
+            'bucket' => $bucket,
+            'allocatedQty' => $allocated,
+            'sumCapped' => $sumCapped,
+            'takenByEarlierLines' => $takenByEarlierLines,
+            'remaining' => $remaining,
+        ]);
     }
 
     public function withTakePartial(bool $takePartial): self

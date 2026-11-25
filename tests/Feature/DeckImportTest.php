@@ -1,19 +1,28 @@
 <?php
 
+use App\Actions\AddDeckToCart;
 use App\Actions\ParseDeckList;
+use App\Actions\SetRestockAlerts;
 use App\Enums\CardCondition;
 use App\Enums\DeckBucket;
 use App\Enums\DeckLineKind;
 use App\Enums\DeckMatchedBy;
 use App\Enums\Finish;
 use App\Enums\Language;
+use App\Exceptions\AlertRefused;
+use App\Exceptions\DeckNotReserved;
 use App\Exceptions\FuzzySearchUnavailable;
 use App\Livewire\Storefront\DeckImport;
 use App\Models\Card;
 use App\Models\CardSet;
+use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Game;
 use App\Models\Printing;
+use App\Models\RestockAlert;
+use App\Models\SavedDeckList;
 use App\Models\StockReservation;
+use App\Models\User;
 use App\Models\Variant;
 use App\Search\FuzzyCardMatcher;
 use App\Search\MeilisearchFuzzyCardMatcher;
@@ -23,12 +32,14 @@ use App\Support\Deck\DeckLine;
 use App\Support\Deck\DeckMatch;
 use App\Support\Deck\DeckParse;
 use App\Support\Deck\NameKey;
+use Database\Seeders\SavedDeckListSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Laravel\Scout\Builder;
 use Laravel\Scout\EngineManager;
 use Laravel\Scout\Engines\NullEngine;
 use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
+use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -527,7 +538,7 @@ test('parsing a long list stays within a fixed number of queries', function () {
     foreach (range(1, 12) as $i) {
         $card = Card::factory()->for($shop['onePiece'], 'game')->create(['name_en' => "Filler {$i}"]);
         $printing = Printing::factory()->for($card)->for($shop['op05'], 'set')->create(['number' => (string) (200 + $i)]);
-        deckVariant($printing, 4);
+        deckVariant($printing, 6);
         $lines[] = '2x OP05-'.(200 + $i);
         $lines[] = "2x Filler {$i}";
         $lines[] = 'OP05-'.(200 + $i).' x2';
@@ -1028,4 +1039,971 @@ test('a card that left the shop after the check is priced as gone on the next re
 
     expect($line->bucket)->toBe(DeckBucket::Missing)
         ->and($line->variants)->toBe([]);
+});
+
+/**
+ * Takes `$qty` of a variant out of what others can buy, as a live hold from another cart would.
+ */
+function deckHold(Variant $variant, int $qty): StockReservation
+{
+    return StockReservation::factory()->create([
+        'cart_id' => Cart::factory()->create(),
+        'purchasable_id' => $variant->id,
+        'qty' => $qty,
+    ]);
+}
+
+/**
+ * The signature the page sends back with "add all" for the list it shows.
+ */
+function shownSignature(Testable $component): string
+{
+    return $component->instance()->result->signature($component->instance()->gameId);
+}
+
+function shownTotal(Testable $component): int
+{
+    return $component->instance()->result->totalSatang();
+}
+
+test('add all holds every line, sums lines on one variant, and lands on the cart with a status', function () {
+    $shop = deckShop();
+    $luffy = deckVariant($shop['luffyEn'], 9, 10000);
+    $zoro = deckVariant($shop['zoroEn'], 5, 20000);
+
+    $component = Livewire::test(DeckImport::class)->set('raw', "2x OP05-119\n1x OP05-119\n3x OP05-120\n5x Unknown Card")->call('check');
+    $component->call('addAll', shownSignature($component))
+        ->assertRedirect(route('cart'));
+
+    $cart = Cart::query()->sole();
+
+    expect(CartItem::query()->where('cart_id', $cart->id)->orderBy('purchasable_id')->get()->map(fn (CartItem $item): array => [$item->purchasable_id, $item->qty])->all())
+        ->toBe([[$luffy->id, 3], [$zoro->id, 3]])
+        ->and(StockReservation::query()->where('cart_id', $cart->id)->sum('qty'))->toBe(6)
+        ->and(session('status'))->toBe(__('storefront.deck.added', ['n' => 6, 'minutes' => config('shop.reservation_minutes')]));
+});
+
+test('add all takes the available quantity of a partial line, only while the toggle is on, and never a missing line', function () {
+    $shop = deckShop();
+    $luffy = deckVariant($shop['luffyEn'], 2, 10000);
+    $zoro = deckVariant($shop['zoroEn'], 4, 20000);
+    $soldOut = deckVariant(Printing::factory()->for($shop['zoro'])->for($shop['op05'], 'set')->create(['number' => '122', 'language' => Language::En]), 0, 5000);
+    $raw = "5x OP05-119\n1x OP05-120\n2x OP05-122";
+
+    $on = Livewire::test(DeckImport::class)->set('raw', $raw)->call('check');
+    $on->call('addAll', shownSignature($on))->assertRedirect(route('cart'));
+
+    expect(CartItem::query()->where('purchasable_id', $luffy->id)->sole()->qty)->toBe(2)
+        ->and(CartItem::query()->count())->toBe(2)
+        ->and(CartItem::query()->where('purchasable_id', $soldOut->id)->exists())->toBeFalse();
+
+    CartItem::query()->delete();
+    StockReservation::query()->delete();
+
+    $off = Livewire::test(DeckImport::class)->set('raw', $raw)->call('check')->call('togglePartial', 1);
+    $off->call('addAll', shownSignature($off))->assertRedirect(route('cart'));
+
+    expect(CartItem::query()->count())->toBe(1)
+        ->and(CartItem::query()->sole()->purchasable_id)->toBe($zoro->id);
+});
+
+test('add all adds nothing for a list with nothing to add', function () {
+    $shop = deckShop();
+
+    $component = Livewire::test(DeckImport::class)->set('raw', '2x OP05-119')->call('check');
+    $component->call('addAll', '')->assertNoRedirect();
+
+    expect(Cart::query()->count())->toBe(0);
+});
+
+test('add all refuses a stale result on the server', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 4, 10000);
+
+    $component = Livewire::test(DeckImport::class)->set('raw', '2x OP05-119')->call('check');
+    $signature = shownSignature($component);
+
+    $component->set('raw', "2x OP05-119\n1x OP05-120")->call('addAll', $signature)->assertNoRedirect();
+
+    expect(Cart::query()->count())->toBe(0)->and(CartItem::query()->count())->toBe(0);
+
+    $failed = Livewire::test(DeckImport::class)->set('raw', '2x OP05-119')->call('check')->set('raw', '')->call('check');
+    $failed->call('addAll', $signature)->assertNoRedirect();
+
+    expect(CartItem::query()->count())->toBe(0);
+});
+
+test('add all adds nothing when the total is not the one the customer saw, and shows the list again', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 4, 10000);
+
+    $component = Livewire::test(DeckImport::class)->set('raw', '2x OP05-119')->call('check');
+
+    $component->call('addAll', 'not-what-was-shown')
+        ->assertNoRedirect()
+        ->assertSet('addNotice', __('storefront.deck.total_changed'))
+        ->assertSee(__('storefront.deck.total_changed'));
+
+    expect(CartItem::query()->count())->toBe(0)->and(StockReservation::query()->count())->toBe(0);
+});
+
+test('a pick that sold out falls back to a dearer default, and add all then adds nothing', function () {
+    $shop = deckShop();
+    $cheap = deckVariant($shop['luffyEn'], 4, 10000, CardCondition::Lp);
+    deckVariant($shop['luffyEn'], 4, 20000, CardCondition::Nm);
+
+    $component = Livewire::test(DeckImport::class)->set('raw', '2x OP05-119')->call('check');
+    $component->call('chooseVariant', 1, $cheap->id);
+    $seen = shownSignature($component);
+    $seenTotal = shownTotal($component);
+
+    deckHold($cheap, 4);
+
+    $component->call('addAll', $seen)
+        ->assertNoRedirect()
+        ->assertSet('addNotice', __('storefront.deck.total_changed'));
+
+    expect($seenTotal)->toBe(20000)
+        ->and(CartItem::query()->count())->toBe(0)
+        ->and(shownTotal($component))->toBe(40000);
+});
+
+test('when the action reports failed variants the page marks them, shows the error and keeps the cart empty', function () {
+    $shop = deckShop();
+    $luffy = deckVariant($shop['luffyEn'], 4, 10000);
+
+    app()->instance(AddDeckToCart::class, new class extends AddDeckToCart
+    {
+        public function __construct() {}
+
+        public function handle(Cart $cart, Game $game, array $variantQty): void
+        {
+            throw new DeckNotReserved(array_keys($variantQty));
+        }
+    });
+
+    $component = Livewire::test(DeckImport::class)->set('raw', '2x OP05-119')->call('check');
+    $component->call('addAll', shownSignature($component))
+        ->assertNoRedirect()
+        ->assertSet('failedVariants', [$luffy->id])
+        ->assertSee(__('storefront.deck.add_failed'))
+        ->assertSee(__('storefront.deck.add_failed_row'));
+});
+
+test('a variant that cannot be held fails the whole add and holds nothing, not even the lines that fit', function () {
+    $shop = deckShop();
+    $fits = deckVariant($shop['luffyEn'], 4, 10000);
+    $gone = deckVariant($shop['zoroEn'], 4, 20000);
+    $cart = Cart::factory()->create();
+
+    deckHold($gone, 4);
+
+    try {
+        app(AddDeckToCart::class)->handle($cart, $shop['onePiece'], [$fits->id => 2, $gone->id => 1]);
+        $this->fail('Expected DeckNotReserved.');
+    } catch (DeckNotReserved $failed) {
+        expect($failed->variantIds)->toBe([$gone->id]);
+    }
+
+    expect(CartItem::query()->where('cart_id', $cart->id)->count())->toBe(0)
+        ->and(StockReservation::query()->where('cart_id', $cart->id)->count())->toBe(0);
+});
+
+test('every variant that fails is reported, not only the first', function () {
+    $shop = deckShop();
+    $one = deckVariant($shop['luffyEn'], 1, 10000);
+    $two = deckVariant($shop['zoroEn'], 1, 20000);
+
+    expect(fn () => app(AddDeckToCart::class)->handle(Cart::factory()->create(), $shop['onePiece'], [$one->id => 2, $two->id => 2]))
+        ->toThrow(fn (DeckNotReserved $failed) => expect($failed->variantIds)->toBe([$one->id, $two->id]));
+});
+
+test('a variant that became unpurchasable fails the whole add', function () {
+    $shop = deckShop();
+    $fits = deckVariant($shop['luffyEn'], 4, 10000);
+    $unpriced = deckVariant($shop['zoroEn'], 4, 20000);
+    $cart = Cart::factory()->create();
+
+    $unpriced->update(['price_satang' => null]);
+
+    expect(fn () => app(AddDeckToCart::class)->handle($cart, $shop['onePiece'], [$fits->id => 1, $unpriced->id => 1]))
+        ->toThrow(fn (DeckNotReserved $failed) => expect($failed->variantIds)->toBe([$unpriced->id]));
+
+    expect(CartItem::query()->count())->toBe(0)->and(StockReservation::query()->count())->toBe(0);
+});
+
+test('add to cart re-validates the game and the quantity it is given', function (string $case) {
+    $shop = deckShop();
+    $mine = deckVariant($shop['luffyEn'], 150, 10000);
+    $other = deckVariant($shop['charizardEn'], 5, 10000);
+    $cart = Cart::factory()->create();
+
+    $map = match ($case) {
+        'another game' => [$mine->id => 1, $other->id => 1],
+        'zero' => [$mine->id => 0],
+        'over the cap' => [$mine->id => config('deck.max_qty') + 1],
+        'unknown id' => [$mine->id => 1, 999999 => 1],
+    };
+    $expected = match ($case) {
+        'another game' => [$other->id],
+        'zero', 'over the cap' => [$mine->id],
+        'unknown id' => [999999],
+    };
+
+    expect(fn () => app(AddDeckToCart::class)->handle($cart, $shop['onePiece'], $map))
+        ->toThrow(fn (DeckNotReserved $failed) => expect($failed->variantIds)->toBe($expected));
+
+    expect(CartItem::query()->count())->toBe(0)->and(StockReservation::query()->count())->toBe(0);
+})->with(['another game', 'zero', 'over the cap', 'unknown id']);
+
+test('add all locks the variants first, in id order, before any other read', function () {
+    $shop = deckShop();
+    $first = deckVariant($shop['luffyEn'], 4, 10000);
+    $second = deckVariant($shop['zoroEn'], 4, 20000);
+    $cart = Cart::factory()->create();
+
+    $queries = [];
+    DB::listen(function ($query) use (&$queries): void {
+        $queries[] = $query->sql;
+    });
+
+    // Handed in reverse order, so only the action itself can put them in id order.
+    app(AddDeckToCart::class)->handle($cart, $shop['onePiece'], [$second->id => 1, $first->id => 1]);
+
+    // SQLite writes no FOR UPDATE, so this proves the order (all variants select first, sorted by id), not the lock itself.
+    expect($queries[0])->toStartWith('select * from "variants" where "id" in (')->toContain('order by "id" asc');
+});
+
+test('the bulk alert makes one call with the candidate variants of every missing line', function () {
+    $shop = deckShop();
+    $first = deckVariant($shop['luffyEn'], 0, 10000);
+    $second = deckVariant($shop['luffyEn'], 0, 11000, CardCondition::Lp);
+    $third = deckVariant($shop['zoroEn'], 2, 20000);
+    $zoroSoldOut = deckVariant(Printing::factory()->for($shop['zoro'])->for($shop['op05'], 'set')->create(['number' => '121', 'language' => Language::En]), 0, 5000);
+    $spy = new class(app(SetRestockAlerts::class)) extends SetRestockAlerts
+    {
+        /** @var list<array<int, int>> */
+        public array $calls = [];
+
+        public function __construct(private SetRestockAlerts $real) {}
+
+        public function handle(User $user, array $variantIds): int
+        {
+            $this->calls[] = $variantIds;
+
+            return $this->real->handle($user, $variantIds);
+        }
+    };
+    app()->instance(SetRestockAlerts::class, $spy);
+
+    $user = User::factory()->create();
+
+    $component = Livewire::actingAs($user)->test(DeckImport::class)->set('raw', "2x OP05-119\n1x OP05-120\n1x OP05-121\nmystery")->call('check')
+        ->assertSee(__('storefront.deck.alert_missing', ['n' => 2]))
+        ->call('alertMissing')
+        ->assertSet('alertSet', true)
+        ->assertSee(__('storefront.deck.alerts_set', ['n' => 2]));
+
+    sort($spy->calls[0]);
+
+    expect($spy->calls)->toHaveCount(1)
+        ->and($spy->calls[0])->toBe([$first->id, $second->id, $zoroSoldOut->id])
+        ->and(RestockAlert::query()->where('user_id', $user->id)->count())->toBe(3);
+});
+
+test('a guest who sets the bulk alert is sent to log in and gets the list back afterwards', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 0, 10000);
+
+    Livewire::test(DeckImport::class)->set('raw', '2x OP05-119')->call('check')
+        ->call('alertMissing')
+        ->assertRedirect(route('login'));
+
+    expect(session('deck.pending'))->toMatchArray(['raw' => '2x OP05-119', 'game' => $shop['onePiece']->id, 'language' => null, 'alert' => true])
+        ->and(session('url.intended'))->toBe(route('deck.import'))
+        ->and(RestockAlert::query()->count())->toBe(0);
+
+    $user = User::factory()->create();
+    session()->put('deck.restore', session('deck.pending'));
+
+    Livewire::actingAs($user)->test(DeckImport::class)
+        ->assertSet('raw', '2x OP05-119')
+        ->assertSet('checked', true)
+        ->assertSet('gameId', $shop['onePiece']->id);
+});
+
+test('a customer with no way to be told gets the refusal message inline', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 0, 10000);
+    $noChannel = User::factory()->withLine()->create(['email' => null, 'line_notify_opt_in' => false]);
+
+    Livewire::actingAs($noChannel)->test(DeckImport::class)->set('raw', '2x OP05-119')->call('check')
+        ->call('alertMissing')
+        ->assertSet('alertSet', false)
+        ->assertSee((new AlertRefused('no_channel'))->message());
+
+    expect(RestockAlert::query()->count())->toBe(0);
+});
+
+test('the bulk alert refuses a stale result and has no button when no missing line has a variant', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 0, 10000);
+    $user = User::factory()->create();
+
+    $component = Livewire::actingAs($user)->test(DeckImport::class)->set('raw', '2x OP05-119')->call('check');
+    $component->set('raw', '2x OP05-120')->call('alertMissing');
+
+    expect(RestockAlert::query()->count())->toBe(0);
+
+    Livewire::actingAs($user)->test(DeckImport::class)->set('raw', '2x OP05-120')->call('check')
+        ->assertDontSee(__('storefront.deck.alert_missing', ['n' => 1]));
+});
+
+test('saving keeps the pasted text byte for byte, with the parsed match and a default name', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 4, 10000);
+    $user = User::factory()->create();
+    $raw = "4x\tOP05-119  \r\n\r\n  mystery card \t\r\n";
+
+    Livewire::actingAs($user)->test(DeckImport::class)->set('raw', $raw)->call('check')
+        ->call('save')
+        ->assertSee(__('storefront.deck.saved'));
+
+    $saved = SavedDeckList::query()->sole();
+
+    expect($saved->raw_text)->toBe($raw)
+        ->and($saved->user_id)->toBe($user->id)
+        ->and($saved->game_id)->toBe($shop['onePiece']->id)
+        ->and($saved->name)->toStartWith('เด็ค One Piece · ')
+        ->and($saved->parsed[0]['kind'])->toBe('matched')
+        ->and($saved->parsed[0]['printingIds'])->toContain($shop['luffyEn']->id);
+});
+
+test('saving takes the name given, refuses one over 100 characters, and needs a signed-in customer and a fresh result', function () {
+    $shop = deckShop();
+    $user = User::factory()->create();
+
+    $component = Livewire::actingAs($user)->test(DeckImport::class)->set('raw', '2x OP05-119')->call('check')
+        ->set('saveName', str_repeat('a', 101))->call('save')
+        ->assertHasErrors(['saveName']);
+
+    expect(SavedDeckList::query()->count())->toBe(0);
+
+    $component->set('saveName', 'Red aggro')->call('save')->assertHasNoErrors();
+
+    expect(SavedDeckList::query()->sole()->name)->toBe('Red aggro');
+
+    $component->set('raw', '2x OP05-120')->call('save');
+
+    expect(SavedDeckList::query()->count())->toBe(1);
+
+    auth()->logout();
+
+    Livewire::test(DeckImport::class)->set('raw', '2x OP05-119')->call('check')->call('save');
+
+    expect(SavedDeckList::query()->count())->toBe(1);
+});
+
+test('a saved list is checked again against current stock, and only its owner can open it', function () {
+    $shop = deckShop();
+    $variant = deckVariant($shop['luffyEn'], 4, 10000);
+    $owner = User::factory()->create();
+    $saved = SavedDeckList::factory()->create(['user_id' => $owner->id, 'game_id' => $shop['onePiece']->id, 'raw_text' => '4x OP05-119']);
+
+    $this->actingAs($owner)->get(route('deck.import', ['list' => $saved->id]))->assertOk()->assertSee(__('storefront.deck.summary_title'));
+
+    deckHold($variant, 3);
+
+    $this->actingAs($owner)->get(route('deck.import', ['list' => $saved->id]))
+        ->assertSee(__('storefront.deck.want_have', ['want' => 4, 'have' => 1]));
+
+    $this->actingAs(User::factory()->create())->get(route('deck.import', ['list' => $saved->id]))->assertNotFound();
+    auth()->logout();
+    $this->get(route('deck.import', ['list' => $saved->id]))->assertNotFound();
+    $this->actingAs($owner)->get(route('deck.import', ['list' => 999999]))->assertNotFound();
+    $this->actingAs($owner)->get(route('deck.import', ['list' => 'abc']))->assertNotFound();
+});
+
+test('the account page lists saved decks, and deleting is for the owner only', function () {
+    $shop = deckShop();
+    $owner = User::factory()->create();
+    $other = User::factory()->create();
+    $mine = SavedDeckList::factory()->create(['user_id' => $owner->id, 'game_id' => $shop['onePiece']->id, 'name' => 'Red aggro']);
+    $theirs = SavedDeckList::factory()->create(['user_id' => $other->id, 'game_id' => $shop['onePiece']->id, 'name' => 'Blue control']);
+
+    $this->actingAs($owner)->get(route('account'))
+        ->assertSee(__('storefront.account.decks.title'))
+        ->assertSee('Red aggro')
+        ->assertDontSee('Blue control')
+        ->assertSee(route('deck.import', ['list' => $mine->id]));
+
+    $this->actingAs($owner)->delete(route('account.decks.destroy', $theirs))->assertNotFound();
+    expect(SavedDeckList::query()->count())->toBe(2);
+
+    $this->actingAs($owner)->delete(route('account.decks.destroy', $mine))->assertRedirect(route('account'));
+    expect(SavedDeckList::query()->pluck('id')->all())->toBe([$theirs->id]);
+
+    auth()->logout();
+    $this->delete(route('account.decks.destroy', $theirs))->assertRedirect();
+    expect(SavedDeckList::query()->count())->toBe(1);
+});
+
+test('the header links to the importer and an empty cart offers it', function () {
+    deckShop();
+
+    $this->get(route('home'))->assertSee('href="'.route('deck.import').'"', false)->assertSee(__('storefront.nav.deck'));
+    $this->get(route('cart'))
+        ->assertSee(__('storefront.cart.deck'))
+        ->assertSee(__('storefront.cart.deck_hint'))
+        ->assertSee(__('storefront.cart.search'));
+});
+
+test('the cart page shows the status add all leaves behind', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 4, 10000);
+
+    $this->withSession(['status' => 'เพิ่ม 2 ใบลงตะกร้าแล้ว'])->get(route('cart'))->assertSee('เพิ่ม 2 ใบลงตะกร้าแล้ว');
+});
+
+test('two lines on one variant share its stock: the later one is partial, and add all holds exactly what there is', function () {
+    $shop = deckShop();
+    $luffy = deckVariant($shop['luffyEn'], 5, 10000);
+
+    $component = Livewire::test(DeckImport::class)->set('raw', "4x OP05-119\n4x OP05-119")->call('check');
+    $lines = $component->instance()->result->lines;
+
+    expect($lines[0]->bucket)->toBe(DeckBucket::Full)
+        ->and($lines[0]->allocatedQty)->toBe(4)
+        ->and($lines[1]->bucket)->toBe(DeckBucket::Partial)
+        ->and($lines[1]->allocatedQty)->toBe(1)
+        ->and($component->instance()->result->variantQty())->toBe([$luffy->id => 5]);
+
+    $component->call('addAll', shownSignature($component))->assertRedirect(route('cart'));
+
+    expect(CartItem::query()->sole()->qty)->toBe(5)
+        ->and(StockReservation::query()->sum('qty'))->toBe(5);
+});
+
+test('a later line moves to another variant that covers it and stays full', function () {
+    $shop = deckShop();
+    $cheap = deckVariant($shop['luffyEn'], 5, 10000, CardCondition::Nm);
+    $dearer = deckVariant($shop['luffyEn'], 5, 15000, CardCondition::Lp);
+
+    $component = Livewire::test(DeckImport::class)->set('raw', "4x OP05-119\n4x OP05-119")->call('check');
+    $lines = $component->instance()->result->lines;
+
+    expect($lines[0]->defaultVariantId)->toBe($cheap->id)
+        ->and($lines[0]->bucket)->toBe(DeckBucket::Full)
+        ->and($lines[1]->defaultVariantId)->toBe($dearer->id)
+        ->and($lines[1]->bucket)->toBe(DeckBucket::Full)
+        ->and($component->instance()->result->variantQty())->toBe([$cheap->id => 4, $dearer->id => 4]);
+
+    $component->call('addAll', shownSignature($component))->assertRedirect(route('cart'));
+
+    expect(CartItem::query()->count())->toBe(2);
+});
+
+test('the picks are laid over the shared stock in paste order, and a switched-off partial line frees its copies', function () {
+    $shop = deckShop();
+    $nm = deckVariant($shop['luffyEn'], 5, 10000, CardCondition::Nm);
+    $lp = deckVariant($shop['luffyEn'], 5, 15000, CardCondition::Lp);
+
+    $component = Livewire::test(DeckImport::class)->set('raw', "4x OP05-119\n4x OP05-119")->call('check');
+    $component->call('chooseVariant', 2, $nm->id);
+
+    $lines = $component->instance()->result->lines;
+
+    // Line 2 asked for the NM copies line 1 already took, so it is left with the 1 that remains.
+    expect($lines[1]->defaultVariantId)->toBe($nm->id)
+        ->and($lines[1]->bucket)->toBe(DeckBucket::Partial)
+        ->and($lines[1]->allocatedQty)->toBe(1);
+
+    $component->call('chooseVariant', 1, $lp->id);
+
+    expect($component->instance()->result->lines[1]->bucket)->toBe(DeckBucket::Full)
+        ->and($component->instance()->result->variantQty())->toBe([$nm->id => 4, $lp->id => 4]);
+
+    deckVariant($shop['zoroEn'], 5, 10000);
+
+    $skip = Livewire::test(DeckImport::class)->set('raw', "4x OP05-120\n4x OP05-120\n1x OP05-120")->call('check');
+    $before = $skip->instance()->result->lines;
+    $skip->call('togglePartial', 2);
+
+    expect($before[2]->bucket)->toBe(DeckBucket::Missing)
+        ->and($skip->instance()->result->lines[2]->bucket)->toBe(DeckBucket::Full);
+});
+
+test('lines on one variant together add at most the per-line cap, and the later line says so', function () {
+    $shop = deckShop();
+    $luffy = deckVariant($shop['luffyEn'], 150, 10000);
+
+    $component = Livewire::test(DeckImport::class)->set('raw', "60x OP05-119\n60x OP05-119")->call('check')
+        ->assertSee(__('storefront.deck.sum_capped', ['max' => config('deck.max_qty')]));
+    $lines = $component->instance()->result->lines;
+
+    expect($lines[0]->sumCapped)->toBeFalse()
+        ->and($lines[1]->bucket)->toBe(DeckBucket::Partial)
+        ->and($lines[1]->allocatedQty)->toBe(39)
+        ->and($lines[1]->sumCapped)->toBeTrue()
+        ->and($component->instance()->result->variantQty())->toBe([$luffy->id => 99]);
+
+    $component->call('addAll', shownSignature($component))->assertRedirect(route('cart'));
+
+    expect(CartItem::query()->sole()->qty)->toBe(99);
+});
+
+test('add all refuses when the shown variant sold out and another at the same price would take its place', function () {
+    $shop = deckShop();
+    $en = deckVariant($shop['luffyEn'], 4, 10000);
+    $ja = deckVariant($shop['luffyJa'], 4, 10000);
+
+    $component = Livewire::test(DeckImport::class)->set('raw', '2x OP05-119')->call('check');
+    $seen = shownSignature($component);
+    $seenTotal = shownTotal($component);
+
+    expect($component->instance()->result->lines[0]->defaultVariantId)->toBe($en->id);
+
+    deckHold($en, 4);
+
+    expect(shownTotal($component))->toBe($seenTotal);
+
+    $component->call('addAll', $seen)
+        ->assertNoRedirect()
+        ->assertSet('addNotice', __('storefront.deck.total_changed'));
+
+    expect(CartItem::query()->count())->toBe(0)
+        ->and(StockReservation::query()->where('purchasable_id', $ja->id)->count())->toBe(0)
+        ->and($component->instance()->result->lines[0]->defaultVariantId)->toBe($ja->id);
+
+    $component->call('addAll', shownSignature($component))->assertRedirect(route('cart'));
+});
+
+test('the failed marker covers the line even when the failed variant is not the one shown', function () {
+    $shop = deckShop();
+    $shown = deckVariant($shop['luffyEn'], 4, 10000, CardCondition::Nm);
+    $other = deckVariant($shop['luffyEn'], 4, 12000, CardCondition::Lp);
+    $variant = $other->id;
+
+    app()->instance(AddDeckToCart::class, new class($variant) extends AddDeckToCart
+    {
+        public function __construct(private int $failed) {}
+
+        public function handle(Cart $cart, Game $game, array $variantQty): void
+        {
+            throw new DeckNotReserved([$this->failed]);
+        }
+    });
+
+    $component = Livewire::test(DeckImport::class)->set('raw', '2x OP05-119')->call('check');
+    $component->call('addAll', shownSignature($component))
+        ->assertSet('failedVariants', [$other->id])
+        ->assertSee(__('storefront.deck.add_failed_row'));
+
+    expect($component->instance()->result->lines[0]->defaultVariantId)->toBe($shown->id);
+});
+
+test('a customer keeps at most deck.max_saved lists and the same list is not saved twice', function () {
+    $shop = deckShop();
+    config(['deck.max_saved' => 2]);
+    $user = User::factory()->create();
+
+    $component = Livewire::actingAs($user)->test(DeckImport::class)->set('raw', '2x OP05-119')->call('check')->call('save')
+        ->set('saveName', 'Again')->call('save')
+        ->assertSee(__('storefront.deck.already_saved', ['name' => SavedDeckList::query()->first()->name]));
+
+    expect(SavedDeckList::query()->count())->toBe(1);
+
+    $component->set('raw', '3x OP05-119')->call('check')->call('save');
+    expect(SavedDeckList::query()->count())->toBe(2);
+
+    $component->set('raw', '4x OP05-119')->call('check')->call('save')
+        ->assertHasErrors(['saveName'])
+        ->assertSee(__('storefront.deck.errors.saved_cap', ['max' => 2]));
+
+    expect(SavedDeckList::query()->count())->toBe(2);
+
+    // Another customer is not counted against the cap, and the same text and game saved by them is theirs.
+    Livewire::actingAs(User::factory()->create())->test(DeckImport::class)->set('raw', '2x OP05-119')->call('check')->call('save');
+    expect(SavedDeckList::query()->count())->toBe(3);
+});
+
+test('a saved list stores only the number, kind, quantity and printings of each line', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 4, 10000);
+
+    Livewire::actingAs(User::factory()->create())->test(DeckImport::class)->set('raw', "4x OP05-119\nmystery")->call('check')->call('save');
+
+    $parsed = SavedDeckList::query()->sole()->parsed;
+
+    expect($parsed)->toHaveCount(2)
+        ->and(array_keys($parsed[0]))->toBe(['number', 'kind', 'qty', 'printingIds'])
+        ->and($parsed[0])->toBe(['number' => 1, 'kind' => 'matched', 'qty' => 4, 'printingIds' => $parsed[0]['printingIds']])
+        ->and($parsed[0]['printingIds'])->toContain($shop['luffyEn']->id);
+});
+
+test('a list held across a login comes back once, from a real login, and a guest page forgets a stale one', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 0, 10000);
+    $user = User::factory()->create();
+    $pending = ['raw' => '2x OP05-119', 'game' => $shop['onePiece']->id, 'language' => null, 'at' => now()->timestamp];
+
+    $this->withSession(['deck.pending' => $pending, 'url.intended' => route('deck.import')])
+        ->post('/login', ['email' => $user->email, 'password' => 'password'])
+        ->assertRedirect(route('deck.import'));
+
+    $this->get(route('deck.import'))->assertSee(__('storefront.deck.summary_title'))->assertSee('2x OP05-119');
+
+    $this->get(route('deck.import'))->assertDontSee(__('storefront.deck.summary_title'));
+
+    auth()->logout();
+    $this->withSession(['deck.pending' => $pending])->get(route('deck.import'))->assertDontSee(__('storefront.deck.summary_title'));
+
+    expect(session()->has('deck.pending'))->toBeFalse();
+});
+
+test('a saved list whose game is closed says so and is not read against another game', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 4, 10000);
+    $owner = User::factory()->create();
+    $saved = SavedDeckList::factory()->create(['user_id' => $owner->id, 'game_id' => $shop['onePiece']->id, 'raw_text' => '4x OP05-119']);
+    $shop['onePiece']->update(['is_active' => false]);
+
+    $this->actingAs($owner)->get(route('deck.import', ['list' => $saved->id]))
+        ->assertOk()
+        ->assertSee(__('storefront.deck.list_game_closed'))
+        ->assertDontSee(__('storefront.deck.summary_title'));
+});
+
+test('the seeder leaves the demo customer to a local machine and can run twice', function () {
+    $shop = deckShop();
+    foreach (range(1, 3) as $number) {
+        deckVariant(Printing::factory()->for($shop['luffy'])->for($shop['op05'], 'set')->create(['number' => (string) (200 + $number), 'language' => Language::En]), 4, 10000);
+    }
+
+    $this->seed(SavedDeckListSeeder::class);
+    expect(SavedDeckList::query()->count())->toBe(0)->and(User::query()->where('email', 'customer@example.com')->exists())->toBeFalse();
+
+    app()->detectEnvironment(fn () => 'local');
+    $this->seed(SavedDeckListSeeder::class);
+    $this->seed(SavedDeckListSeeder::class);
+
+    $saved = SavedDeckList::query()->sole();
+
+    expect(User::query()->where('email', 'customer@example.com')->count())->toBe(1)
+        ->and($saved->game_id)->toBe($shop['onePiece']->id)
+        ->and($saved->requested_cards)->toBe(6);
+});
+
+test('the account page reads a saved list without its pasted text', function () {
+    $shop = deckShop();
+    $owner = User::factory()->create();
+    SavedDeckList::factory()->create(['user_id' => $owner->id, 'game_id' => $shop['onePiece']->id, 'name' => 'Red aggro']);
+
+    $queries = [];
+    DB::listen(function ($query) use (&$queries): void {
+        $queries[] = $query->sql;
+    });
+
+    $this->actingAs($owner)->get(route('account'))->assertSee('Red aggro');
+
+    $read = collect($queries)->first(fn (string $sql): bool => str_contains($sql, 'from "saved_deck_lists"'));
+
+    expect($read)->not->toBeNull()->not->toContain('raw_text')->not->toContain('*');
+});
+
+test('a line missing only because earlier lines took the stock says so, has no select and takes no part in the alert', function (string $raw, int $stock, string $copy) {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], $stock, 10000);
+    deckVariant(Printing::factory()->for($shop['zoro'])->for($shop['op05'], 'set')->create(['number' => '122', 'language' => Language::En]), 0, 5000);
+
+    $component = Livewire::actingAs(User::factory()->create())->test(DeckImport::class)->set('raw', $raw."\n1x OP05-122")->call('check');
+    $lines = $component->instance()->result->lines;
+
+    $component->assertSee($copy)
+        ->assertDontSee('deck-variant-2')
+        ->assertSee(__('storefront.deck.alert_missing', ['n' => 1]));
+
+    expect($lines[1]->bucket)->toBe(DeckBucket::Missing)
+        ->and($lines[1]->takenByEarlierLines)->toBeTrue()
+        ->and(collect($component->instance()->alertableLines())->pluck('number')->all())->toBe([3]);
+
+    $component->call('alertMissing');
+
+    expect(RestockAlert::query()->count())->toBe(1);
+})->with([
+    'taken by the line before' => ["4x OP05-119\n4x OP05-119", 4, 'ใช้ไปกับบรรทัดก่อนหน้าแล้ว'],
+    'closed by the per-variant cap' => ["99x OP05-119\n4x OP05-119", 150, 'รวมกับบรรทัดก่อนหน้าเกิน 99 ใบ'],
+]);
+
+test('the variant select offers, and chooseVariant accepts, only what earlier lines left', function () {
+    $shop = deckShop();
+    $nm = deckVariant($shop['luffyEn'], 5, 10000, CardCondition::Nm);
+    $lp = deckVariant($shop['luffyEn'], 8, 15000, CardCondition::Lp);
+    $mp = deckVariant($shop['luffyEn'], 8, 16000, CardCondition::Mp);
+
+    $component = Livewire::test(DeckImport::class)->set('raw', "5x OP05-119\n2x OP05-119")->call('check');
+
+    expect($component->instance()->result->lines[1]->remaining)->toBe([$nm->id => 0, $lp->id => 8, $mp->id => 8]);
+
+    // Line 1 may still pick the NM copies; line 2's select must not offer them.
+    preg_match('/<select id="deck-variant-2".*?<\/select>/s', $component->html(), $select);
+
+    expect($select)->not->toBeEmpty()
+        ->and($select[0])->toContain('<option value="'.$lp->id.'"')
+        ->and($select[0])->toContain('<option value="'.$mp->id.'"')
+        ->and($select[0])->not->toContain('<option value="'.$nm->id.'"');
+
+    $component->call('chooseVariant', 2, $nm->id)->assertSet('choices', []);
+
+    $component->call('chooseVariant', 2, $mp->id)->assertSet('choices', [2 => ['variant' => $mp->id]]);
+});
+
+test('every refused action on a stale result says so next to its control', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 4, 10000);
+    $user = User::factory()->create();
+
+    $component = Livewire::actingAs($user)->test(DeckImport::class)->set('raw', '2x OP05-119')->call('check');
+    $signature = shownSignature($component);
+    $component->set('raw', '3x OP05-119');
+
+    $component->call('addAll', $signature)->assertSet('addNotice', __('storefront.deck.stale'));
+    $component->call('alertMissing')->assertSet('alertNotice', __('storefront.deck.stale'));
+    $component->call('save')->assertHasErrors(['saveName'])->assertSee(__('storefront.deck.stale'));
+});
+
+test('a guest who pressed the bulk alert finishes it after a real login and is scrolled to the result', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 0, 10000);
+    $user = User::factory()->create();
+
+    Livewire::test(DeckImport::class)->set('raw', '2x OP05-119')->call('check')->call('alertMissing')->assertRedirect(route('login'));
+
+    $pending = session('deck.pending');
+
+    $this->withSession(['deck.pending' => $pending])->get(route('login'))->assertSee(__('storefront.deck.login_note'));
+
+    $this->withSession(['deck.pending' => $pending, 'url.intended' => route('deck.import')])
+        ->post('/login', ['email' => $user->email, 'password' => 'password'])
+        ->assertRedirect(route('deck.import'));
+
+    expect(RestockAlert::query()->count())->toBe(0);
+
+    $this->get(route('deck.import'))
+        ->assertSee(__('storefront.deck.alerts_set', ['n' => 1]))
+        ->assertSee('deck-alerted', false);
+
+    expect(RestockAlert::query()->where('user_id', $user->id)->count())->toBe(1);
+
+    $this->get(route('deck.import'))->assertDontSee(__('storefront.deck.alerts_set', ['n' => 1]));
+    $this->get(route('login'))->assertDontSee(__('storefront.deck.login_note'));
+});
+
+test('the phone bar says how many of the list it adds, and a changed list is a prompt, not an error', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 2, 10000);
+
+    $component = Livewire::test(DeckImport::class)->set('raw', '5x OP05-119')->call('check')
+        ->assertSee(__('storefront.deck.bar_cards', ['have' => 2, 'want' => 5]))
+        ->assertSee('id="deck-add-bar"', false);
+
+    $component->call('addAll', 'not-what-was-shown')->assertSet('addFailed', false)->assertSet('addNotice', __('storefront.deck.total_changed'));
+});
+
+test('the header and the phone nav both link to the importer, and the importer page hides the phone nav', function () {
+    deckShop();
+
+    $home = $this->get(route('home'))->getContent();
+
+    expect(substr_count($home, 'href="'.route('deck.import').'"'))->toBe(2);
+
+    $this->get(route('deck.import'))->assertDontSee('aria-label="'.__('storefront.nav.bottom').'"', false);
+});
+
+test('the account page shows the stored count of cards a saved list asks for, and confirms before deleting', function () {
+    $shop = deckShop();
+    $owner = User::factory()->create();
+    SavedDeckList::factory()->create(['user_id' => $owner->id, 'game_id' => $shop['onePiece']->id, 'name' => 'Red aggro', 'requested_cards' => 7]);
+
+    $this->actingAs($owner)->get(route('account'))
+        ->assertSee(__('storefront.account.decks.meta', ['n' => 7, 'game' => 'One Piece']))
+        ->assertSee('x-on:submit', false)
+        ->assertSee('Red aggro ?', false);
+});
+
+test('the full bucket opens by itself when one of its rows failed', function () {
+    $shop = deckShop();
+    $variants = [];
+    $lines = [];
+
+    foreach (range(1, 9) as $i) {
+        $printing = Printing::factory()->for($shop['zoro'])->for($shop['op05'], 'set')->create(['number' => (string) (300 + $i), 'language' => Language::En]);
+        $variants[] = deckVariant($printing, 4, 10000);
+        $lines[] = '1x OP05-'.(300 + $i);
+    }
+
+    $failed = $variants[3]->id;
+
+    app()->instance(AddDeckToCart::class, new class($failed) extends AddDeckToCart
+    {
+        public function __construct(private int $failed) {}
+
+        public function handle(Cart $cart, Game $game, array $variantQty): void
+        {
+            throw new DeckNotReserved([$this->failed]);
+        }
+    });
+
+    $component = Livewire::test(DeckImport::class)->set('raw', implode("\n", $lines))->call('check')->assertSee('open: false', false);
+    $component->call('addAll', shownSignature($component))->assertSee('open: true', false);
+});
+
+test('two lists that differ only in letter case are two lists, and no statement filters on the pasted text', function () {
+    deckShop();
+    $queries = [];
+    DB::listen(function ($query) use (&$queries): void {
+        $queries[] = $query->sql;
+    });
+
+    Livewire::actingAs(User::factory()->create())->test(DeckImport::class)->set('raw', '4x luffy')->call('check')->call('save')
+        ->set('raw', '4X Luffy')->call('check')->call('save');
+
+    // SQL equality on `raw_text` is case-insensitive under MySQL's default collation; SQLite cannot show that, so the
+    // statement itself is checked: the comparison is made in PHP.
+    expect(SavedDeckList::query()->count())->toBe(2)
+        ->and(collect($queries)->filter(fn (string $sql): bool => preg_match('/\bwhere\b.*"?raw_text"?\s*(=|like|in)/i', $sql) === 1)->all())->toBe([]);
+});
+
+/**
+ * Counts every call to the bulk restock action, passing it on.
+ */
+function countRestockCalls(): object
+{
+    $spy = new class(app(SetRestockAlerts::class)) extends SetRestockAlerts
+    {
+        public int $calls = 0;
+
+        public function __construct(private SetRestockAlerts $real) {}
+
+        public function handle(User $user, array $variantIds): int
+        {
+            $this->calls++;
+
+            return $this->real->handle($user, $variantIds);
+        }
+    };
+    app()->instance(SetRestockAlerts::class, $spy);
+
+    return $spy;
+}
+
+test('a guest alert replays once after a storefront login, not on every visit', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 0, 10000);
+    $user = User::factory()->create();
+    $spy = countRestockCalls();
+
+    Livewire::test(DeckImport::class)->set('raw', '2x OP05-119')->call('check')->call('alertMissing');
+    $pending = session('deck.pending');
+
+    $this->withSession(['deck.pending' => $pending, 'url.intended' => route('deck.import')])
+        ->post('/login', ['email' => $user->email, 'password' => 'password'])
+        ->assertRedirect(route('deck.import'));
+
+    expect(session()->has('deck.pending'))->toBeFalse();
+
+    $this->get(route('deck.import'));
+    $this->get(route('deck.import'));
+    $this->get(route('deck.import'));
+
+    expect($spy->calls)->toBe(1);
+});
+
+test('a login that is not the storefront one never replays what a guest left, and clears it', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 0, 10000);
+    $spy = countRestockCalls();
+    $pending = ['raw' => '2x OP05-119', 'game' => $shop['onePiece']->id, 'language' => null, 'alert' => true, 'at' => now()->timestamp];
+
+    $this->actingAs(User::factory()->create())->withSession(['deck.pending' => $pending])->get(route('deck.import'))
+        ->assertDontSee(__('storefront.deck.summary_title'));
+
+    $this->get(route('deck.import'));
+
+    expect($spy->calls)->toBe(0)
+        ->and(session()->has('deck.pending'))->toBeFalse()
+        ->and(RestockAlert::query()->count())->toBe(0);
+});
+
+test('a restore payload older than 15 minutes is ignored', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 0, 10000);
+    $user = User::factory()->create();
+    $spy = countRestockCalls();
+    $payload = fn (int $minutes): array => ['raw' => '2x OP05-119', 'game' => $shop['onePiece']->id, 'language' => null, 'alert' => true, 'at' => now()->subMinutes($minutes)->timestamp];
+
+    $this->actingAs($user)->withSession(['deck.restore' => $payload(16)])->get(route('deck.import'))
+        ->assertDontSee(__('storefront.deck.summary_title'));
+
+    expect($spy->calls)->toBe(0);
+
+    $this->withSession(['deck.restore' => $payload(14)])->get(route('deck.import'))
+        ->assertSee(__('storefront.deck.summary_title'));
+
+    expect($spy->calls)->toBe(1);
+});
+
+test('staff cannot set the bulk alert', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 0, 10000);
+
+    Livewire::actingAs(User::factory()->staff()->create())->test(DeckImport::class)->set('raw', '2x OP05-119')->call('check')
+        ->call('alertMissing')
+        ->assertSet('alertSet', false)
+        ->assertSee((new AlertRefused('unavailable'))->message());
+
+    expect(RestockAlert::query()->count())->toBe(0);
+});
+
+test('a full row shows what is left after earlier lines, not the shop stock', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 5, 10000);
+
+    Livewire::test(DeckImport::class)->set('raw', "1x OP05-119\n1x OP05-119")->call('check')
+        ->assertSee(__('storefront.deck.have', ['n' => 5]))
+        ->assertSee(__('storefront.deck.have', ['n' => 4]));
+});
+
+test('with nothing to add there is no add-all button and no phone bar, and a forced call says why', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 0, 10000);
+
+    Livewire::test(DeckImport::class)->set('raw', '2x OP05-119')->call('check')
+        ->assertDontSee('id="deck-add-bar"', false)
+        ->assertDontSee(__('storefront.deck.add_all_short'))
+        ->call('addAll', '')
+        ->assertSet('addNotice', __('storefront.deck.nothing_to_add'));
+});
+
+test('the stale line sits under the bulk alert button, and the summary card is the scroll target', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 0, 10000);
+
+    Livewire::test(DeckImport::class)->set('raw', '2x OP05-119')->call('check')
+        ->assertSee('x-show="dirty || false" x-cloak class="basis-full text-small font-medium text-low">'.__('storefront.deck.stale'), false)
+        ->assertSee("(dirty || false) && 'opacity-60'", false)
+        ->assertSee('x-ref="summary" tabindex="-1" class="scroll-mt-4', false);
+});
+
+test('a restore payload is consumed by the page that reads it, even when the session does not expire it', function () {
+    $shop = deckShop();
+    deckVariant($shop['luffyEn'], 0, 10000);
+    $spy = countRestockCalls();
+    $payload = ['raw' => '2x OP05-119', 'game' => $shop['onePiece']->id, 'language' => null, 'alert' => true, 'at' => now()->timestamp];
+
+    $this->actingAs(User::factory()->create())->withSession(['deck.restore' => $payload])->get(route('deck.import'));
+    $this->get(route('deck.import'));
+    $this->get(route('deck.import'));
+
+    expect($spy->calls)->toBe(1)->and(session()->has('deck.restore'))->toBeFalse();
 });

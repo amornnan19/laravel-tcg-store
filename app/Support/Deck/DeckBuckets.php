@@ -60,4 +60,89 @@ final class DeckBuckets
 
         return $available[0] ?? null;
     }
+
+    /**
+     * Assigns every line of a list at once, in paste order, so lines that land on one variant share its stock: each takes
+     * its copies from what the lines before it left, and a line that no longer fits moves to another variant that
+     * covers it, or becomes partial at the remainder. A variant also gives at most `deck.max_qty` copies over all lines.
+     * A partial line the customer switched off takes nothing, so it leaves its stock for the lines after it.
+     *
+     * `$choices` is the customer's picks, `line number => ['variant' => ?int, 'partial' => bool]`. A pick with nothing
+     * left (sold out, or taken by an earlier line) is no pick: the line falls back to the default.
+     *
+     * @param  list<DeckLine>  $lines
+     * @param  array<int, array{variant?: ?int, partial?: bool}>  $choices
+     * @return list<DeckLine>
+     */
+    public static function allocate(array $lines, array $choices = []): array
+    {
+        $max = (int) config('deck.max_qty');
+        $used = [];
+        $assigned = [];
+
+        foreach ($lines as $line) {
+            if ($line->kind !== DeckLineKind::Matched) {
+                $assigned[] = self::assign($line, null);
+
+                continue;
+            }
+
+            $choice = $choices[$line->number] ?? [];
+            $left = fn (DeckVariant $variant): int => max(0, min($variant->availableQty, $max) - ($used[$variant->id] ?? 0));
+
+            $picked = isset($choice['variant']) ? ($line->variants[$choice['variant']] ?? null) : null;
+            $chosen = $picked !== null && $left($picked) >= 1 ? $picked : self::defaultAllocated($line, $left);
+            $takePartial = $choice['partial'] ?? true;
+
+            $remaining = [];
+
+            foreach ($line->variants as $variant) {
+                $remaining[$variant->id] = $left($variant);
+            }
+
+            if ($chosen === null) {
+                // Missing, but is it the shop's stock or the lines before this one? Something in stock that these lines
+                // already took (or that the per-variant cap now closes) is not a sold-out card.
+                $inStock = array_filter($line->variants, fn (DeckVariant $variant): bool => $variant->availableQty > 0);
+                $capped = array_filter($inStock, fn (DeckVariant $variant): bool => $variant->availableQty - ($used[$variant->id] ?? 0) > 0 && $left($variant) < 1);
+
+                $assigned[] = $line->withChoice(null, DeckBucket::Missing, 0, $capped !== [], $inStock !== [], $remaining)->withTakePartial($takePartial);
+
+                continue;
+            }
+
+            $room = $left($chosen);
+            $allocated = min($line->qty, $room);
+            $bucket = $allocated >= $line->qty ? DeckBucket::Full : DeckBucket::Partial;
+            $stockLeft = max(0, $chosen->availableQty - ($used[$chosen->id] ?? 0));
+
+            if ($bucket === DeckBucket::Full || $takePartial) {
+                $used[$chosen->id] = ($used[$chosen->id] ?? 0) + $allocated;
+            }
+
+            $assigned[] = $line->withChoice($chosen->id, $bucket, $allocated, $room < min($line->qty, $stockLeft), false, $remaining)->withTakePartial($takePartial);
+        }
+
+        return $assigned;
+    }
+
+    /**
+     * @param  callable(DeckVariant): int  $left
+     */
+    private static function defaultAllocated(DeckLine $line, callable $left): ?DeckVariant
+    {
+        $available = array_filter($line->variants, fn (DeckVariant $variant): bool => $left($variant) > 0);
+
+        $covering = array_filter($available, fn (DeckVariant $variant): bool => $left($variant) >= $line->qty);
+
+        if ($covering !== []) {
+            usort($covering, fn (DeckVariant $a, DeckVariant $b): int => [$a->priceSatang, $a->id] <=> [$b->priceSatang, $b->id]);
+
+            return $covering[0];
+        }
+
+        usort($available, fn (DeckVariant $a, DeckVariant $b): int => [$left($b), $a->priceSatang, $a->id] <=> [$left($a), $b->priceSatang, $b->id]);
+
+        return $available[0] ?? null;
+    }
 }

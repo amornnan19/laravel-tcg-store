@@ -120,6 +120,9 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **A Meilisearch `_rankingScore` threshold is not a name match: a query with no word tokens scores 1.0 (placeholder search) and a one-word prefix scores about 0.98. Verify a fuzzy hit against the card's name before accepting it.**
 - **Never fold Thai text with NFKC before comparing it with stored text: NFKC decomposes ำ (U+0E33). Use NFC, and fold only full-width ASCII.**
 - **A Livewire `#[Computed]` is recomputed on every request. Expensive work derived from user input (a search, a parse) runs in the action the rate limit guards, and its result is kept in locked state or a cache, never re-derived in a computed that any later request re-runs.**
+- **A guard that checks "what the customer saw is what we add" compares the full variant→quantity map (or a hash of it), never only a total; and pricing that sums several lines onto one variant allocates that variant's available stock across the lines, or the summed add can fail forever. Seeded users with a known password are created only when `app()->isLocal()`.**
+- **A control that is soft-disabled with `aria-disabled` must look disabled and must answer a click: either hide it in the state where it does nothing, or show the reason next to it. An action that returns early without a notice is a dead button.**
+- **A session value a guest leaves for "after login" is read with `pull()`, never `get()`, and only from the key `CustomerLogin` writes. Any other login (the Filament panel shares the web guard) leaves a guest's `put` value in place, and a `get()` replays it on every request.**
 
 ## Language
 

@@ -114,7 +114,7 @@ class ParseDeckList
 
         $variants = $this->variantsFor($printings->keys()->all());
 
-        return new DeckParse(array_map(fn (array $record): DeckLine => $this->line($record, $printings, $variants, $language), $match->lines));
+        return new DeckParse(DeckBuckets::allocate(array_map(fn (array $record): DeckLine => $this->line($record, $printings, $variants, $language), $match->lines)));
     }
 
     /**

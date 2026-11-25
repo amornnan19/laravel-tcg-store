@@ -37,6 +37,7 @@ class AccountController extends Controller
                 ->with(['variant.printing.card', 'variant.printing.set'])
                 ->orderByDesc('id')
                 ->get(),
+            'savedDecks' => $user->savedDeckLists()->select(['id', 'name', 'game_id', 'requested_cards', 'created_at'])->with('game:id,name_en')->orderByDesc('id')->get(),
             'lineConfigured' => filled(config('services.line.client_id')),
             'lineMessagingConfigured' => filled(config('services.line.messaging_token')),
         ]);
