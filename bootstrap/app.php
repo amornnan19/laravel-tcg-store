@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Session\Middleware\AuthenticateSession;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,8 +15,14 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Behind the TLS-terminating proxy the request must read the forwarded scheme, or a signed link (made for
         // https) fails its own signature check. Host and prefix are not trusted: the proxy passes Host through.
-        // The only guest-protected routes are the staff ones, so a guest goes to the panel's own login page.
-        $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
+        // A guest on a panel path goes to the panel's own login page; on any other path to the storefront's.
+        $middleware->redirectGuestsTo(
+            fn (Request $request) => $request->is('admin', 'admin/*') ? route('filament.admin.auth.login') : route('login'),
+        );
+        $middleware->redirectUsersTo(fn () => route('account'));
+
+        // A password reset changes the stored hash, which ends every other session signed in with the old password.
+        $middleware->web(append: [AuthenticateSession::class]);
 
         $middleware->trustProxies(
             at: '*',

@@ -23,6 +23,7 @@ use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\Printing;
 use App\Models\StockReservation;
+use App\Models\User;
 use App\Models\Variant;
 use App\Notifications\OrderPlaced;
 use App\Support\CartLines;
@@ -595,4 +596,49 @@ test('PromptPay is offered only when the configured id is a valid PromptPay id',
         config(['shop.promptpay_id' => $id]);
         expect(PaymentMethod::offered())->not->toContain(PaymentMethod::Promptpay);
     }
+});
+
+test('a signed-in customer\'s order belongs to them and a guest\'s order has no owner', function () {
+    Notification::fake();
+    $user = User::factory()->create();
+
+    $mine = app(PlaceOrder::class)->handle(checkoutCart([checkoutVariant()]), checkoutData(), $user);
+    $guest = app(PlaceOrder::class)->handle(checkoutCart([checkoutVariant()]), checkoutData());
+
+    expect($mine->user_id)->toBe($user->id)->and($guest->user_id)->toBeNull();
+});
+
+test('checkout prefills the name and email of a signed-in customer and places the order for them', function () {
+    Notification::fake();
+    $user = User::factory()->create(['name' => 'Somchai Jaidee', 'email' => 'somchai@example.com']);
+    $cart = checkoutCart([checkoutVariant()]);
+    session(['cart_token' => $cart->token]);
+
+    $this->actingAs($user);
+    Livewire::test(CheckoutForm::class)
+        ->assertSet('form.name', 'Somchai Jaidee')
+        ->assertSet('form.email', 'somchai@example.com')
+        ->set('form.phone', '0812345678')
+        ->set('form.line1', '99/9 ซอยสุขุมวิท 1')
+        ->set('form.subdistrict', 'คลองเตย')
+        ->set('form.district', 'คลองเตย')
+        ->set('form.province', 'กรุงเทพมหานคร')
+        ->set('form.postcode', '10110')
+        ->call('placeOrder')
+        ->assertHasNoErrors();
+
+    $order = Order::query()->latest('id')->first();
+    expect($order->user_id)->toBe($user->id)
+        ->and(session('orders_placed'))->toBe([$order->id])
+        ->and(session('orders'))->toBe([$order->id]);
+});
+
+test('checkout leaves the fields empty for a guest and for a customer without an email', function () {
+    $cart = checkoutCart([checkoutVariant()]);
+    session(['cart_token' => $cart->token]);
+
+    Livewire::test(CheckoutForm::class)->assertSet('form.name', '')->assertSet('form.email', '');
+
+    $this->actingAs(User::factory()->withLine()->create(['email' => null, 'password' => null]));
+    Livewire::test(CheckoutForm::class)->assertSet('form.email', '');
 });

@@ -12,6 +12,7 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\StockReservation;
+use App\Models\User;
 use App\Models\Variant;
 use App\Notifications\OrderPlaced;
 use App\Support\CartLines;
@@ -34,7 +35,7 @@ class PlaceOrder
      *                         be bought, or has less stock than the hold says.
      * @throws InvalidArgumentException when the payment method is not one the shop offers.
      */
-    public function handle(Cart $cart, CheckoutData $data): Order
+    public function handle(Cart $cart, CheckoutData $data, ?User $user = null): Order
     {
         $method = PaymentMethod::tryFrom($data->method);
         $courier = Courier::from($data->courier);
@@ -54,7 +55,7 @@ class PlaceOrder
             ->unique()
             ->values();
 
-        $order = DB::transaction(function () use ($cart, $data, $method, $courier, $variantIds): Order {
+        $order = DB::transaction(function () use ($cart, $data, $method, $courier, $variantIds, $user): Order {
             $variants = Variant::query()->whereIn('id', $variantIds)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
 
             $items = $cart->items()->orderBy('id')->get();
@@ -98,6 +99,7 @@ class PlaceOrder
             // column valid for that instant.
             $order = Order::query()->create([
                 'number' => 'new-'.Str::ulid(),
+                'user_id' => $user?->getKey(),
                 'status' => OrderStatus::AwaitingPayment,
                 'contact_name' => $normalized['name'],
                 'contact_phone' => $normalized['phone'],

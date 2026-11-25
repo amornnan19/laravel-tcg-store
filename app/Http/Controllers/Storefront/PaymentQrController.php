@@ -18,7 +18,7 @@ class PaymentQrController extends Controller
 {
     public function __invoke(Request $request, Order $order): Response
     {
-        abort_unless($request->hasValidSignature() || OrderAccess::ownedBySession($order), 404);
+        abort_unless($request->hasValidSignature() || OrderAccess::canView($order), 404);
 
         $payment = $order->isAwaitingPayment()
             ? $order->payments()->where('status', PaymentStatus::Pending->value)->whereNotNull('qr_payload')->latest('id')->first()

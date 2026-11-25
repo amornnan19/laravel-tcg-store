@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\URL;
 /**
  * What a customer bought, as it was when they bought it: contact, address and items are copies, so editing the
  * catalogue or an account never rewrites an order. The status timeline reads the `*_at` columns and has no state of
- * its own. `user_id` stays null until accounts arrive in M6.
+ * its own. `user_id` is the customer's account, or null for a guest order.
  */
 class Order extends Model
 {

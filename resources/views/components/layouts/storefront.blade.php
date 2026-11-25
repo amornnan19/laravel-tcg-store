@@ -36,6 +36,15 @@
                 <livewire:storefront.search-box />
 
                 <livewire:storefront.cart-link variant="header" />
+
+                <a
+                    href="{{ route(auth()->check() ? 'account' : 'login') }}"
+                    @if (request()->routeIs('account', 'login')) aria-current="page" @endif
+                    class="inline-flex min-h-11 flex-none items-center gap-2 rounded-control border border-line-strong bg-surface px-4 text-small text-ink transition-[border-color] duration-160 ease-ui hover:border-accent motion-reduce:transition-none max-lg:hidden"
+                >
+                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="7" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M3.8 17c.5-3 3-4.8 6.2-4.8s5.7 1.8 6.2 4.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                    {{ auth()->check() ? __('storefront.nav.account') : __('storefront.nav.login') }}
+                </a>
             </div>
 
             @if ($games->isNotEmpty())
@@ -91,6 +100,18 @@
                 </button>
             </div>
             <livewire:storefront.cart-link variant="bottom" />
+            <a
+                href="{{ route(auth()->check() ? 'account' : 'login') }}"
+                @if (request()->routeIs('account')) aria-current="page" @endif
+                @class([
+                    'flex min-h-12 flex-1 flex-col items-center justify-center gap-1 rounded-control text-label',
+                    'font-medium text-accent' => request()->routeIs('account'),
+                    'text-faint' => ! request()->routeIs('account'),
+                ])
+            >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="7" r="3.2" stroke="currentColor" stroke-width="1.5"/><path d="M3.8 17c.5-3 3-4.8 6.2-4.8s5.7 1.8 6.2 4.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                {{ __('storefront.nav.account') }}
+            </a>
         </nav>
         @endif
 

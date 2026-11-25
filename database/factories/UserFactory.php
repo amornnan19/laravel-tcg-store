@@ -46,6 +46,18 @@ class UserFactory extends Factory
     }
 
     /**
+     * Indicate that the user signs in with LINE.
+     */
+    public function withLine(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'line_user_id' => 'U'.fake()->unique()->regexify('[0-9a-f]{32}'),
+            'line_display_name' => fake()->firstName(),
+            'line_avatar_url' => null,
+        ]);
+    }
+
+    /**
      * Indicate that the user is a staff member who may access the admin panel.
      */
     public function staff(): static

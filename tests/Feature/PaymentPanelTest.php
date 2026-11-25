@@ -13,6 +13,7 @@ use App\Exceptions\SlipNotStored;
 use App\Livewire\Storefront\PaymentPanel;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\User;
 use App\Support\Money;
 use App\Support\PaymentQr;
 use App\Support\PromptPay;
@@ -673,4 +674,16 @@ test('an order cancelled while its panel is open reloads the page instead of off
     $order->payments()->sole()->update(['status' => PaymentStatus::Rejected]);
 
     $component->call('$refresh')->assertRedirect(route('order.show', $order->number));
+});
+
+test('the owner, signed in and without the session or a signature, downloads the QR of their own pending order', function () {
+    $owner = User::factory()->create();
+    $order = panelOrder();
+    $order->update(['user_id' => $owner->id]);
+    session()->forget('orders');
+
+    $response = $this->actingAs($owner)->get(route('order.qr', $order->number))->assertOk();
+
+    expect($response->headers->get('Content-Disposition'))->toBe('attachment; filename="promptpay-'.$order->number.'.png"')
+        ->and(substr($response->getContent(), 0, 8))->toBe("\x89PNG\r\n\x1a\n");
 });

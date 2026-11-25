@@ -54,7 +54,7 @@ class PaymentPanel extends Component
     {
         $order = Order::query()->find($this->orderId);
 
-        abort_if($order === null || ! OrderAccess::ownedBySession($order), 404);
+        abort_if($order === null || ! OrderAccess::canView($order), 404);
 
         return $order;
     }

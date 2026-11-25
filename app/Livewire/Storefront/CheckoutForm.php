@@ -34,6 +34,13 @@ class CheckoutForm extends Component
 
     public function mount(): void
     {
+        $user = auth()->user();
+
+        if ($user !== null) {
+            $this->form->name = $user->name;
+            $this->form->email = $user->email ?? '';
+        }
+
         $this->form->courier = Courier::Flash->value;
         $this->form->method = PaymentMethod::offered()[0]->value ?? '';
         $this->form->protection = $this->heldLines->contains(
@@ -70,7 +77,7 @@ class CheckoutForm extends Component
         }
 
         try {
-            $order = $placeOrder->handle($cart, $this->form);
+            $order = $placeOrder->handle($cart, $this->form, auth()->user());
         } catch (CheckoutBlocked) {
             $this->refused = true;
             unset($this->cart, $this->cartLines, $this->heldLines, $this->expiresAt, $this->subtotal);
@@ -80,6 +87,7 @@ class CheckoutForm extends Component
 
         // The visitor's own session may open the order page later without the signed link.
         session()->push('orders', $order->getKey());
+        session()->push('orders_placed', $order->getKey());
         session()->flash('order_placed', $order->getKey());
 
         $this->redirect($order->signedUrl());

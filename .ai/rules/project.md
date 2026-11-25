@@ -108,6 +108,9 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **A QR code, or anything that must stay light for a scanner, sits on a fixed white ground (`bg-white`), never on a theme token such as `bg-ink` or `bg-surface`: the light theme flips those.**
 - **`bootstrap/app.php` sends every unauthenticated web request to the Filament panel login. Before any customer route uses `auth` (M6), make `redirectGuestsTo` choose by path, so customers never land on the staff login.**
 - **Custom Blade views inside the Filament panel only get Tailwind utilities through the panel's custom theme (`resources/css/filament/admin/theme.css`); its `@source` must cover every folder those views live in.**
+- **`session('orders')` lists orders this session placed or opened through a signed link: it is proof of access, never of ownership. Only `session('orders_placed')` (orders this session placed) may be claimed into an account.**
+- **A screen has at most one gold (`bg-accent`) primary button; every other action on it uses the secondary button (`border border-line-strong bg-surface text-ink`).**
+- **Promoting a user to staff must rotate their `remember_token` and end their sessions: a session made before `is_staff` was set reaches `/admin` without the second-factor challenge.**
 
 ## Language
 

@@ -126,7 +126,7 @@
                     </div>
 
                     <label class="mt-3 flex cursor-pointer items-start gap-3 rounded-card border border-line bg-surface p-3 has-checked:border-accent has-checked:bg-accent/8 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent">
-                        <input type="checkbox" wire:model.live="form.protection" class="mt-0.5 focus-visible:outline-none grid size-5 flex-none appearance-none place-items-center rounded-tag border-2 border-line-strong bg-transparent before:mb-0.5 before:h-2.5 before:w-1.5 before:rotate-45 before:scale-0 before:border-b-2 before:border-r-2 before:border-accent-ink checked:border-accent checked:bg-accent checked:before:scale-100 motion-safe:before:transition-transform motion-safe:before:duration-160">
+                        <x-checkbox wire:model.live="form.protection" class="mt-0.5" />
                         <span class="min-w-0 flex-1">
                             <span class="block text-small font-medium">{{ __('storefront.checkout.protection') }} <span class="tabular-nums text-accent">+ <x-price :satang="(int) config('shipping.protection_satang')" /></span></span>
                             <span class="mt-1 block text-small text-muted">{{ __('storefront.checkout.protection_hint', ['threshold' => $format((int) config('shipping.protection_threshold_satang'))]) }}</span>

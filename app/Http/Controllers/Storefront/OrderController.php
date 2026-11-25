@@ -9,8 +9,8 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
 /**
- * `/orders/{number}`: one order. Opens with a valid signature (the link in every email) or when the visitor's own
- * session placed it. Anything else is a 404, never a 403, so the page does not confirm that a number exists.
+ * `/orders/{number}`: one order. Opens with a valid signature (the link in every email) when the visitor's own
+ * session placed it, or when the signed-in customer owns it. Anything else is a 404, never a 403, so the page does not confirm that a number exists.
  */
 class OrderController extends Controller
 {
@@ -20,7 +20,7 @@ class OrderController extends Controller
 
         $signed = $request->hasValidSignature();
 
-        abort_unless($signed || $ownedBySession, 404);
+        abort_unless($signed || OrderAccess::canView($order), 404);
 
         // The payment panel's Livewire updates carry no signature: a visitor who arrived from the email is remembered
         // by the session the same way as the one who placed the order here.
