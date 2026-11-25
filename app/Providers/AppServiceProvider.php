@@ -6,6 +6,8 @@ use App\Models\Game;
 use App\Models\User;
 use App\Models\Variant;
 use App\Notifications\Channels\LineChannel;
+use App\Search\FuzzyCardMatcher;
+use App\Search\MeilisearchFuzzyCardMatcher;
 use App\Search\QueryParser;
 use App\Support\CurrentCart;
 use GuzzleHttp\Client as GuzzleClient;
@@ -35,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->scoped(QueryParser::class);
         $this->app->scoped(CurrentCart::class);
+        $this->app->bind(FuzzyCardMatcher::class, MeilisearchFuzzyCardMatcher::class);
 
         // Scout's own binding has no timeout, so a stopped Meilisearch would hang the page instead of
         // failing fast into CatalogueSearch's database fallback.

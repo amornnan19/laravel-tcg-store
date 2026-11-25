@@ -47,6 +47,58 @@ final class QueryParser
     }
 
     /**
+     * The set and card number a code-like input names, without reading any printing: every reading in the order
+     * `parse()` tries them (longest set code first), as `[set ids, plain card number]`. A caller that parses many
+     * lines loads the printings of all the sets once, instead of one query per line.
+     *
+     * @return list<array{setIds: list<int>, number: int}>
+     */
+    public function codeCandidates(string $raw): array
+    {
+        $text = trim($raw);
+        $input = $this->fold($text);
+
+        if (str_contains($input, '/')) {
+            if (preg_match('~^(?<head>[^/]*?)(?<number>\d{1,4})\s*/\s*\d{1,4}$~', $input, $matches) !== 1) {
+                return [];
+            }
+
+            $tokens = $this->tokens($matches['head']);
+
+            if ($tokens === []) {
+                return [];
+            }
+
+            $tokens = [...$tokens, $matches['number']];
+        } else {
+            $tokens = $this->tokens($input);
+        }
+
+        if (count($tokens) > self::MAX_TOKENS) {
+            return [];
+        }
+
+        $candidates = [];
+
+        for ($count = count($tokens); $count >= 1; $count--) {
+            $setIds = $this->setIds()[$this->normalise(implode('', array_slice($tokens, 0, $count)))] ?? null;
+            $rest = array_slice($tokens, $count);
+
+            if ($setIds === null || $rest === []) {
+                continue;
+            }
+
+            $number = $this->cardNumber($rest);
+
+            if ($number !== null) {
+                $candidates[] = ['setIds' => $setIds, 'number' => $number];
+            }
+        }
+
+        return $candidates;
+    }
+
+    /**
      * `SV3PT5 2/165` and `SV4a 190/190`: the part before the slash ends with the card number.
      */
     private function parseFraction(string $text, string $input): ParsedQuery

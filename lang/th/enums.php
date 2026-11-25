@@ -17,6 +17,11 @@ return [
         'normal' => 'ปกติ',
         'foil' => 'ฟอยล์',
     ],
+    'deck_bucket' => [
+        'full' => 'มีครบ',
+        'partial' => 'มีไม่พอ',
+        'missing' => 'ไม่มี',
+    ],
     'order_status' => [
         'awaiting_payment' => 'รอชำระเงิน',
         'paid' => 'ชำระเงินแล้ว',

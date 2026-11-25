@@ -116,6 +116,10 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **A queued job that re-reads current state to act on it (`CheckVariantAlerts`) uses `ShouldBeUniqueUntilProcessing`, not `ShouldBeUnique`; and a queued notification snapshots what it says at the moment it is sent for, rather than re-reading models that may be trashed or changed before it runs.**
 - **An action that belongs to one row (restock, price watch, remove) sits inside that row's bordered container, and its result or error renders next to that action, never in a region shared with another control.**
 - **A unique re-read job is dispatched with `DB::afterCommit(fn () => Job::dispatch(...))`, not `->afterCommit()`: the latter takes the unique lock inside the open transaction, so a check that starts before the commit swallows the change.**
+- **A result computed from user input (a parsed list, a quote) shows when the input has changed since it was computed, and any action on that result is `aria-disabled` until it is recomputed.**
+- **A Meilisearch `_rankingScore` threshold is not a name match: a query with no word tokens scores 1.0 (placeholder search) and a one-word prefix scores about 0.98. Verify a fuzzy hit against the card's name before accepting it.**
+- **Never fold Thai text with NFKC before comparing it with stored text: NFKC decomposes ำ (U+0E33). Use NFC, and fold only full-width ASCII.**
+- **A Livewire `#[Computed]` is recomputed on every request. Expensive work derived from user input (a search, a parse) runs in the action the rate limit guards, and its result is kept in locked state or a cache, never re-derived in a computed that any later request re-runs.**
 
 ## Language
 

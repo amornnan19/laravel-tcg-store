@@ -11,6 +11,7 @@ use App\Http\Controllers\Storefront\AccountController;
 use App\Http\Controllers\Storefront\CardController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CheckoutController;
+use App\Http\Controllers\Storefront\DeckController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\OrderController;
 use App\Http\Controllers\Storefront\PaymentQrController;
@@ -31,6 +32,8 @@ Route::get('/s/{set:code}', SetController::class)->name('set.show');
 Route::get('/cart', CartController::class)->name('cart');
 
 Route::get('/checkout', CheckoutController::class)->name('checkout');
+
+Route::get('/deck', DeckController::class)->name('deck.import');
 
 Route::get('/orders/{order:number}', OrderController::class)->name('order.show');
 
