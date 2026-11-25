@@ -5,14 +5,14 @@ namespace App\Notifications;
 use App\Models\Order;
 use App\Support\Money;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /**
  * Sent to the order's own email when it is placed, with the signed link that opens the order page.
  */
-class OrderPlaced extends Notification implements ShouldQueue
+class OrderPlaced extends Notification implements ShouldQueueAfterCommit
 {
     use Queueable;
 

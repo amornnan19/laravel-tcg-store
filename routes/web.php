@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\SlipController;
 use App\Http\Controllers\Storefront\CardController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CheckoutController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Storefront\OrderController;
 use App\Http\Controllers\Storefront\PaymentQrController;
 use App\Http\Controllers\Storefront\ResultsController;
 use App\Http\Controllers\Storefront\SetController;
+use Filament\Http\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -26,3 +28,7 @@ Route::get('/checkout', CheckoutController::class)->name('checkout');
 Route::get('/orders/{order:number}', OrderController::class)->name('order.show');
 
 Route::get('/orders/{order:number}/qr.png', PaymentQrController::class)->name('order.qr');
+
+Route::get('/admin/slips/{payment}', SlipController::class)
+    ->middleware(['auth', AuthenticateSession::class, 'can:view,payment'])
+    ->name('admin.slip');

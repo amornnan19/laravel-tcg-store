@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Exceptions\IllegalOrderTransition;
+use App\Exceptions\PaymentRefused;
 use App\Models\Order;
 use App\Models\Variant;
 use App\Notifications\OrderCancelled;
@@ -30,6 +31,7 @@ class CancelOrder
      * @param  (Closure(Order): bool)|null  $guard
      *
      * @throws IllegalOrderTransition when the order is not `awaiting_payment` or `paid`.
+     * @throws PaymentRefused when a slip is waiting for staff (`slip_submitted`): decide the slip first.
      */
     public function handle(Order $order, string $reason, ?Closure $guard = null): ?Order
     {
@@ -57,6 +59,12 @@ class CancelOrder
                 throw new IllegalOrderTransition("An order that is {$locked->status->value} cannot be cancelled.");
             }
 
+            // A slip waiting for staff may be money in: it is decided first, never swept away by a cancel. A locking
+            // read: inside the panel's outer transaction a plain read would see the snapshot from before the lock.
+            if ($locked->payments()->where('status', PaymentStatus::Submitted->value)->lockForUpdate()->exists()) {
+                throw new PaymentRefused('slip_submitted');
+            }
+
             foreach ($locked->items()->get() as $item) {
                 $variant = $variants->get($item->purchasable_id);
 
@@ -67,7 +75,7 @@ class CancelOrder
             }
 
             $locked->payments()
-                ->whereIn('status', [PaymentStatus::Pending->value, PaymentStatus::Submitted->value])
+                ->where('status', PaymentStatus::Pending->value)
                 ->update(['status' => PaymentStatus::Rejected->value, 'rejected_reason' => $reason, 'updated_at' => now()]);
 
             $locked->update(['status' => OrderStatus::Cancelled, 'cancelled_at' => now(), 'cancel_reason' => $reason]);

@@ -12,7 +12,8 @@ use Illuminate\Foundation\Queue\Queueable;
 
 /**
  * Cancels the orders that ran out their payment window and returns their stock. An order with a slip waiting for
- * staff is left alone: the customer paid, and the shop decides.
+ * staff, or with money already in (a short slip, a partial confirmation), is left alone: the customer paid, and the
+ * shop decides.
  */
 class CancelUnpaidOrders implements ShouldQueue
 {
@@ -22,7 +23,8 @@ class CancelUnpaidOrders implements ShouldQueue
     {
         $isOverdue = fn (Order $order): bool => $order->status === OrderStatus::AwaitingPayment
             && $order->payment_due_at->lte(now())
-            && ! $order->payments()->where('status', PaymentStatus::Submitted->value)->exists();
+            && ! $order->payments()->where('status', PaymentStatus::Submitted->value)->exists()
+            && $order->receivedSatang() === 0;
 
         Order::query()
             ->where('status', OrderStatus::AwaitingPayment->value)

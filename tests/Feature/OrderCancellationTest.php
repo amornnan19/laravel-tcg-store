@@ -4,6 +4,7 @@ use App\Actions\CancelOrder;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Exceptions\IllegalOrderTransition;
+use App\Exceptions\PaymentRefused;
 use App\Jobs\CancelUnpaidOrders;
 use App\Models\Card;
 use App\Models\CardSet;
@@ -22,6 +23,7 @@ use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
 
@@ -184,6 +186,7 @@ test('the job is queued and scheduled every minute without overlapping', functio
 
 test('seeded open orders took their stock, so cancelling one returns exactly what it took', function () {
     Notification::fake();
+    Storage::fake('local');
     $variants = collect(range(1, 7))->map(fn (): Variant => cancellableVariant(qty: 5));
     $before = $variants->mapWithKeys(fn (Variant $variant): array => [$variant->id => $variant->qty]);
 
@@ -202,7 +205,15 @@ test('seeded open orders took their stock, so cancelling one returns exactly wha
             ->and($stock($order))->toBeGreaterThanOrEqual(0);
     }
 
-    foreach ($orders->filter(fn (Order $order): bool => in_array($order->status, [OrderStatus::AwaitingPayment, OrderStatus::Paid], true)) as $order) {
+    $cancellable = $orders->filter(fn (Order $order): bool => in_array($order->status, [OrderStatus::AwaitingPayment, OrderStatus::Paid], true));
+
+    // The seeded order whose slip waits for staff is decided first: cancelling it is refused.
+    [$waiting, $cancellable] = $cancellable->partition(fn (Order $order): bool => $order->payments()->where('status', PaymentStatus::Submitted->value)->exists());
+
+    expect($waiting)->toHaveCount(1)
+        ->and(fn () => app(CancelOrder::class)->handle($waiting->sole(), 'ยกเลิก'))->toThrow(PaymentRefused::class);
+
+    foreach ($cancellable as $order) {
         app(CancelOrder::class)->handle($order, 'ยกเลิก');
 
         expect($stock($order))->toBe($before[$order->items->sole()->purchasable_id]);

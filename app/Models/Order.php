@@ -7,6 +7,7 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use Carbon\CarbonInterface;
 use Database\Factories\OrderFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,7 +28,7 @@ class Order extends Model
     protected $fillable = [
         'number', 'user_id', 'status', 'contact_name', 'contact_phone', 'contact_email', 'address', 'courier',
         'subtotal_satang', 'shipping_satang', 'protection_satang', 'insurance_satang', 'credit_used_satang',
-        'total_satang', 'tracking_number', 'staff_note', 'cancel_reason', 'payment_due_at', 'placed_at', 'paid_at', 'packed_at',
+        'refunded_satang', 'total_satang', 'tracking_number', 'staff_note', 'cancel_reason', 'refund_reason', 'payment_due_at', 'placed_at', 'paid_at', 'packed_at',
         'shipped_at', 'delivered_at', 'cancelled_at', 'refunded_at',
     ];
 
@@ -45,6 +46,7 @@ class Order extends Model
             'protection_satang' => 'integer',
             'insurance_satang' => 'integer',
             'credit_used_satang' => 'integer',
+            'refunded_satang' => 'integer',
             'total_satang' => 'integer',
             'payment_due_at' => 'datetime',
             'placed_at' => 'datetime',
@@ -79,8 +81,8 @@ class Order extends Model
     }
 
     /**
-     * Money staff have seen arrive: confirmed payments in full, plus what a rejected payment's slip showed when it was
-     * short of that payment's own amount.
+     * Money staff have seen arrive and still hold: confirmed payments in full, plus what a rejected payment's slip showed
+     * when it was short of that payment's own amount, less what a refund has already returned. Never below zero.
      */
     public function receivedSatang(): int
     {
@@ -91,7 +93,7 @@ class Order extends Model
             ->whereColumn('slip_amount_satang', '<', 'amount_satang')
             ->sum('slip_amount_satang');
 
-        return $confirmed + $short;
+        return max(0, $confirmed + $short - $this->refunded_satang);
     }
 
     /**
@@ -100,6 +102,42 @@ class Order extends Model
     public function remainingSatang(): int
     {
         return max(0, $this->total_satang - $this->receivedSatang());
+    }
+
+    /**
+     * Orders that ran past their payment deadline with money already in (a slip rejected as short): the shop must
+     * decide, so nothing cancels them on its own.
+     *
+     * @param  Builder<Order>  $query
+     * @return Builder<Order>
+     */
+    public function scopeOverdueWithShortSlip(Builder $query): Builder
+    {
+        return $query->where('status', OrderStatus::AwaitingPayment->value)
+            ->where('payment_due_at', '<=', now())
+            ->whereHas('payments', fn (Builder $payments) => $payments
+                ->where('status', PaymentStatus::Rejected->value)
+                ->whereNotNull('slip_amount_satang')
+                ->whereColumn('slip_amount_satang', '<', 'amount_satang'));
+    }
+
+    /**
+     * Whether a slip reference is already credited on a payment of this order other than `$exceptPaymentId`: the payment
+     * was confirmed, or it was rejected as short and its slip amount counts towards `receivedSatang()`. One slip must not
+     * be credited twice. `$slipRef` is compared in its normalised form (see `Payment::normaliseSlipRef()`).
+     */
+    public function slipRefCredited(string $slipRef, int $exceptPaymentId): bool
+    {
+        return $this->payments()
+            ->whereKeyNot($exceptPaymentId)
+            ->where('slip_ref', $slipRef)
+            ->where(fn ($query) => $query
+                ->where('status', PaymentStatus::Confirmed->value)
+                ->orWhere(fn ($short) => $short
+                    ->where('status', PaymentStatus::Rejected->value)
+                    ->whereNotNull('slip_amount_satang')
+                    ->whereColumn('slip_amount_satang', '<', 'amount_satang')))
+            ->exists();
     }
 
     public function isAwaitingPayment(): bool

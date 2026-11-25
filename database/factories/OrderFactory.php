@@ -113,6 +113,7 @@ class OrderFactory extends Factory
     {
         return $this->state(fn (): array => [
             'status' => OrderStatus::Paid,
+            'placed_at' => now()->subHours(2),
             'paid_at' => now()->subHour(),
         ]);
     }
@@ -121,6 +122,7 @@ class OrderFactory extends Factory
     {
         return $this->state(fn (): array => [
             'status' => OrderStatus::Packing,
+            'placed_at' => now()->subHours(4),
             'paid_at' => now()->subHours(3),
             'packed_at' => now()->subHour(),
         ]);
@@ -130,6 +132,7 @@ class OrderFactory extends Factory
     {
         return $this->state(fn (): array => [
             'status' => OrderStatus::Shipped,
+            'placed_at' => now()->subDays(2),
             'paid_at' => now()->subDay(),
             'packed_at' => now()->subHours(20),
             'shipped_at' => now()->subHours(18),

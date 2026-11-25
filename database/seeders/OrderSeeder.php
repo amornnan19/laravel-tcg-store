@@ -3,10 +3,12 @@
 namespace Database\Seeders;
 
 use App\Enums\Courier;
+use App\Enums\PaymentStatus;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Variant;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 class OrderSeeder extends Seeder
 {
@@ -14,7 +16,7 @@ class OrderSeeder extends Seeder
      * A few orders in different statuses, so the admin desk has something to show. Each one snapshots a seeded variant
      * through the factory. An order that is still open (awaiting payment, paid, packing) took its stock out of the
      * variant as PlaceOrder would, so cancelling it gives back exactly what it took; the others took nothing, and
-     * cannot reach an action that returns stock. No slip file exists.
+     * cannot reach an action that returns stock. A waiting slip is a small placeholder PNG drawn here, never a real photo.
      */
     public function run(): void
     {
@@ -70,11 +72,43 @@ class OrderSeeder extends Seeder
                 $factory = $factory->submitted();
             }
 
-            $factory->create([
+            $order = $factory->create([
                 'courier' => $courier,
                 'shipping_satang' => $courier->rateSatang(),
                 'protection_satang' => $protected ? (int) config('shipping.protection_satang') : 0,
             ]);
+
+            if ($slipWaiting) {
+                $this->storePlaceholderSlip($order);
+            }
         }
+    }
+
+    /**
+     * Draws a small grey-and-amber PNG on the private disk and points the order's submitted payment at it, so the
+     * payment desk shows an image. Skipped (the factory path stays, the desk shows its missing-file note) without GD.
+     */
+    private function storePlaceholderSlip(Order $order): void
+    {
+        if (! function_exists('imagecreatetruecolor')) {
+            return;
+        }
+
+        $image = imagecreatetruecolor(240, 360);
+        imagefill($image, 0, 0, imagecolorallocate($image, 238, 238, 240));
+        imagefilledrectangle($image, 0, 0, 239, 60, imagecolorallocate($image, 231, 182, 78));
+
+        foreach ([100, 130, 160, 190, 220] as $y) {
+            imagefilledrectangle($image, 24, $y, 24 + 120 + ($y % 60), $y + 8, imagecolorallocate($image, 190, 192, 198));
+        }
+
+        ob_start();
+        imagepng($image);
+        $png = (string) ob_get_clean();
+
+        $path = 'slips/'.$order->number.'/slip.png';
+        Storage::disk('local')->put($path, $png);
+
+        $order->payments()->where('status', PaymentStatus::Submitted->value)->update(['slip_path' => $path]);
     }
 }

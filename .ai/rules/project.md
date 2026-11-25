@@ -94,6 +94,7 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **A wrapper with `overflow-hidden` must not contain focusable controls (it clips the focus ring); a control at a limit uses `aria-disabled`, not `disabled`, so focus is not dropped.**
 - **A property bound with `wire:model.live` is never rewritten server-side (trim, cap, case); normalise into a local variable, or the response overwrites what the user is typing. `wire:loading` on a grid or flex container needs the matching display modifier (`wire:loading.grid`).**
 - **`trustProxies` trusts forwarded headers from any caller: the app container must be reachable only through the reverse proxy (no published port), and any URL emailed from inside a request (password reset) must be built from `APP_URL`, not the request host.**
+- **A check that refuses an action because a row exists ("a slip is submitted") and runs under the order lock must itself be a locking read (`lockForUpdate()`): panel actions run inside an outer transaction, so a plain read sees the snapshot from before the lock while the following UPDATE sees the latest rows.**
 - **In Livewire 4 `wire:model.blur` and `wire:model.change` only delay the client-side sync and send no request; server-side validation on blur needs `wire:model.live.blur`.**
 - **A transaction that calls `ReserveStock` (or otherwise sums `stock_reservations` to decide a hold) must lock the variant with `lockForUpdate()` before any other read in that transaction: on MySQL's REPEATABLE READ an earlier plain read fixes the snapshot and the reservation sum misses holds committed while waiting on the lock.**
 - **Every path that creates or increases a hold (`AddToCart`, `ChangeCartQuantity` up, `RenewCartItem`, swap, M5 `PlaceOrder`) applies the same purchasability check — price not null and `Printing::searchVisible()` — and the cart page treats a line that fails it as gone.**
@@ -105,6 +106,8 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **`lang/th/validation.php` applies to every form in the app, Filament admin included, and to every Livewire temporary upload. Keep its lines generic; wording for one field belongs in that component's `messages()`.**
 - **Money received on an order is `Order::receivedSatang()`: confirmed amounts plus the slip amount of rejected payments that were short. Any action that pays out, refunds or cancels with money in must use it, and staff must not credit one slip (`slip_ref`) on two payments.**
 - **A QR code, or anything that must stay light for a scanner, sits on a fixed white ground (`bg-white`), never on a theme token such as `bg-ink` or `bg-surface`: the light theme flips those.**
+- **`bootstrap/app.php` sends every unauthenticated web request to the Filament panel login. Before any customer route uses `auth` (M6), make `redirectGuestsTo` choose by path, so customers never land on the staff login.**
+- **Custom Blade views inside the Filament panel only get Tailwind utilities through the panel's custom theme (`resources/css/filament/admin/theme.css`); its `@source` must cover every folder those views live in.**
 
 ## Language
 

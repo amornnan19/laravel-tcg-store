@@ -42,6 +42,16 @@ class Payment extends Model
     }
 
     /**
+     * A bank slip reference as it is stored and compared: trimmed and upper-cased, null when blank.
+     */
+    public static function normaliseSlipRef(?string $slipRef): ?string
+    {
+        $slipRef = mb_strtoupper(trim((string) $slipRef));
+
+        return $slipRef === '' ? null : $slipRef;
+    }
+
+    /**
      * @return BelongsTo<Order, $this>
      */
     public function order(): BelongsTo
