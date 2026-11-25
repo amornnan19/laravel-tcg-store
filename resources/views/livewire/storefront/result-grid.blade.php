@@ -128,7 +128,7 @@
             @endif
         </div>
 
-        <div wire:loading.delay wire:target="loadMore" class="mt-3 {{ $gridClasses }}">
+        <div wire:loading.delay.grid wire:target="loadMore" class="mt-3 {{ $gridClasses }}">
             @foreach (range(1, 6) as $placeholder)
                 <x-skeleton :tile="true" />
             @endforeach

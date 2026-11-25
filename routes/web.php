@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\Storefront\CardController;
 use App\Http\Controllers\Storefront\HomeController;
-use App\Http\Controllers\Storefront\NotBuiltYet;
 use App\Http\Controllers\Storefront\ResultsController;
+use App\Http\Controllers\Storefront\SetController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -13,5 +13,4 @@ Route::get('/g/{game:slug}', [ResultsController::class, 'game'])->name('game.sho
 
 Route::get('/c/{card:slug}', CardController::class)->name('card.show');
 
-// Registered now so links can use route(); M3 builds this page and replaces the controller.
-Route::get('/s/{set:code}', NotBuiltYet::class)->name('set.show');
+Route::get('/s/{set:code}', SetController::class)->name('set.show');

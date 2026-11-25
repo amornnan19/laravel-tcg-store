@@ -41,7 +41,7 @@ test('the game chips list active games in sort order', function () {
         ->assertDontSee('Hidden Game');
 });
 
-test('the search and game routes resolve and the card and set routes are not built yet', function () {
+test('the search, game and set routes resolve and a card without printings is a 404', function () {
     $game = Game::factory()->create();
     $set = CardSet::factory()->for($game)->create(['code' => 'OP-05']);
     $card = Card::factory()->for($game)->create(['name_en' => 'Monkey D. Luffy']);
@@ -53,7 +53,7 @@ test('the search and game routes resolve and the card and set routes are not bui
 
     $this->get(route('search'))->assertOk();
     $this->get(route('card.show', $card))->assertNotFound();
-    $this->get(route('set.show', $set))->assertNotFound();
+    $this->get(route('set.show', $set))->assertOk();
 });
 
 test('the price component formats satang with tabular figures', function () {

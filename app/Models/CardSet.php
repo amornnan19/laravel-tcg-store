@@ -66,6 +66,22 @@ class CardSet extends Model
     }
 
     /**
+     * `/s/{set:code}`: a code is unique per game, not globally, so the URL resolves the same set every time:
+     * the lowest id among the sets of an active game. A code that only inactive games have is not found.
+     *
+     * @param  mixed  $value
+     * @param  string|null  $field
+     */
+    public function resolveRouteBinding($value, $field = null): ?Model
+    {
+        if ($field !== 'code') {
+            return parent::resolveRouteBinding($value, $field);
+        }
+
+        return $this->newQuery()->searchVisible()->where('code', $value)->orderBy('id')->first();
+    }
+
+    /**
      * Set the `in_stock_numbers` and `extra_numbers` attributes on every set in one query, for counts shown
      * against `card_count`. Both count distinct card numbers across all languages, never raw printings:
      * in-stock numbers have an available variant, extra numbers are printed past `card_count` (secret rares).

@@ -66,7 +66,7 @@
                 </div>
 
                 <p class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-small text-muted">
-                    <span class="tabular-nums">{{ $printing->display_code }}</span>
+                    <a href="{{ route('set.show', $printing->set) }}" class="inline-flex min-h-11 items-center rounded-tag tabular-nums underline decoration-line-strong underline-offset-4 hover:text-ink">{{ $printing->display_code }}</a>
                     <span aria-hidden="true" class="h-3 w-px bg-line"></span>
                     <span>{{ $game->name_en }}</span>
                     <x-rarity-badge :code="$printing->rarity_code" class="border border-line" />
@@ -95,7 +95,6 @@
                 <section aria-labelledby="other-cards-heading" class="min-w-0 lg:col-span-2">
                     <div class="mb-3 flex items-baseline justify-between gap-4">
                         <h2 id="other-cards-heading" class="font-display text-card font-medium lg:text-h3">{{ __('storefront.card.other_cards', ['code' => $printing->set->display_code]) }}</h2>
-                        <a href="{{ route('set.show', $printing->set) }}" class="inline-flex min-h-11 items-center text-small text-accent hover:text-ink">{{ __('storefront.home.browse_set') }}</a>
                     </div>
                     <ul class="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 lg:mx-0 lg:grid lg:grid-cols-6 lg:overflow-visible lg:px-0 lg:pb-0">
                         @foreach ($otherPrintings as $other)
@@ -106,6 +105,10 @@
                     </ul>
                 </section>
             @endif
+
+            <p class="lg:col-span-2">
+                <a href="{{ route('set.show', $printing->set) }}" class="inline-flex min-h-11 items-center text-small text-accent hover:text-ink">{{ __('storefront.home.browse_set') }}</a>
+            </p>
         </div>
     </div>
 </x-layouts.storefront>

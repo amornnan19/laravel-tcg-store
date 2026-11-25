@@ -501,3 +501,15 @@ test('the sample history seeder gives NM variants of rr, sar and sec 90 days aro
     $this->seed(PricePointSeeder::class);
     expect(PricePoint::query()->where('variant_id', $nm->id)->count())->toBe(90);
 });
+
+test('a printing alone in its set and language still links to its set page, from the meta line and a browse link', function () {
+    $card = cardPageCard('Lonely Card');
+    $printing = cardPagePrinting($card);
+    cardPageVariant($printing);
+
+    $this->get(route('card.show', $card))
+        ->assertOk()
+        ->assertDontSee(__('storefront.card.other_cards', ['code' => $printing->set->display_code]))
+        ->assertSeeHtml('<a href="'.route('set.show', $printing->set).'" class="inline-flex min-h-11 items-center text-small text-accent hover:text-ink">'.__('storefront.home.browse_set').'</a>')
+        ->assertSeeHtml('<a href="'.route('set.show', $printing->set).'" class="inline-flex min-h-11 items-center rounded-tag tabular-nums underline decoration-line-strong underline-offset-4 hover:text-ink">'.$printing->display_code.'</a>');
+});
