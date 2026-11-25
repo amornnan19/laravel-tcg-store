@@ -48,17 +48,30 @@ class ReserveStock
                 ->where('purchasable_id', $locked->getKey())
                 ->first();
 
-            return StockReservation::query()->updateOrCreate(
-                [
+            // One upsert on the unique key, never a delete or update that may miss followed by an insert: on MySQL the
+            // miss takes a gap lock and two carts adding different variants deadlock. A row the release job deleted
+            // between the read above and this write is simply inserted again.
+            $now = now();
+
+            StockReservation::query()->upsert(
+                [[
                     'cart_id' => $cart->getKey(),
                     'purchasable_type' => $locked->getMorphClass(),
                     'purchasable_id' => $locked->getKey(),
-                ],
-                [
                     'qty' => ($current?->isLive() ? $current->qty : 0) + $additional,
-                    'expires_at' => now()->addMinutes(config('shop.reservation_minutes')),
-                ],
+                    'expires_at' => $now->copy()->addMinutes(config('shop.reservation_minutes')),
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]],
+                uniqueBy: ['cart_id', 'purchasable_type', 'purchasable_id'],
+                update: ['qty', 'expires_at', 'updated_at'],
             );
+
+            return StockReservation::query()
+                ->where('cart_id', $cart->getKey())
+                ->where('purchasable_type', $locked->getMorphClass())
+                ->where('purchasable_id', $locked->getKey())
+                ->firstOrFail();
         });
     }
 }

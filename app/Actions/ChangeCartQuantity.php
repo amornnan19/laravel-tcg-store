@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Exceptions\InsufficientStock;
+use App\Exceptions\NotPurchasable;
 use App\Models\CartItem;
 use App\Models\Variant;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,7 @@ class ChangeCartQuantity
      * the lock time. Removing a line is RemoveCartItem; an expired line goes through RenewCartItem.
      *
      * @throws InsufficientStock when the difference is more than can be reserved.
+     * @throws NotPurchasable when raising a line whose item can no longer be bought.
      * @throws LogicException when the line's hold has expired.
      */
     public function handle(CartItem $item, int $qty): CartItem
@@ -41,6 +43,10 @@ class ChangeCartQuantity
             }
 
             if ($qty > $item->qty) {
+                if (! $variant->isPurchasable()) {
+                    throw new NotPurchasable;
+                }
+
                 $this->reserveStock->handle($item->cart, $variant, $qty - $item->qty);
             } elseif ($qty < $item->qty) {
                 $reservation->update(['qty' => $qty]);

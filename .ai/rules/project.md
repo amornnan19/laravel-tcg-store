@@ -94,6 +94,9 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **A wrapper with `overflow-hidden` must not contain focusable controls (it clips the focus ring); a control at a limit uses `aria-disabled`, not `disabled`, so focus is not dropped.**
 - **A property bound with `wire:model.live` is never rewritten server-side (trim, cap, case); normalise into a local variable, or the response overwrites what the user is typing. `wire:loading` on a grid or flex container needs the matching display modifier (`wire:loading.grid`).**
 - **A transaction that calls `ReserveStock` (or otherwise sums `stock_reservations` to decide a hold) must lock the variant with `lockForUpdate()` before any other read in that transaction: on MySQL's REPEATABLE READ an earlier plain read fixes the snapshot and the reservation sum misses holds committed while waiting on the lock.**
+- **Every path that creates or increases a hold (`AddToCart`, `ChangeCartQuantity` up, `RenewCartItem`, swap, M5 `PlaceOrder`) applies the same purchasability check — price not null and `Printing::searchVisible()` — and the cart page treats a line that fails it as gone.**
+- **Never combine a base colour utility and a conditional colour utility for the same property on one element (e.g. `text-ink` in a shared class string plus `'text-faint' => $atMin`): Tailwind v4 resolves same-property utilities by stylesheet order, not class order, so the conditional one can silently lose. Put every alternative colour in the conditional.**
+- **On MySQL/MariaDB, never run a locking `DELETE`/`UPDATE` against a `stock_reservations` key that may not exist and then `INSERT` it in the same transaction: the miss takes a gap lock and two carts deadlock. Write a cart's hold with a single upsert on the unique key.**
 
 ## Language
 

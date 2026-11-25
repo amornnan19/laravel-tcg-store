@@ -6,7 +6,7 @@
     $multiplePrintings = $this->rows->pluck('printing_id')->unique()->count() > 1;
     $selectedLabel = $selected === null ? null : strtoupper($selected->condition->value).' · '.$selected->printing->language->shortCode().' · '.$selected->finish->label();
     $columns = 'lg:grid-cols-[4rem_5.5rem_minmax(0,1fr)_9rem_6rem]';
-    $stepperButton = 'size-11 text-card text-ink transition-[background-color] duration-160 ease-ui motion-reduce:transition-none';
+    $stepperButton = 'size-11 text-card transition-[background-color] duration-160 ease-ui motion-reduce:transition-none';
     $atMin = $quantity <= 1;
     $atMax = $quantity >= $cap;
     $inCart = $this->inCart;
@@ -126,9 +126,9 @@
                 <span class="min-w-0 flex-1 text-small text-muted">{{ __('storefront.card.quantity') }} <span class="font-medium text-ink">{{ $selectedLabel }}</span></span>
                 {{-- No overflow-hidden here: it would clip the focus ring. A button at its limit is aria-disabled, not disabled, so focus stays on it; the actions clamp anyway. --}}
                 <span class="inline-flex flex-none items-center rounded-control border border-line-strong bg-surface">
-                    <button type="button" wire:click="decrement" @if ($atMin) aria-disabled="true" @endif aria-label="{{ __('storefront.card.decrease') }}" @class([$stepperButton, 'rounded-l-control', 'text-faint' => $atMin, 'hover:bg-raised' => ! $atMin])>&minus;</button>
+                    <button type="button" wire:click="decrement" @if ($atMin) aria-disabled="true" @endif aria-label="{{ __('storefront.card.decrease') }}" @class([$stepperButton, 'rounded-l-control', 'text-faint' => $atMin, 'text-ink hover:bg-raised' => ! $atMin])>&minus;</button>
                     <span class="min-w-9 text-center text-body font-medium tabular-nums" aria-live="polite">{{ $quantity }}</span>
-                    <button type="button" wire:click="increment" @if ($atMax) aria-disabled="true" @endif aria-label="{{ __('storefront.card.increase') }}" @class([$stepperButton, 'rounded-r-control', 'text-faint' => $atMax, 'hover:bg-raised' => ! $atMax])>+</button>
+                    <button type="button" wire:click="increment" @if ($atMax) aria-disabled="true" @endif aria-label="{{ __('storefront.card.increase') }}" @class([$stepperButton, 'rounded-r-control', 'text-faint' => $atMax, 'text-ink hover:bg-raised' => ! $atMax])>+</button>
                 </span>
                 {{-- On a desktop the total and the add button live here; a phone has the bar below. --}}
                 <p class="hidden flex-none items-baseline gap-2 lg:flex">

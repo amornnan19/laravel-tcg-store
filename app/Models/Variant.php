@@ -107,6 +107,28 @@ class Variant extends Model
     }
 
     /**
+     * Variants that can be put in a basket at all: a price, and a printing the storefront shows (card not trashed,
+     * game active). The one purchasability rule: every path that creates or increases a hold goes through it, and the
+     * cart page treats a line that fails it as gone. Stock is a separate question (scopeAvailable()).
+     *
+     * @param  Builder<Variant>  $query
+     * @return Builder<Variant>
+     */
+    public function scopePurchasable(Builder $query): Builder
+    {
+        return $query->whereNotNull($query->getModel()->qualifyColumn('price_satang'))
+            ->whereHas('printing', fn (Builder $printing) => $printing->searchVisible());
+    }
+
+    /**
+     * Whether this variant, as the database has it now, passes scopePurchasable().
+     */
+    public function isPurchasable(): bool
+    {
+        return $this->exists && static::query()->purchasable()->whereKey($this->getKey())->exists();
+    }
+
+    /**
      * Load `reserved_qty` (the sum of live reservations) with the variants, so availableQty() and isAvailable()
      * run no query per variant. Every storefront query that loads variants for display uses it.
      *
@@ -134,6 +156,14 @@ class Variant extends Model
     public function availableQty(): int
     {
         return max(0, $this->qty - $this->reservedQty());
+    }
+
+    /**
+     * "NM · ฟอยล์": the condition code and the finish, how a cart line names the variant it holds.
+     */
+    public function conditionFinishLabel(): string
+    {
+        return strtoupper($this->condition->value).' · '.$this->finish->label();
     }
 
     private function reservedQty(): int

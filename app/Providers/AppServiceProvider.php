@@ -10,6 +10,7 @@ use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -52,6 +53,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // An alias, not enforceMorphMap(): Filament's notifications and imports store other morph types unaliased.
         Relation::morphMap(['variant' => Variant::class]);
+
+        // `php artisan dev` runs no scheduler by default, and ReleaseExpiredReservations runs from the schedule.
+        DevCommands::artisan('schedule:work');
 
         Event::listen(SocialiteWasCalled::class, [LineExtendSocialite::class, 'handle']);
 

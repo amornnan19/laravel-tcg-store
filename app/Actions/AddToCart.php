@@ -6,7 +6,6 @@ use App\Exceptions\InsufficientStock;
 use App\Exceptions\NotPurchasable;
 use App\Models\Cart;
 use App\Models\CartItem;
-use App\Models\Printing;
 use App\Models\StockReservation;
 use App\Models\Variant;
 use Illuminate\Support\Facades\DB;
@@ -38,9 +37,7 @@ class AddToCart
             // before the lock is taken, and the reservation sum would miss holds committed while waiting.
             $current = Variant::query()->lockForUpdate()->find($variant->getKey());
 
-            if ($current === null
-                || $current->price_satang === null
-                || ! Printing::query()->searchVisible()->whereKey($current->printing_id)->exists()) {
+            if ($current === null || ! $current->isPurchasable()) {
                 throw new NotPurchasable;
             }
 
