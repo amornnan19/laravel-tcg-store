@@ -57,7 +57,7 @@ class CatalogueSearch
         }
 
         $page = Printing::search($parsed->text)
-            ->query(fn (Builder $builder) => $builder->searchVisible()->with(['card', 'set', 'variants']))
+            ->query(fn (Builder $builder) => $builder->searchVisible()->withCheapestVariant())
             ->paginate(self::PRINTING_LIMIT, 'page', 1);
 
         $sets = CardSet::search($parsed->text)
@@ -82,7 +82,7 @@ class CatalogueSearch
         $matching = Printing::query()->searchVisible()->matchingText($parsed->text);
 
         $total = $matching->count();
-        $printings = $matching->with(['card', 'set', 'variants'])->orderBy('id')->limit(self::PRINTING_LIMIT)->get();
+        $printings = $matching->withCheapestVariant()->orderBy('id')->limit(self::PRINTING_LIMIT)->get();
 
         $sets = CardSet::query()
             ->searchVisible()
@@ -116,7 +116,7 @@ class CatalogueSearch
 
         return Printing::query()
             ->searchVisible()
-            ->with(['card', 'set', 'variants'])
+            ->withCheapestVariant()
             ->whereKey($parsed->printingIds)
             ->get()
             ->sortBy(fn (Printing $printing): array => [

@@ -173,11 +173,11 @@ test('the stepper stops at the available quantity and says so in a sentence', fu
     ['card' => $card, 'en' => $en, 'enLp' => $enLp] = cardPageTwoLanguages();
 
     $table = cardPageTable($card, $en)->assertSet('variantId', $enLp->id)
-        ->assertSee(__('storefront.card.cap', ['n' => 2]))
-        ->assertDontSee(__('storefront.card.cap_reached', ['n' => 2]))
+        ->assertSee(__('storefront.card.cap', ['n' => 2, 'minutes' => config('shop.reservation_minutes')]))
+        ->assertDontSee(__('storefront.card.cap_reached', ['n' => 2, 'minutes' => config('shop.reservation_minutes')]))
         ->call('decrement')->assertSet('qty', 1)
         ->call('increment')->assertSet('qty', 2)
-        ->assertSee(__('storefront.card.cap_reached', ['n' => 2]))
+        ->assertSee(__('storefront.card.cap_reached', ['n' => 2, 'minutes' => config('shop.reservation_minutes')]))
         ->call('increment')->assertSet('qty', 2);
 
     // At the cap the plus button is aria-disabled and still focusable: `disabled` would drop focus from it.
@@ -202,10 +202,21 @@ test('the sticky bar total is the quantity times the price of the selected row',
         ->assertSee(__('storefront.card.selected_line', ['variant' => 'NM · EN · '.Finish::Normal->label(), 'qty' => 3]));
 });
 
-test('there is no add-to-cart button, only the total', function () {
+test('the add button sits beside the total and the cap sentence carries the lock line', function () {
     ['card' => $card, 'en' => $en] = cardPageTwoLanguages();
 
-    cardPageTable($card, $en)->assertSee(__('storefront.card.total'))->assertDontSee('ใส่ตะกร้า')->assertDontSee('wire:click="add"', false);
+    $html = cardPageTable($card, $en)->assertSee(__('storefront.card.total'))->html();
+
+    expect(substr_count($html, 'wire:click="addToCart"'))->toBe(2)
+        ->and($html)->toContain(__('storefront.card.add'))
+        ->and($html)->toContain('ล็อกสต็อกให้ '.config('shop.reservation_minutes').' นาทีเมื่อกดซื้อ');
+});
+
+test('no add button is rendered when nothing in the language can be bought', function () {
+    ['card' => $card, 'ja' => $ja, 'jaLp' => $jaLp] = cardPageTwoLanguages();
+    $jaLp->update(['qty' => 0]);
+
+    expect(cardPageTable($card, $ja)->html())->not->toContain('wire:click="addToCart"');
 });
 
 test('sold-out and unpriced rows stay visible, dimmed, and cannot be chosen', function () {
@@ -283,7 +294,7 @@ test('calls bundled in one request follow the newest selection', function () {
     expect($table->html())
         ->toMatch('/wire:key="row-'.$enNm->id.'"[^>]*aria-checked="true"/s')
         ->toMatch('/wire:key="row-'.$enLp->id.'"[^>]*aria-checked="false"/s');
-    $table->assertSee('฿ 3,960')->assertSee(__('storefront.card.cap', ['n' => 6]));
+    $table->assertSee('฿ 3,960')->assertSee(__('storefront.card.cap', ['n' => 6, 'minutes' => config('shop.reservation_minutes')]));
 
     $table = cardPageTable($card, $en)->update(calls: [
         ['path' => '', 'method' => 'increment', 'params' => []],
@@ -291,7 +302,7 @@ test('calls bundled in one request follow the newest selection', function () {
     ]);
 
     expect($table->html())->toMatch('/wire:key="row-'.$jaLp->id.'"[^>]*aria-checked="true"/s');
-    $table->assertSet('language', 'ja')->assertSet('qty', 1)->assertSee('฿ 2,500')->assertSee(__('storefront.card.cap', ['n' => 4]));
+    $table->assertSet('language', 'ja')->assertSet('qty', 1)->assertSee('฿ 2,500')->assertSee(__('storefront.card.cap', ['n' => 4, 'minutes' => config('shop.reservation_minutes')]));
 });
 
 test('rows have one tab stop, the selected row', function () {

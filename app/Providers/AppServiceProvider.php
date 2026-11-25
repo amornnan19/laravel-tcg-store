@@ -3,10 +3,13 @@
 namespace App\Providers;
 
 use App\Models\Game;
+use App\Models\Variant;
 use App\Search\QueryParser;
+use App\Support\CurrentCart;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\View as ViewContract;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -23,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->scoped(QueryParser::class);
+        $this->app->scoped(CurrentCart::class);
 
         // Scout's own binding has no timeout, so a stopped Meilisearch would hang the page instead of
         // failing fast into CatalogueSearch's database fallback.
@@ -46,6 +50,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // An alias, not enforceMorphMap(): Filament's notifications and imports store other morph types unaliased.
+        Relation::morphMap(['variant' => Variant::class]);
+
         Event::listen(SocialiteWasCalled::class, [LineExtendSocialite::class, 'handle']);
 
         View::composer('components.layouts.storefront', function (ViewContract $view): void {

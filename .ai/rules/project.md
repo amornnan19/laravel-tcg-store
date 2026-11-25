@@ -93,6 +93,7 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **A Livewire action that changes state a `#[Computed]` property derives from must `unset()` every computed that depends on it; one request can carry several calls.**
 - **A wrapper with `overflow-hidden` must not contain focusable controls (it clips the focus ring); a control at a limit uses `aria-disabled`, not `disabled`, so focus is not dropped.**
 - **A property bound with `wire:model.live` is never rewritten server-side (trim, cap, case); normalise into a local variable, or the response overwrites what the user is typing. `wire:loading` on a grid or flex container needs the matching display modifier (`wire:loading.grid`).**
+- **A transaction that calls `ReserveStock` (or otherwise sums `stock_reservations` to decide a hold) must lock the variant with `lockForUpdate()` before any other read in that transaction: on MySQL's REPEATABLE READ an earlier plain read fixes the snapshot and the reservation sum misses holds committed while waiting on the lock.**
 
 ## Language
 

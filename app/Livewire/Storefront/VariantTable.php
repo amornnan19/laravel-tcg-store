@@ -2,12 +2,19 @@
 
 namespace App\Livewire\Storefront;
 
+use App\Actions\AddToCart;
 use App\Enums\Language;
+use App\Exceptions\InsufficientStock;
+use App\Exceptions\NotPurchasable;
+use App\Models\Cart;
 use App\Models\PricePoint;
 use App\Models\Printing;
+use App\Models\StockReservation;
 use App\Models\Variant;
+use App\Support\CurrentCart;
 use App\Support\PriceChart;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
@@ -15,9 +22,9 @@ use Livewire\Component;
 
 /**
  * The interactive half of the card page: language tabs, the variant rows of the chosen language, the quantity
- * stepper, the price chart of the selected row and the sticky bar with the total. There is no add button until M4.
+ * stepper, the price chart of the selected row, the add-to-cart button and the sticky bar with the total.
  *
- * Only the language, the selected variant and the quantity are state, and all three are re-checked against the
+ * Only the language, the selected variant, the quantity and the last add's notice are state, and all three are re-checked against the
  * rows on every request, so a stale or tampered value falls back to something that can be bought.
  */
 class VariantTable extends Component
@@ -36,6 +43,15 @@ class VariantTable extends Component
     public ?int $variantId = null;
 
     public int $qty = 1;
+
+    /** What the last add said, shown in the one live region; cleared by any change of selection. */
+    public ?string $notice = null;
+
+    /** Whether the button reads "added": the last add succeeded and the row it added is still the selected one. */
+    public bool $added = false;
+
+    /** Whether the notice reports a successful add (and offers the link to the cart) rather than an error. */
+    public bool $noticeOk = false;
 
     /**
      * @param  int  $printingId  The printing the page header shows: its language is the first tab, its own rows are preferred.
@@ -64,6 +80,7 @@ class VariantTable extends Component
         }
 
         $this->language = $chosen->value;
+        $this->clearNotice();
         $this->forgetSelection(withRows: true);
 
         $this->variantId = $this->cheapest($this->rows)?->id;
@@ -80,17 +97,80 @@ class VariantTable extends Component
 
         $this->variantId = $variant->id;
         $this->qty = min($this->qty, $variant->availableQty());
+        $this->clearNotice();
         $this->forgetSelection();
     }
 
     public function increment(): void
     {
+        $this->clearNotice();
         $this->qty = min($this->quantity() + 1, $this->cap);
     }
 
     public function decrement(): void
     {
+        $this->clearNotice();
         $this->qty = max($this->quantity() - 1, 1);
+    }
+
+    /**
+     * Put the chosen quantity of the selected row in the visitor's cart, which locks that stock for them. The cart
+     * row is created here, on the first add. Availability changed either way, so the stock-derived computeds are
+     * dropped and the next render reads the new figures.
+     */
+    public function addToCart(AddToCart $addToCart, CurrentCart $currentCart): void
+    {
+        // Exactly the row the customer chose: `selected` would fall back to another row that cannot be what they tapped.
+        $variant = $this->rows->firstWhere('id', $this->variantId);
+
+        $this->clearNotice();
+
+        if ($variant === null || ! $this->isSelectable($variant)) {
+            $this->notice = __('storefront.card.add_failed_none');
+            $this->refreshStock();
+            $this->variantId = $this->cheapest($this->rows)?->id;
+
+            return;
+        }
+
+        try {
+            $addToCart->handle($currentCart->findOrCreate(), $variant, $this->quantity());
+
+            $this->notice = __('storefront.card.added');
+            $this->noticeOk = true;
+            $this->qty = 1;
+            $this->dispatch('cart-updated');
+            $this->refreshStock();
+
+            // The last copy just went into this cart: move to the next row explicitly, and the button reads "add" again.
+            $added = $this->rows->firstWhere('id', $variant->id);
+
+            if ($added !== null && $this->isSelectable($added)) {
+                $this->added = true;
+            } else {
+                $this->variantId = $this->cheapest($this->rows)?->id;
+            }
+        } catch (InsufficientStock $stock) {
+            $this->notice = $stock->available > 0
+                ? __('storefront.card.add_failed_some', ['n' => $stock->available])
+                : __('storefront.card.add_failed_none');
+        } catch (NotPurchasable) {
+            $this->notice = __('storefront.card.add_failed');
+        }
+
+        $this->refreshStock();
+    }
+
+    private function refreshStock(): void
+    {
+        unset($this->rows, $this->selected, $this->cap, $this->printings, $this->chart, $this->inCart);
+    }
+
+    private function clearNotice(): void
+    {
+        $this->notice = null;
+        $this->added = false;
+        $this->noticeOk = false;
     }
 
     /**
@@ -117,7 +197,7 @@ class VariantTable extends Component
         return Printing::query()
             ->searchVisible()
             ->where('card_id', $this->cardId)
-            ->with(['set', 'variants'])
+            ->with(['set', 'variants' => fn (HasMany $variants) => $variants->withReservedQty()])
             ->orderBy('id')
             ->get();
     }
@@ -149,6 +229,33 @@ class VariantTable extends Component
             ->sortBy(fn (Printing $printing): int => $printing->id === $this->headerPrintingId ? 0 : 1)
             ->flatMap(fn (Printing $printing): Collection => $printing->variants->each->setRelation('printing', $printing))
             ->values();
+    }
+
+    /**
+     * How many of each variant of the card the visitor's own cart holds right now, `variant id => qty`, from one
+     * query over the live reservations (none when the session has no cart). Covers every language, so it does not
+     * change with the tab.
+     *
+     * @return array<int, int>
+     */
+    #[Computed]
+    public function inCart(): array
+    {
+        $token = app(CurrentCart::class)->token();
+        $variantIds = $this->printings->flatMap(fn (Printing $printing): Collection => $printing->variants)->pluck('id');
+
+        if ($token === null || $variantIds->isEmpty()) {
+            return [];
+        }
+
+        return StockReservation::query()
+            ->live()
+            ->whereIn('cart_id', Cart::query()->select('id')->where('token', $token))
+            ->where('purchasable_type', (new Variant)->getMorphClass())
+            ->whereIn('purchasable_id', $variantIds)
+            ->pluck('qty', 'purchasable_id')
+            ->map(fn (mixed $qty): int => (int) $qty)
+            ->all();
     }
 
     #[Computed]

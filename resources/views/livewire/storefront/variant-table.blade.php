@@ -9,6 +9,9 @@
     $stepperButton = 'size-11 text-card text-ink transition-[background-color] duration-160 ease-ui motion-reduce:transition-none';
     $atMin = $quantity <= 1;
     $atMax = $quantity >= $cap;
+    $inCart = $this->inCart;
+    $minutes = config('shop.reservation_minutes');
+    $addButton = 'flex-none items-center justify-center gap-2 bg-accent font-medium text-accent-ink transition-transform duration-160 ease-ui active:scale-98 motion-reduce:transition-none';
 @endphp
 
 <div class="flex flex-col gap-8 lg:contents">
@@ -107,7 +110,12 @@
                                 <span class="text-small font-normal">{{ __('storefront.card.no_price') }}</span>
                             @endif
                         </span>
-                        <x-stock-indicator :in-stock="$row->isAvailable()" :qty="$row->availableQty()" class="mt-1 block lg:mt-0 lg:text-right" />
+                        <span class="mt-1 block lg:mt-0 lg:text-right">
+                            <x-stock-indicator :in-stock="$row->isAvailable()" :qty="$row->availableQty()" class="block" />
+                            @if (($inCart[$row->id] ?? 0) > 0)
+                                <span class="block text-label tabular-nums text-accent">{{ __('storefront.card.in_cart', ['n' => $inCart[$row->id]]) }}</span>
+                            @endif
+                        </span>
                     </span>
                 </button>
             @endforeach
@@ -122,28 +130,65 @@
                     <span class="min-w-9 text-center text-body font-medium tabular-nums" aria-live="polite">{{ $quantity }}</span>
                     <button type="button" wire:click="increment" @if ($atMax) aria-disabled="true" @endif aria-label="{{ __('storefront.card.increase') }}" @class([$stepperButton, 'rounded-r-control', 'text-faint' => $atMax, 'hover:bg-raised' => ! $atMax])>+</button>
                 </span>
-                {{-- On a desktop the total lives here, where the add button goes in M4; a phone has the bar below. --}}
+                {{-- On a desktop the total and the add button live here; a phone has the bar below. --}}
                 <p class="hidden flex-none items-baseline gap-2 lg:flex">
                     <span class="text-small text-faint">{{ __('storefront.card.total') }}</span>
                     <x-price :satang="$selected->price_satang * $quantity" class="text-h3 font-medium text-accent" />
                 </p>
+                <button type="button" wire:click="addToCart" wire:loading.attr="aria-busy" wire:target="addToCart" @class([$addButton, 'hidden min-h-11 rounded-control px-5 text-body lg:inline-flex'])>
+                    @if ($this->added)
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m4.5 10.5 3.6 3.6 7.4-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        {{ __('storefront.card.added') }}
+                    @else
+                        {{ __('storefront.card.add') }}
+                    @endif
+                </button>
             </div>
-            <p role="status" @class(['mt-2 text-small', 'text-low' => $atMax, 'text-faint' => ! $atMax])>
-                {{ $atMax ? __('storefront.card.cap_reached', ['n' => $cap]) : __('storefront.card.cap', ['n' => $cap]) }}
+            {{-- The one live region of the table: the add result and the cap sentence are announced from here. --}}
+            <p role="status" class="mt-2 text-small">
+                @if ($this->notice !== null)
+                    <span @class(['block', 'text-stock' => $this->noticeOk, 'text-low' => ! $this->noticeOk])>
+                        {{ $this->notice }}
+                        @if ($this->noticeOk)
+                            <a href="{{ route('cart') }}" class="ml-2 inline-flex min-h-11 items-center rounded-tag text-accent hover:text-ink">{{ __('storefront.card.view_cart') }}</a>
+                        @endif
+                    </span>
+                @endif
+                <span @class(['block', 'text-low' => $atMax, 'text-faint' => ! $atMax])>{{ $atMax ? __('storefront.card.cap_reached', ['n' => $cap, 'minutes' => $minutes]) : __('storefront.card.cap', ['n' => $cap, 'minutes' => $minutes]) }}</span>
             </p>
         @else
-            <p role="status" class="mt-4 text-small text-muted">{{ __('storefront.card.none_available') }}</p>
+            <p role="status" class="mt-4 text-small text-muted">
+                @if ($this->notice !== null)
+                    <span @class(['block', 'text-stock' => $this->noticeOk, 'text-low' => ! $this->noticeOk])>
+                        {{ $this->notice }}
+                        @if ($this->noticeOk)
+                            <a href="{{ route('cart') }}" class="ml-2 inline-flex min-h-11 items-center rounded-tag text-accent hover:text-ink">{{ __('storefront.card.view_cart') }}</a>
+                        @endif
+                    </span>
+                @endif
+                <span class="block">{{ __('storefront.card.none_available') }}</span>
+            </p>
         @endif
     </section>
 
     @if ($selected !== null)
         <div class="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-sunken px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 lg:hidden">
-            <div class="flex items-center justify-between gap-4">
-                <p class="min-w-0 text-label text-faint">{{ __('storefront.card.selected_line', ['variant' => $selectedLabel, 'qty' => $quantity]) }}</p>
-                <p class="flex flex-none items-baseline gap-2">
-                    <span class="text-label text-faint">{{ __('storefront.card.total') }}</span>
-                    <x-price :satang="$selected->price_satang * $quantity" class="text-h3 font-medium text-accent" />
-                </p>
+            <div class="flex items-center gap-3">
+                <div class="min-w-0 flex-1">
+                    <p class="text-label text-faint">{{ __('storefront.card.selected_line', ['variant' => $selectedLabel, 'qty' => $quantity]) }}</p>
+                    <p class="mt-1 flex items-baseline gap-2">
+                        <span class="text-label text-faint">{{ __('storefront.card.total') }}</span>
+                        <x-price :satang="$selected->price_satang * $quantity" class="text-h3 font-medium text-accent" />
+                    </p>
+                </div>
+                <button type="button" wire:click="addToCart" wire:loading.attr="aria-busy" wire:target="addToCart" @class([$addButton, 'inline-flex min-h-13 rounded-card px-5 text-card'])>
+                    @if ($this->added)
+                        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m4.5 10.5 3.6 3.6 7.4-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        {{ __('storefront.card.added') }}
+                    @else
+                        {{ __('storefront.card.add') }}
+                    @endif
+                </button>
             </div>
         </div>
     @endif

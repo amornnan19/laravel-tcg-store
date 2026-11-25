@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Storefront\CardController;
+use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\ResultsController;
 use App\Http\Controllers\Storefront\SetController;
@@ -14,3 +15,5 @@ Route::get('/g/{game:slug}', [ResultsController::class, 'game'])->name('game.sho
 Route::get('/c/{card:slug}', CardController::class)->name('card.show');
 
 Route::get('/s/{set:code}', SetController::class)->name('set.show');
+
+Route::get('/cart', CartController::class)->name('cart');

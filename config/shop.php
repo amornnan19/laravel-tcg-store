@@ -14,4 +14,16 @@ return [
 
     'sample_price_history' => (bool) env('SHOP_SAMPLE_PRICE_HISTORY', true),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Stock lock
+    |--------------------------------------------------------------------------
+    |
+    | How long adding a card to the cart holds its stock for that cart. The reservation row, the cart's countdown
+    | and the Thai copy all read this one number.
+    |
+    */
+
+    'reservation_minutes' => 15,
+
 ];

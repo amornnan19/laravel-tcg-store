@@ -8,6 +8,7 @@ use App\Models\Card;
 use App\Models\Printing;
 use App\Models\Variant;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Lang;
@@ -23,7 +24,7 @@ class CardController extends Controller
     public function __invoke(Request $request, Card $card): View
     {
         // A trashed card never binds, and a printing of an inactive game is not visible: either way there is nothing to show.
-        $printings = $card->printings()->searchVisible()->with(['set', 'variants'])->get();
+        $printings = $card->printings()->searchVisible()->with(['set', 'variants' => fn (HasMany $variants) => $variants->withReservedQty()])->get();
 
         abort_if($printings->isEmpty(), 404);
 

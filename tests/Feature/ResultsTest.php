@@ -490,7 +490,7 @@ test('the tile grid costs the same queries for 3 tiles as for 24', function () {
     }
     $many = $queries();
 
-    $touching = fn (array $queries, string $table): int => count(array_filter($queries, fn (string $sql): bool => str_starts_with($sql, 'select * from "'.$table.'"')));
+    $touching = fn (array $queries, string $table): int => count(array_filter($queries, fn (string $sql): bool => str_starts_with($sql, 'select * from "'.$table.'"') || str_starts_with($sql, 'select "'.$table.'".*')));
 
     expect(count($many))->toBe(count($few))
         ->and($touching($many, 'printings'))->toBe(1)

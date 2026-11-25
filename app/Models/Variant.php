@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use LogicException;
 
 #[ObservedBy(VariantSearchObserver::class)]
@@ -85,15 +86,36 @@ class Variant extends Model
     }
 
     /**
-     * Variants a customer can buy now. Today that is `qty > 0`; M4 subtracts unexpired stock reservations
-     * here, so every "available" or "in stock" computation must go through this scope or isAvailable().
+     * Variants a customer can buy now: `qty` is greater than what unexpired reservations of any cart hold. Every
+     * "available" or "in stock" computation must go through this scope or isAvailable(), never `qty` alone.
+     *
+     * The sum is a correlated subquery, so it works in `whereHas('variants', ...)` and `Variant::query()`.
      *
      * @param  Builder<Variant>  $query
      * @return Builder<Variant>
      */
     public function scopeAvailable(Builder $query): Builder
     {
-        return $query->where('qty', '>', 0);
+        $model = $query->getModel();
+
+        return $query->whereRaw(
+            $model->qualifyColumn('qty').' > (select coalesce(sum(stock_reservations.qty), 0) from stock_reservations'
+            .' where stock_reservations.purchasable_type = ? and stock_reservations.purchasable_id = '.$model->getQualifiedKeyName()
+            .' and stock_reservations.expires_at > ?)',
+            [$model->getMorphClass(), now()->toDateTimeString()],
+        );
+    }
+
+    /**
+     * Load `reserved_qty` (the sum of live reservations) with the variants, so availableQty() and isAvailable()
+     * run no query per variant. Every storefront query that loads variants for display uses it.
+     *
+     * @param  Builder<Variant>  $query
+     * @return Builder<Variant>
+     */
+    public function scopeWithReservedQty(Builder $query): Builder
+    {
+        return $query->withSum('liveReservations as reserved_qty', 'qty');
     }
 
     /**
@@ -101,16 +123,40 @@ class Variant extends Model
      */
     public function isAvailable(): bool
     {
-        return $this->qty > 0;
+        return $this->availableQty() > 0;
     }
 
     /**
-     * How many a customer can put in a basket now: `qty` today, `qty` minus unexpired reservations from M4.
-     * The quantity stepper's cap reads this and never `qty`.
+     * How many a customer can put in a basket now: `qty` minus unexpired reservations of every cart, never below
+     * zero. The quantity stepper's cap reads this and never `qty`. Reads `reserved_qty` when the query loaded it
+     * (withReservedQty()), else the loaded `liveReservations`, else runs one query.
      */
     public function availableQty(): int
     {
-        return max(0, $this->qty);
+        return max(0, $this->qty - $this->reservedQty());
+    }
+
+    private function reservedQty(): int
+    {
+        if (array_key_exists('reserved_qty', $this->attributes)) {
+            return (int) $this->attributes['reserved_qty'];
+        }
+
+        if ($this->relationLoaded('liveReservations')) {
+            return (int) $this->liveReservations->sum('qty');
+        }
+
+        return (int) $this->liveReservations()->sum('qty');
+    }
+
+    /**
+     * Reservations that still hold stock, from any cart.
+     *
+     * @return MorphMany<StockReservation, $this>
+     */
+    public function liveReservations(): MorphMany
+    {
+        return $this->morphMany(StockReservation::class, 'purchasable')->live();
     }
 
     /**

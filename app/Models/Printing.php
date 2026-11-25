@@ -64,7 +64,7 @@ class Printing extends Model
      */
     public function hasAvailableFoil(): bool
     {
-        $variants = $this->relationLoaded('variants') ? $this->variants : $this->variants()->get();
+        $variants = $this->relationLoaded('variants') ? $this->variants : $this->variants()->withReservedQty()->get();
 
         return $variants->contains(fn (Variant $variant): bool => $variant->finish === Finish::Foil && $variant->isAvailable());
     }
@@ -78,7 +78,7 @@ class Printing extends Model
      */
     public function scopeWithCheapestVariant(Builder $query): Builder
     {
-        return $query->with(['card', 'set', 'variants']);
+        return $query->with(['card', 'set', 'variants' => fn (HasMany $variants) => $variants->withReservedQty()]);
     }
 
     /**
@@ -134,19 +134,24 @@ class Printing extends Model
      * Stock facts derived from the variants, the one place they are computed (search index and results).
      * Uses the loaded `variants` relation when there is one, so a bulk import runs no per-printing query.
      *
+     * By default a variant counts when a customer can buy it now (live reservations subtracted, so load the
+     * variants `withReservedQty()`). `$onHand = true` counts `qty > 0` and sums `qty`: the search index uses it,
+     * because a reservation never triggers a re-index, so an index written while something was held would keep
+     * saying "sold out" after the hold expired. Tiles and rows read the live figure.
+     *
      * `from_satang` is the lowest price of an available variant; `from_satang_any` the lowest price of any variant,
      * sold out or not, so a sold-out tile can still show what it cost.
      *
      * @return array{in_stock: bool, available_qty: int, from_satang: ?int, from_satang_any: ?int, conditions: list<string>, has_real_photo: bool}
      */
-    public function stockSummary(): array
+    public function stockSummary(bool $onHand = false): array
     {
-        $variants = $this->relationLoaded('variants') ? $this->variants : $this->variants()->get();
-        $available = $variants->filter(fn (Variant $variant): bool => $variant->isAvailable());
+        $variants = $this->relationLoaded('variants') ? $this->variants : $this->variants()->withReservedQty()->get();
+        $available = $variants->filter(fn (Variant $variant): bool => $onHand ? $variant->qty > 0 : $variant->isAvailable());
 
         return [
             'in_stock' => $available->isNotEmpty(),
-            'available_qty' => (int) $available->sum('qty'),
+            'available_qty' => (int) $available->sum(fn (Variant $variant): int => $onHand ? $variant->qty : $variant->availableQty()),
             'from_satang' => $available->whereNotNull('price_satang')->min('price_satang'),
             'from_satang_any' => $variants->whereNotNull('price_satang')->min('price_satang'),
             'conditions' => $available->map(fn (Variant $variant): string => $variant->condition->value)->unique()->values()->all(),
@@ -159,7 +164,7 @@ class Printing extends Model
      */
     public function toSearchableArray(): array
     {
-        $stock = $this->stockSummary();
+        $stock = $this->stockSummary(onHand: true);
 
         return [
             'id' => $this->id,
