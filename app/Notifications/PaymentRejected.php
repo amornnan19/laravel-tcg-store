@@ -4,27 +4,14 @@ namespace App\Notifications;
 
 use App\Models\Order;
 use App\Models\Payment;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
 /**
  * Sent when staff reject a slip: the reason verbatim, line by line, and the link back to the payment panel.
  */
-class PaymentRejected extends Notification implements ShouldQueueAfterCommit
+class PaymentRejected extends ShopNotification
 {
-    use Queueable;
-
     public function __construct(public Order $order, public Payment $payment) {}
-
-    /**
-     * @return array<int, string>
-     */
-    public function via(object $notifiable): array
-    {
-        return ['mail'];
-    }
 
     public function toMail(object $notifiable): MailMessage
     {
@@ -41,5 +28,19 @@ class PaymentRejected extends Notification implements ShouldQueueAfterCommit
             ->line(__('notifications.payment_rejected.deadline', ['minutes' => config('shop.payment_window_minutes')]))
             ->action(__('notifications.payment_rejected.action'), $this->order->signedUrl())
             ->salutation(__('notifications.salutation', ['shop' => config('app.name')]));
+    }
+
+    public function toLine(object $notifiable): string
+    {
+        return __('notifications.payment_rejected.line_text', [
+            'number' => $this->order->number,
+            'reason' => trim((string) $this->payment->rejected_reason),
+        ]).' '.__('notifications.payment_rejected.line_deadline', ['minutes' => config('shop.payment_window_minutes')])
+            ."\n".$this->order->signedUrl();
+    }
+
+    public function fallbackMailRoute(?object $notifiable): ?string
+    {
+        return $this->order->contact_email;
     }
 }

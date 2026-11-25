@@ -3,27 +3,14 @@
 namespace App\Notifications;
 
 use App\Models\Order;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
 /**
  * Sent when staff mark an order delivered.
  */
-class OrderDelivered extends Notification implements ShouldQueueAfterCommit
+class OrderDelivered extends ShopNotification
 {
-    use Queueable;
-
     public function __construct(public Order $order) {}
-
-    /**
-     * @return array<int, string>
-     */
-    public function via(object $notifiable): array
-    {
-        return ['mail'];
-    }
 
     public function toMail(object $notifiable): MailMessage
     {
@@ -33,5 +20,16 @@ class OrderDelivered extends Notification implements ShouldQueueAfterCommit
             ->line(__('notifications.order_delivered.line', ['number' => $this->order->number]))
             ->action(__('notifications.order_delivered.action'), $this->order->signedUrl())
             ->salutation(__('notifications.salutation', ['shop' => config('app.name')]));
+    }
+
+    public function toLine(object $notifiable): string
+    {
+        return __('notifications.order_delivered.line_text', ['number' => $this->order->number])
+            ."\n".$this->order->signedUrl();
+    }
+
+    public function fallbackMailRoute(?object $notifiable): ?string
+    {
+        return $this->order->contact_email;
     }
 }

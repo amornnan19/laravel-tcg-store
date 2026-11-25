@@ -83,6 +83,33 @@
             </section>
         @endif
 
+        <section aria-labelledby="account-notifications-heading" class="flex flex-col items-start gap-3 rounded-card border border-line bg-sunken p-4">
+            <h2 id="account-notifications-heading" class="font-display text-card font-medium">{{ __('storefront.account.notifications') }}</h2>
+
+            @if ($user->hasLine() && $lineMessagingConfigured)
+                <form method="POST" action="{{ route('account.notifications') }}" class="flex flex-col items-start gap-3">
+                    @csrf
+                    <label class="flex min-h-11 cursor-pointer items-center gap-3 rounded-control text-small text-ink has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent">
+                        <x-checkbox name="line_notify_opt_in" value="1" :checked="$user->line_notify_opt_in" aria-describedby="account-notify-hint" />
+                        {{ __('storefront.account.notify_line') }}
+                    </label>
+                    <p id="account-notify-hint" class="text-small text-muted">
+                        {{ __('storefront.account.notify_line_hint') }}
+                        @if (filled(config('shop.line_oa_url')))
+                            <a href="{{ config('shop.line_oa_url') }}" target="_blank" rel="noopener noreferrer" class="rounded-tag text-ink underline underline-offset-2 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">{{ __('storefront.account.notify_line_add_friend') }}</a>
+                        @endif
+                    </p>
+                    <button type="submit" class="{{ $secondaryButton }}">{{ __('storefront.account.notify_save') }}</button>
+                </form>
+            @elseif ($user->email !== null)
+                <p class="text-small text-muted">{{ __('storefront.account.notify_email') }}</p>
+            @elseif ($user->hasLine())
+                <p class="text-small text-muted">{{ __('storefront.account.line_not_open') }}</p>
+            @else
+                <p class="text-small text-muted">{{ __('storefront.account.no_channel') }}</p>
+            @endif
+        </section>
+
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="{{ $secondaryButton }}">{{ __('storefront.account.logout') }}</button>

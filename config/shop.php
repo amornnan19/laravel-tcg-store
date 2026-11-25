@@ -54,6 +54,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | LINE Official Account
+    |--------------------------------------------------------------------------
+    |
+    | The add-friend link of the shop's LINE Official Account. A customer must add it as a friend before LINE lets the
+    | shop push messages to them, so the account page links to it. Empty: no link is shown.
+    |
+    */
+
+    'line_oa_url' => env('SHOP_LINE_OA_URL'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Display timezone
     |--------------------------------------------------------------------------
     |

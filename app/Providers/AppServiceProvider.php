@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Game;
 use App\Models\User;
 use App\Models\Variant;
+use App\Notifications\Channels\LineChannel;
 use App\Search\QueryParser;
 use App\Support\CurrentCart;
 use GuzzleHttp\Client as GuzzleClient;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\DevCommands;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -63,6 +65,8 @@ class AppServiceProvider extends ServiceProvider
         DevCommands::artisan('schedule:work');
 
         Event::listen(SocialiteWasCalled::class, [LineExtendSocialite::class, 'handle']);
+
+        Notification::extend('line', fn (Application $app): LineChannel => $app->make(LineChannel::class));
 
         $this->configureAccountMail();
 

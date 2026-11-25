@@ -6,8 +6,8 @@ use App\Enums\OrderStatus;
 use App\Exceptions\IllegalOrderTransition;
 use App\Models\Order;
 use App\Notifications\OrderShipped;
+use App\Support\OrderRecipient;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification;
 use InvalidArgumentException;
 
 /**
@@ -44,7 +44,7 @@ class ShipOrder
             return $locked;
         });
 
-        Notification::route('mail', $shipped->contact_email)->notify(new OrderShipped($shipped));
+        OrderRecipient::notify($shipped, new OrderShipped($shipped));
 
         return $shipped;
     }

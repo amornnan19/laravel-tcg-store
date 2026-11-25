@@ -11,8 +11,8 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Notifications\PaymentRejected;
 use App\Support\Money;
+use App\Support\OrderRecipient;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification;
 use InvalidArgumentException;
 
 /**
@@ -67,7 +67,7 @@ class RejectPayment
             return [$locked, $order];
         });
 
-        Notification::route('mail', $order->contact_email)->notify(new PaymentRejected($order, $rejected));
+        OrderRecipient::notify($order, new PaymentRejected($order, $rejected));
 
         return $rejected;
     }

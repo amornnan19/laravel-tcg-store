@@ -111,6 +111,7 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **`session('orders')` lists orders this session placed or opened through a signed link: it is proof of access, never of ownership. Only `session('orders_placed')` (orders this session placed) may be claimed into an account.**
 - **A screen has at most one gold (`bg-accent`) primary button; every other action on it uses the secondary button (`border border-line-strong bg-surface text-ink`).**
 - **Promoting a user to staff must rotate their `remember_token` and end their sessions: a session made before `is_staff` was set reaches `/admin` without the second-factor challenge.**
+- **Jobs and queued notifications get one attempt unless the class sets `$tries` (the worker default is `--tries=1`). A job that calls an external API sets `$tries` and `backoff()`, sends an idempotency key when the API supports one, and a customer message that cannot be delivered on its channel falls back to email rather than being dropped.**
 
 ## Language
 

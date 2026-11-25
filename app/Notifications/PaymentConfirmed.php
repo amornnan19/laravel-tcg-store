@@ -4,27 +4,14 @@ namespace App\Notifications;
 
 use App\Models\Order;
 use App\Support\Money;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
 /**
  * Sent when staff confirm a slip: the order is paid in full, or the money so far is acknowledged and the rest is owed.
  */
-class PaymentConfirmed extends Notification implements ShouldQueueAfterCommit
+class PaymentConfirmed extends ShopNotification
 {
-    use Queueable;
-
     public function __construct(public Order $order) {}
-
-    /**
-     * @return array<int, string>
-     */
-    public function via(object $notifiable): array
-    {
-        return ['mail'];
-    }
 
     public function toMail(object $notifiable): MailMessage
     {
@@ -44,5 +31,23 @@ class PaymentConfirmed extends Notification implements ShouldQueueAfterCommit
         return $mail
             ->action(__('notifications.payment_confirmed.action'), $this->order->signedUrl())
             ->salutation(__('notifications.salutation', ['shop' => config('app.name')]));
+    }
+
+    public function toLine(object $notifiable): string
+    {
+        $text = $this->order->isPaid()
+            ? __('notifications.payment_confirmed.line_text', ['number' => $this->order->number])
+            : __('notifications.payment_confirmed.line_text_partial', [
+                'number' => $this->order->number,
+                'remaining' => Money::fromSatang($this->order->remainingSatang())->format(),
+            ]);
+
+        return $text
+            ."\n".$this->order->signedUrl();
+    }
+
+    public function fallbackMailRoute(?object $notifiable): ?string
+    {
+        return $this->order->contact_email;
     }
 }

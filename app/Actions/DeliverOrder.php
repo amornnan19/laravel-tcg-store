@@ -6,8 +6,8 @@ use App\Enums\OrderStatus;
 use App\Exceptions\IllegalOrderTransition;
 use App\Models\Order;
 use App\Notifications\OrderDelivered;
+use App\Support\OrderRecipient;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification;
 
 /**
  * `shipped` to `delivered`. The status is re-read under the order's row lock; the customer is told afterwards.
@@ -31,7 +31,7 @@ class DeliverOrder
             return $locked;
         });
 
-        Notification::route('mail', $order->contact_email)->notify(new OrderDelivered($order));
+        OrderRecipient::notify($order, new OrderDelivered($order));
 
         return $order;
     }

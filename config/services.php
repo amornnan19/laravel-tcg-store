@@ -39,6 +39,9 @@ return [
         'client_id' => env('LINE_CHANNEL_ID'),
         'client_secret' => env('LINE_CHANNEL_SECRET'),
         'redirect' => env('LINE_REDIRECT_URI'),
+        // The Messaging API channel's token, for pushing notifications. The LINE Login channel and the Messaging API
+        // channel must sit under the same LINE provider, or the user id Login returns is not the id the push addresses.
+        'messaging_token' => env('LINE_MESSAGING_CHANNEL_TOKEN'),
     ],
 
 ];

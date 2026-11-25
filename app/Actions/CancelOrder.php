@@ -9,9 +9,9 @@ use App\Exceptions\PaymentRefused;
 use App\Models\Order;
 use App\Models\Variant;
 use App\Notifications\OrderCancelled;
+use App\Support\OrderRecipient;
 use Closure;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification;
 
 /**
  * Cancels an order that is waiting for money or has just been paid, and gives its stock back. By the time an order
@@ -87,7 +87,7 @@ class CancelOrder
             return null;
         }
 
-        Notification::route('mail', $cancelled->contact_email)->notify(new OrderCancelled($cancelled));
+        OrderRecipient::notify($cancelled, new OrderCancelled($cancelled));
 
         return $cancelled;
     }

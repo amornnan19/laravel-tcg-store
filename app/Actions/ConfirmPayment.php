@@ -9,8 +9,8 @@ use App\Exceptions\SlipRefAlreadyCredited;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Notifications\PaymentConfirmed;
+use App\Support\OrderRecipient;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification;
 
 /**
  * Staff confirm a submitted slip: the payment is confirmed and, once the money received reaches the order total, the
@@ -58,7 +58,7 @@ class ConfirmPayment
             return [$locked, $order];
         });
 
-        Notification::route('mail', $order->contact_email)->notify(new PaymentConfirmed($order));
+        OrderRecipient::notify($order, new PaymentConfirmed($order));
 
         return $confirmed;
     }

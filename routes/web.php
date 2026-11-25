@@ -62,6 +62,7 @@ Route::middleware('auth')->group(function (): void {
 
     Route::post('/account/line/unlink', [LineController::class, 'unlink'])->name('line.unlink');
     Route::get('/account', AccountController::class)->name('account');
+    Route::post('/account/notifications', [AccountController::class, 'notifications'])->name('account.notifications');
 });
 
 Route::get('/auth/line', [LineController::class, 'redirect'])->name('line.redirect');

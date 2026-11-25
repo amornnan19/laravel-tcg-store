@@ -76,6 +76,21 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     }
 
     /**
+     * Messages go to LINE only when the customer linked it, opted in, and the shop has a Messaging API token to push with.
+     */
+    public function prefersLine(): bool
+    {
+        return $this->hasLine()
+            && $this->line_notify_opt_in
+            && filled(config('services.line.messaging_token'));
+    }
+
+    public function routeNotificationForLine(): ?string
+    {
+        return $this->line_user_id;
+    }
+
+    /**
      * An account made through LINE may have no email; there is nothing to send a verification link to.
      */
     public function sendEmailVerificationNotification(): void

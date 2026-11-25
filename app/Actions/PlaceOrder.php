@@ -16,9 +16,9 @@ use App\Models\User;
 use App\Models\Variant;
 use App\Notifications\OrderPlaced;
 use App\Support\CartLines;
+use App\Support\OrderRecipient;
 use App\Support\PaymentQr;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
@@ -160,7 +160,7 @@ class PlaceOrder
             return $order;
         });
 
-        Notification::route('mail', $order->contact_email)->notify(new OrderPlaced($order));
+        OrderRecipient::notify($order, new OrderPlaced($order));
 
         return $order;
     }

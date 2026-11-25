@@ -8,8 +8,8 @@ use App\Exceptions\IllegalOrderTransition;
 use App\Models\Order;
 use App\Models\Variant;
 use App\Notifications\OrderRefunded;
+use App\Support\OrderRecipient;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification;
 use InvalidArgumentException;
 
 /**
@@ -74,7 +74,7 @@ class RefundOrder
             return new RefundResult($locked, $refundedSatang);
         });
 
-        Notification::route('mail', $result->order->contact_email)->notify(new OrderRefunded($result->order, $result->refundedSatang));
+        OrderRecipient::notify($result->order, new OrderRefunded($result->order, $result->refundedSatang));
 
         return $result;
     }
