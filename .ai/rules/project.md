@@ -101,6 +101,10 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **On MySQL/MariaDB, never run a locking `DELETE`/`UPDATE` against a `stock_reservations` key that may not exist and then `INSERT` it in the same transaction: the miss takes a gap lock and two carts deadlock. Write a cart's hold with a single upsert on the unique key.**
 - **A job or caller that filters orders before calling a shared action (CancelOrder, RefundOrder) must have that filter re-evaluated inside the action under the order's row lock; checking it before the call is a race. Seeders may create orders without taking stock only if those orders cannot reach an action that returns stock.**
 - **A radio or checkbox styled as a card puts its focus-visible ring on the card (`has-focus-visible:outline-*`), never on the accent-bordered control inside it; text inside a card that turns `bg-raised` when selected uses `text-muted`, not `text-faint` (faint is 4.3:1 on raised).**
+- **An action that stores an upload must check that the file exists before it writes the path to a row: on the `local` disk (`throw => false`) Livewire's `TemporaryUploadedFile::storeAs` returns the path even when the write failed.**
+- **`lang/th/validation.php` applies to every form in the app, Filament admin included, and to every Livewire temporary upload. Keep its lines generic; wording for one field belongs in that component's `messages()`.**
+- **Money received on an order is `Order::receivedSatang()`: confirmed amounts plus the slip amount of rejected payments that were short. Any action that pays out, refunds or cancels with money in must use it, and staff must not credit one slip (`slip_ref`) on two payments.**
+- **A QR code, or anything that must stay light for a scanner, sits on a fixed white ground (`bg-white`), never on a theme token such as `bg-ink` or `bg-surface`: the light theme flips those.**
 
 ## Language
 

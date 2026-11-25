@@ -105,6 +105,7 @@ test('a signed link made for https verifies behind a proxy that terminates TLS',
 });
 
 test('a pending order says by when to pay in shop time and that the link was emailed', function () {
+    Carbon::setTestNow('2026-11-25 09:00:00 UTC');
     $order = Order::factory()->create(['payment_due_at' => Carbon::parse('2026-11-25 10:05:00', 'UTC'), 'contact_email' => 'buyer@example.com']);
 
     $this->get($order->signedUrl())
@@ -112,6 +113,8 @@ test('a pending order says by when to pay in shop time and that the link was ema
         ->assertSee(__('storefront.order.emailed', ['email' => 'buyer@example.com']))
         ->assertSee($order->latestPayment->method->label())
         ->assertDontSee(__('storefront.order.placed_flash'));
+
+    Carbon::setTestNow();
 });
 
 test('the placed flash shows only when checkout flashed it', function () {

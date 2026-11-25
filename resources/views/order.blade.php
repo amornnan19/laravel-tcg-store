@@ -20,15 +20,12 @@
         @endif
 
         @if ($order->isAwaitingPayment())
-            {{-- Step B replaces this with <livewire:storefront.payment-panel :order-id="$order->id" />. --}}
-            <section aria-labelledby="order-payment-heading" class="rounded-card border border-line bg-sunken p-4">
-                <h2 id="order-payment-heading" class="text-small font-medium text-low">{{ __('storefront.order.pay_by', ['time' => $order->payment_due_at->copy()->setTimezone($timezone)->format('H:i')]) }}</h2>
-                <p class="mt-3 flex items-baseline justify-between gap-4">
-                    <span class="text-small text-muted">{{ __('storefront.order.amount_due') }}</span>
-                    <x-price :satang="$order->total_satang" class="text-h3 font-medium text-accent" />
-                </p>
+            <section aria-label="{{ __('storefront.payment.section') }}" class="rounded-card border border-line bg-sunken p-4">
+                <livewire:storefront.payment-panel :order-id="$order->id" />
                 <p class="mt-3 text-label text-muted">{{ __('storefront.order.emailed', ['email' => $order->contact_email]) }}</p>
             </section>
+        @elseif ($order->status === \App\Enums\OrderStatus::Paid)
+            <livewire:storefront.payment-panel :order-id="$order->id" />
         @elseif ($order->isCancelled())
             <section aria-labelledby="order-cancelled-heading" class="flex items-start gap-3 rounded-card border border-line bg-sunken p-4">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" class="mt-0.5 flex-none text-danger"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 7l6 6M13 7l-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>

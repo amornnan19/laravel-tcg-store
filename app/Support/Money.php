@@ -62,6 +62,18 @@ final readonly class Money
     }
 
     /**
+     * `4290.00` or `4290.50`: always two decimals, no thousands separator, no currency symbol. The form a payment QR and
+     * a copied amount need.
+     */
+    public function toDecimalString(): string
+    {
+        $sign = $this->satang < 0 ? '-' : '';
+        $absolute = abs($this->satang);
+
+        return $sign.intdiv($absolute, 100).'.'.str_pad((string) ($absolute % 100), 2, '0', STR_PAD_LEFT);
+    }
+
+    /**
      * `฿ 4,290` or `฿ 4,290.50`.
      */
     public function format(): string
@@ -72,5 +84,16 @@ final readonly class Money
 
         return '฿ '.$sign.number_format(intdiv($absolute, 100))
             .($fraction === 0 ? '' : '.'.str_pad((string) $fraction, 2, '0', STR_PAD_LEFT));
+    }
+
+    /**
+     * `฿ 19,350.00`: the grouped form with the satang always shown, for an amount a customer must transfer exactly.
+     */
+    public function formatWithSatang(): string
+    {
+        $sign = $this->satang < 0 ? '-' : '';
+        $absolute = abs($this->satang);
+
+        return '฿ '.$sign.number_format(intdiv($absolute, 100)).'.'.str_pad((string) ($absolute % 100), 2, '0', STR_PAD_LEFT);
     }
 }

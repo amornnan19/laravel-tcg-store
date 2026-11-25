@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Support\OrderAccess;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,7 @@ class OrderController extends Controller
 {
     public function __invoke(Request $request, Order $order): View
     {
-        $ownedBySession = in_array($order->getKey(), (array) $request->session()->get('orders', []), true);
+        $ownedBySession = OrderAccess::ownedBySession($order);
 
         $signed = $request->hasValidSignature();
 

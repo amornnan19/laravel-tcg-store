@@ -202,3 +202,65 @@ document.addEventListener('alpine:init', () => {
         },
     }));
 });
+
+// A button that copies a fixed text and says so for two seconds. The text is a data attribute, never user input.
+document.addEventListener('alpine:init', () => {
+    window.Alpine.data('copyButton', () => ({
+        copied: false,
+        timer: null,
+
+        async copy() {
+            try {
+                await navigator.clipboard.writeText(this.$root.dataset.copy);
+                this.copied = true;
+                clearTimeout(this.timer);
+                this.timer = setTimeout(() => {
+                    this.copied = false;
+                }, 2000);
+            } catch (error) {
+                this.copied = false;
+            }
+        },
+    }));
+});
+
+// "Save QR": where the browser can share files (iOS, Android) the PNG goes to the share sheet, so it can be saved to
+// Photos; anywhere else the link downloads it as the attachment it is.
+document.addEventListener('alpine:init', () => {
+    window.Alpine.data('saveQr', () => ({
+        async save(event) {
+            // Only phones need the share sheet (it is how a QR reaches Photos for a bank app); a desktop browser may
+            // expose navigator.share and then never settle it, so there the link simply downloads.
+            if (!navigator.share || !navigator.canShare || !window.matchMedia('(pointer: coarse)').matches) {
+                return;
+            }
+
+            event.preventDefault();
+            const url = this.$root.href;
+
+            try {
+                const response = await fetch(url, { credentials: 'same-origin' });
+                const file = new File([await response.blob()], 'promptpay.png', { type: 'image/png' });
+
+                if (!response.ok) {
+                    // The QR is gone (paid, cancelled, slip sent elsewhere): stay on the page and let it catch up.
+                    this.$wire?.$refresh();
+
+                    return;
+                }
+
+                if (!navigator.canShare({ files: [file] })) {
+                    window.location.href = url;
+
+                    return;
+                }
+
+                await navigator.share({ files: [file] });
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    this.$wire?.$refresh();
+                }
+            }
+        },
+    }));
+});

@@ -15,6 +15,7 @@ use App\Models\StockReservation;
 use App\Models\Variant;
 use App\Notifications\OrderPlaced;
 use App\Support\CartLines;
+use App\Support\PaymentQr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
@@ -142,11 +143,11 @@ class PlaceOrder
                 $variant->save();
             }
 
-            // The QR payload for PromptPay arrives with the payment panel (Step B); the column stays null until then.
             $order->payments()->create([
                 'method' => $method,
                 'status' => PaymentStatus::Pending,
                 'amount_satang' => $total,
+                ...PaymentQr::attributes($method, $total, $order->payment_due_at),
             ]);
 
             // The holds are consumed, not released: the stock they held is now out of `qty` itself.

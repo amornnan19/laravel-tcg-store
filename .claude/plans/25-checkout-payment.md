@@ -186,7 +186,7 @@ pages/actions/infolists/widgets, notifications, signed URLs, scheduler. Skills `
 
 - Actions in `app/Actions` (each one transaction, locks first, stamps its timestamp, notifies):
   `ConfirmPayment(Payment)`: `submitted` → `confirmed`, `confirmed_at`; the order becomes `paid` (`paid_at`) when
-  `payment.amount + (shortfall_of?->slip_amount_satang ?? 0) >= order.total`;
+  `Order::receivedSatang()` (confirmed amounts + short-rejected slip amounts, #32) plus this payment reaches the total;
   `RejectPayment(Payment, string $reason, ?int $slipAmountSatang)`: `submitted` → `rejected`, stores both; the
   order stays `awaiting_payment` and its `payment_due_at` is extended to `now + payment_window_minutes` so
   the customer has time to act; `PackOrder` (`paid` → `packing`, `packed_at`); `ShipOrder(Order, string
@@ -194,6 +194,12 @@ pages/actions/infolists/widgets, notifications, signed URLs, scheduler. Skills `
   effects); `DeliverOrder` (`shipped` → `delivered`); `CancelOrder` (Step A); `RefundOrder(Order, string $reason)`
   (`paid|packing` → `refunded`, confirmed payments → `refunded`, returns qty like CancelOrder, `refunded_at`).
   Illegal transitions throw `App\Exceptions\IllegalOrderTransition`; Filament only shows the legal button.
+  **Money-in contracts from Step B (#32):** money received is `Order::receivedSatang()`. RejectPayment's reason is picked
+  from fixed reasons — `amount_mismatch` (requires the slip amount; the stored reason is two lines: heading
+  "ยอดในสลิปไม่ตรง" then "สลิปโอน :slip · ยอดที่ต้องชำระ :due (ขาด :gap)"), `unreadable` ("สลิปไม่ชัด อ่านยอดหรือเวลาไม่ได้"),
+  `wrong_account` ("โอนเข้าบัญชีอื่นที่ไม่ใช่ของร้าน"), `other` (free text required); `slip_ref` is entered by staff on
+  confirm/short-reject and a ref already credited on another payment of the same order is refused; RefundOrder refunds
+  `receivedSatang()` (and shows it), and cancelling an order with `receivedSatang() > 0` shows staff the amount to return.
   **The test the docs ask for:** a short slip moves the payment to `rejected` with a reason, never `confirmed`.
 - `OrderResource` (navigation group "คำสั่งซื้อ", Thai labels), list: number, placed, contact name, total
   `<x-price>`-equivalent money column, status badge, payment status; filters by status; default sort newest.

@@ -2,6 +2,8 @@
 
 namespace App\Enums;
 
+use App\Support\PromptPay;
+
 enum PaymentMethod: string
 {
     case Promptpay = 'promptpay';
@@ -22,7 +24,7 @@ enum PaymentMethod: string
     {
         $offered = [];
 
-        if (filled(config('shop.promptpay_id'))) {
+        if (PromptPay::isValidId((string) config('shop.promptpay_id'))) {
             $offered[] = self::Promptpay;
         }
 

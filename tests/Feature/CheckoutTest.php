@@ -26,6 +26,7 @@ use App\Models\StockReservation;
 use App\Models\Variant;
 use App\Notifications\OrderPlaced;
 use App\Support\CartLines;
+use App\Support\PromptPay;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -144,7 +145,7 @@ test('placing an order takes the stock, consumes the holds, empties the cart and
     expect($payment->method)->toBe(PaymentMethod::Promptpay)
         ->and($payment->status)->toBe(PaymentStatus::Pending)
         ->and($payment->amount_satang)->toBe($order->total_satang)
-        ->and($payment->qr_payload)->toBeNull();
+        ->and($payment->qr_payload)->toBe(PromptPay::payload('0812345678', $order->total_satang));
 
     // The stock that was held is gone for real: nothing is available to anyone else.
     expect($variant->availableQty())->toBe(1)
@@ -561,4 +562,37 @@ test('a fixed field clears its error when it loses focus, and a failed submit as
         ->assertDispatched('checkout-invalid');
 
     expect($component->html())->toContain('wire:model.live.blur="form.phone"')->toContain('maxlength="5"')->toContain('enterkeyhint="next"');
+});
+
+test('a PromptPay order is placed with the QR payload for its total, valid for qr_minutes inside the payment window', function () {
+    Notification::fake();
+    $order = app(PlaceOrder::class)->handle(checkoutCart([checkoutVariant(priceSatang: 123400)]), checkoutData());
+    $payment = $order->payments()->sole();
+
+    expect($payment->qr_payload)->toBe(PromptPay::payload('0812345678', $order->total_satang))
+        ->and($payment->qr_expires_at->equalTo($order->placed_at->copy()->addMinutes(15)))->toBeTrue();
+});
+
+test('the first QR never outlives the payment window, and a bank transfer has none', function () {
+    Notification::fake();
+    config(['shop.payment_window_minutes' => 10]);
+
+    $order = app(PlaceOrder::class)->handle(checkoutCart([checkoutVariant()]), checkoutData());
+    expect($order->payments()->sole()->qr_expires_at->equalTo($order->payment_due_at))->toBeTrue();
+
+    $bank = app(PlaceOrder::class)->handle(checkoutCart([checkoutVariant()]), checkoutData(['method' => 'bank_transfer']));
+    $payment = $bank->payments()->sole();
+    expect($payment->qr_payload)->toBeNull()->and($payment->qr_expires_at)->toBeNull();
+});
+
+test('PromptPay is offered only when the configured id is a valid PromptPay id', function () {
+    foreach (['0812345678', '+66812345678', '1234567890123'] as $id) {
+        config(['shop.promptpay_id' => $id]);
+        expect(PaymentMethod::offered())->toContain(PaymentMethod::Promptpay);
+    }
+
+    foreach (['12345', 'abc', ''] as $id) {
+        config(['shop.promptpay_id' => $id]);
+        expect(PaymentMethod::offered())->not->toContain(PaymentMethod::Promptpay);
+    }
 });

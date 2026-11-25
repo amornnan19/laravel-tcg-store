@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Courier;
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use Carbon\CarbonInterface;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -75,6 +76,30 @@ class Order extends Model
     public function signedUrl(): string
     {
         return URL::signedRoute('order.show', ['order' => $this->number]);
+    }
+
+    /**
+     * Money staff have seen arrive: confirmed payments in full, plus what a rejected payment's slip showed when it was
+     * short of that payment's own amount.
+     */
+    public function receivedSatang(): int
+    {
+        $confirmed = (int) $this->payments()->where('status', PaymentStatus::Confirmed->value)->sum('amount_satang');
+        $short = (int) $this->payments()
+            ->where('status', PaymentStatus::Rejected->value)
+            ->whereNotNull('slip_amount_satang')
+            ->whereColumn('slip_amount_satang', '<', 'amount_satang')
+            ->sum('slip_amount_satang');
+
+        return $confirmed + $short;
+    }
+
+    /**
+     * What is still owed: the total less what has been received, never below zero.
+     */
+    public function remainingSatang(): int
+    {
+        return max(0, $this->total_satang - $this->receivedSatang());
     }
 
     public function isAwaitingPayment(): bool
