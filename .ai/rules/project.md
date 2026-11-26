@@ -134,6 +134,7 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **Every Filament `DateTimePicker` sets `->timezone(config('shop.timezone'))`.**
 - **A Filament page hook (`afterSave`, `afterCreate`, an action's `after`) runs inside the panel's save transaction, after the record's row is already written and locked: an action called from it takes its locks in the project-wide order relative to that row, or runs in `DB::afterCommit`.**
 - **Every label next to a money figure says what the figure is: once store credit applies, a figure showing `payableSatang()` is labelled "ยอดที่ต้องโอน", never "ยอดรวม"; and a credit spend is guarded against the amount the customer saw.**
+- **A Filament bulk action that saves records another action locks saves them in ascending key order (`sortBy` the key, or `lockForUpdate()->orderBy('id')` first): `getSelectedTableRecords()` applies the table sort, which is often `id desc`. A "shown quote" signature covers every field that decides what is bought (printing, condition, finish), not only prices and quantities.**
 - **A phone-only fixed bottom action bar never hides on input focus, and its page sets `scroll-padding-bottom` on `html` (as `#deck-add-bar` and `#checkout-bar` do in `resources/css/app.css`) so a focused field is never under it.**
 
 ## Language
