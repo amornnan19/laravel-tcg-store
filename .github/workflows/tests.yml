@@ -96,3 +96,32 @@ jobs:
 
       - name: Tests
         run: php artisan test --compact
+
+  # Deploys main to Coolify once every test leg has passed. Runs only on a push to main in this repository, never on
+  # a pull request or a fork. Needs three repository secrets: COOLIFY_URL (https://<coolify host>), COOLIFY_TOKEN
+  # (an API token with the deploy ability only) and COOLIFY_APP_UUID. Without them the job says so and does nothing.
+  deploy:
+    name: deploy to coolify
+    needs: tests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'amornnan19/laravel-tcg-store'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+
+    steps:
+      - name: Ask Coolify to deploy
+        env:
+          COOLIFY_URL: ${{ secrets.COOLIFY_URL }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_APP_UUID: ${{ secrets.COOLIFY_APP_UUID }}
+        run: |
+          if [ -z "$COOLIFY_URL" ] || [ -z "$COOLIFY_TOKEN" ] || [ -z "$COOLIFY_APP_UUID" ]; then
+            echo "::warning::COOLIFY_URL, COOLIFY_TOKEN or COOLIFY_APP_UUID is not set; skipping the deploy."
+            exit 0
+          fi
+          curl --fail-with-body --silent --show-error --max-time 30 \
+            -X POST "${COOLIFY_URL%/}/api/v1/deploy?uuid=${COOLIFY_APP_UUID}" \
+            -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+            -H "Accept: application/json"
