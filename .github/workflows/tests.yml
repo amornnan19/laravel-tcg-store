@@ -14,8 +14,29 @@ concurrency:
 
 jobs:
   tests:
+    name: tests (${{ matrix.db }})
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        db: [sqlite, pgsql]
+
+    services:
+      # Started on both legs (a service cannot be conditional); only the pgsql leg points the tests at it.
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testing
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +44,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-          extensions: bcmath, exif, gd, intl, pdo_sqlite, sqlite3, zip
+          extensions: bcmath, exif, gd, intl, pdo_pgsql, pdo_sqlite, sqlite3, zip
           coverage: none
 
       - uses: actions/setup-node@v4
@@ -56,7 +77,22 @@ jobs:
           php artisan key:generate --no-interaction
 
       - name: Pint
+        if: matrix.db == 'sqlite'
         run: vendor/bin/pint --test --format agent
+
+      # phpunit.xml sets the sqlite values with <env>, which PHPUnit applies only when the variable is not already set.
+      # So the pgsql leg overrides them from the environment, and the sqlite leg sets nothing and keeps :memory:.
+      - name: Point the tests at Postgres
+        if: matrix.db == 'pgsql'
+        run: |
+          {
+            echo "DB_CONNECTION=pgsql"
+            echo "DB_HOST=127.0.0.1"
+            echo "DB_PORT=5432"
+            echo "DB_DATABASE=testing"
+            echo "DB_USERNAME=postgres"
+            echo "DB_PASSWORD=postgres"
+          } >> "$GITHUB_ENV"
 
       - name: Tests
         run: php artisan test --compact
