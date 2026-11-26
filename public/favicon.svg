@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Colours are the design tokens: bg #0B0C10 (token color-bg), fox #E7B64E (token color-accent), face #121318 (token color-accent-ink). -->
+  <rect width="32" height="32" rx="7" fill="#0B0C10"/>
+  <polygon points="5,5 12,10 20,10 27,5 27,18 16,28 5,18" fill="#E7B64E"/>
+  <polygon points="9,15 14,17.5 13,20 9,18" fill="#121318"/>
+  <polygon points="23,15 18,17.5 19,20 23,18" fill="#121318"/>
+  <polygon points="14,24 18,24 16,27" fill="#121318"/>
+</svg>

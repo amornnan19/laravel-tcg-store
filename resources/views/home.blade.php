@@ -1,4 +1,8 @@
 <x-layouts.storefront>
+    @if ($showDemoNotice)
+        <x-demo-notice />
+    @endif
+
     <div class="mx-auto flex max-w-7xl flex-col gap-8 px-4 pb-8 pt-5 lg:gap-12 lg:px-8 lg:pb-16 lg:pt-10">
         @if ($heroSet !== null)
             <section class="flex items-center gap-4 rounded-sheet border border-accent/30 bg-sunken p-4 lg:gap-7 lg:p-8">
