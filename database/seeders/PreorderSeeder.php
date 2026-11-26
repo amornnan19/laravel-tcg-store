@@ -13,18 +13,21 @@ use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\Preorder;
 use App\Models\SealedProduct;
+use Database\Seeders\Concerns\SeedsDemoData;
 use Illuminate\Database\Seeder;
 
 class PreorderSeeder extends Seeder
 {
+    use SeedsDemoData;
+
     /**
-     * Two open pre-orders, local only: a booster box releasing in 30 days and one releasing in 5 days. The 5-day one
-     * already has a deposit order waiting for its balance, so the daily balance job has something to ask for. Prices are
+     * Two open pre-orders (demo data): a booster box releasing in 30 days and one releasing in 5 days. Locally the 5-day
+     * one already has a deposit order waiting for its balance, so the daily balance job has something to ask for. Prices are
      * plausible demo values, never a real quote; the products have no image (the storefront draws a neutral block).
      */
     public function run(): void
     {
-        if (! app()->isLocal()) {
+        if (! $this->shouldSeedDemoData() || Preorder::query()->exists()) {
             return;
         }
 
@@ -40,7 +43,12 @@ class PreorderSeeder extends Seeder
             [5, 2, 'Pre-order Booster Box (Wave 2)', 600, 3200, 20, 1],
         ];
 
+        // Outside a local environment no customer order is seeded: the balance job would ask its customer for money. With
+        // no order, no place is taken either.
+        $isLocal = app()->isLocal();
+
         foreach ($specs as $index => [$release, $cancel, $name, $deposit, $full, $quota, $taken]) {
+            $taken = $isLocal ? $taken : 0;
             $set = $sets[$index] ?? $sets->first();
 
             $product = SealedProduct::query()->create([

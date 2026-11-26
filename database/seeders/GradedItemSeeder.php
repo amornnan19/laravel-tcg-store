@@ -6,19 +6,22 @@ use App\Enums\GradedStatus;
 use App\Enums\Grader;
 use App\Models\GradedItem;
 use App\Models\Printing;
+use Database\Seeders\Concerns\SeedsDemoData;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 
 class GradedItemSeeder extends Seeder
 {
+    use SeedsDemoData;
+
     /**
-     * Six graded cards for sale on seeded printings, local only: nothing here is a real slab or a real photo. The
+     * Six graded cards for sale on seeded printings (demo data): nothing here is a real slab or a real photo. The
      * three photos of each are plain labelled rectangles drawn with GD ("FRONT · DEMO"), never card art. Without GD
      * the items are created withdrawn, since the listing rule needs all three photos.
      */
     public function run(): void
     {
-        if (! app()->isLocal()) {
+        if (! $this->shouldSeedDemoData() || GradedItem::query()->exists()) {
             return;
         }
 

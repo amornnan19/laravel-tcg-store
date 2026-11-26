@@ -16,6 +16,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Demo data
+    |--------------------------------------------------------------------------
+    |
+    | `db:seed` always loads the catalogue. Orders, price history, graded cards, sealed products, pre-orders and buy
+    | prices are demo content: seeded on a local machine, and elsewhere only when this is on (a deployed demo). Seeded
+    | accounts with a known password exist only locally, whatever this says.
+    |
+    */
+
+    'demo_data' => (bool) env('SHOP_DEMO_DATA', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Stock lock
     |--------------------------------------------------------------------------
     |

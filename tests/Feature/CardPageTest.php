@@ -497,6 +497,7 @@ test('the sample history seeder gives NM variants of rr, sar and sec 90 days aro
     $unpriced = cardPageVariant(cardPagePrinting(cardPageCard('Unpriced'), attributes: ['rarity_code' => 'sec']), priceSatang: null);
     $plain = cardPageVariant($common);
 
+    config(['shop.demo_data' => true]);
     $this->seed(PricePointSeeder::class);
 
     $rows = PricePoint::query()->where('variant_id', $nm->id)->orderBy('on_date')->get();
@@ -509,6 +510,7 @@ test('the sample history seeder gives NM variants of rr, sar and sec 90 days aro
         ->and($rows->every(fn (PricePoint $row): bool => $row->low_satang <= $row->avg_satang && $row->avg_satang <= $row->high_satang && $row->sold_qty >= 0 && $row->sold_qty <= 3))->toBeTrue()
         ->and(PricePoint::query()->whereIn('variant_id', [$lp->id, $unpriced->id, $plain->id])->count())->toBe(0);
 
+    config(['shop.demo_data' => true]);
     $this->seed(PricePointSeeder::class);
     expect(PricePoint::query()->where('variant_id', $nm->id)->count())->toBe(90);
 });

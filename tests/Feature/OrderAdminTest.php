@@ -622,6 +622,7 @@ test('the seeded waiting slip is a real image on the private disk and no timesta
     }
     Order::query()->delete();
 
+    app()['env'] = 'local';
     app(OrderSeeder::class)->run();
 
     $payment = Payment::query()->where('status', PaymentStatus::Submitted->value)->sole();

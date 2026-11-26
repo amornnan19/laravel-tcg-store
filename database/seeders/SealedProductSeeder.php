@@ -6,18 +6,21 @@ use App\Enums\SealedKind;
 use App\Models\CardSet;
 use App\Models\Game;
 use App\Models\SealedProduct;
+use Database\Seeders\Concerns\SeedsDemoData;
 use Illuminate\Database\Seeder;
 
 class SealedProductSeeder extends Seeder
 {
+    use SeedsDemoData;
+
     /**
-     * Six sealed products across the four kinds, local only, with no image: the storefront draws its neutral block.
+     * Six sealed products across the four kinds (demo data), with no image: the storefront draws its neutral block.
      * Boxes, packs and decks sit on seeded sets, the accessory on a game only. Prices are plausible demo values,
      * never a real quote.
      */
     public function run(): void
     {
-        if (! app()->isLocal()) {
+        if (! $this->shouldSeedDemoData() || SealedProduct::query()->where('sku', 'like', 'DEMO-%')->where('is_preorder', false)->exists()) {
             return;
         }
 

@@ -3,23 +3,36 @@
 namespace Database\Seeders;
 
 use App\Enums\Courier;
+use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Variant;
+use Database\Seeders\Concerns\SeedsDemoData;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 
 class OrderSeeder extends Seeder
 {
+    use SeedsDemoData;
+
     /**
      * A few orders in different statuses, so the admin desk has something to show. Each one snapshots a seeded variant
      * through the factory. An order that is still open (awaiting payment, paid, packing) took its stock out of the
      * variant as PlaceOrder would, so cancelling it gives back exactly what it took; the others took nothing, and
-     * cannot reach an action that returns stock. A waiting slip is a small placeholder PNG drawn here, never a real photo.
+     * cannot reach an action that returns stock. Outside a local environment only orders no scheduled job acts on are
+     * seeded (paid, packing, shipped, delivered, cancelled, refunded: none awaiting payment, none with a slip waiting), and
+     * their contact addresses are on the reserved `example.invalid` domain, so nothing can mail a real person. Seeded once:
+     * it does nothing when any order exists. A waiting slip is a small placeholder PNG drawn here, never a real photo.
      */
     public function run(): void
     {
+        if (! $this->shouldSeedDemoData() || Order::query()->exists()) {
+            return;
+        }
+
+        $isLocal = app()->isLocal();
+
         $variants = Variant::query()
             ->purchasable()
             ->with(['printing.card', 'printing.set'])
@@ -43,11 +56,20 @@ class OrderSeeder extends Seeder
             ['cancelled', Courier::Kerry, false, false],
         ];
 
+        if (! $isLocal) {
+            $orders = array_values(array_filter($orders, fn (array $order): bool => $order[0] !== 'awaitingPayment'));
+            $orders[] = ['refunded', Courier::Flash, false, false];
+        }
+
         foreach ($orders as $index => [$state, $courier, $protected, $slipWaiting]) {
             $variant = $variants[$index];
             $qty = $index % 3 === 0 ? 2 : 1;
 
-            $factory = Order::factory()->{$state}()->has(OrderItem::factory()->state([
+            $base = $state === 'refunded'
+                ? Order::factory()->paid()->state(['status' => OrderStatus::Refunded, 'refunded_at' => now()])
+                : Order::factory()->{$state}();
+
+            $factory = $base->has(OrderItem::factory()->state([
                 'purchasable_type' => $variant->getMorphClass(),
                 'purchasable_id' => $variant->getKey(),
                 ...$variant->snapshot(),
@@ -67,6 +89,7 @@ class OrderSeeder extends Seeder
             }
 
             $order = $factory->create([
+                ...($isLocal ? [] : ['contact_email' => 'demo-order-'.($index + 1).'@example.invalid']),
                 'courier' => $courier,
                 'shipping_satang' => $courier->rateSatang(),
                 'protection_satang' => $protected ? (int) config('shipping.protection_satang') : 0,

@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Enums\CardCondition;
+use App\Models\PricePoint;
+use Database\Seeders\Concerns\SeedsDemoData;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -12,6 +14,8 @@ use Illuminate\Support\Facades\DB;
  */
 class PricePointSeeder extends Seeder
 {
+    use SeedsDemoData;
+
     private const DAYS = 90;
 
     private const RARITIES = ['rr', 'sar', 'sec'];
@@ -23,6 +27,10 @@ class PricePointSeeder extends Seeder
 
     public function run(): void
     {
+        if (! $this->shouldSeedDemoData() || PricePoint::query()->exists()) {
+            return;
+        }
+
         fake()->seed(2);
 
         $rows = [];

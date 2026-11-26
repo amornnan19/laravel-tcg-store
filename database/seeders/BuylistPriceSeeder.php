@@ -9,11 +9,14 @@ use App\Enums\Finish;
 use App\Models\BuylistPrice;
 use App\Models\User;
 use App\Support\BuylistQuote;
+use Database\Seeders\Concerns\SeedsDemoData;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class BuylistPriceSeeder extends Seeder
 {
+    use SeedsDemoData;
+
     private const PRINTINGS = 30;
 
     /** What the shop pays for a card in each condition, as a share of the price it sells the NM copy for. */
@@ -25,11 +28,15 @@ class BuylistPriceSeeder extends Seeder
 
     /**
      * Buy prices for about thirty seeded printings, from their NM selling price, with the configured credit bonus and a
-     * weekly quota on a few. Local only: one submitted list for the demo customer, so the account page has something to
+     * weekly quota on a few. One submitted list for the demo customer (local only), so the account page has something to
      * show. Skipped for a printing that already has its rows, so it can run again.
      */
     public function run(): void
     {
+        if (! $this->shouldSeedDemoData()) {
+            return;
+        }
+
         $nmVariants = DB::table('variants')
             ->join('printings', 'printings.id', '=', 'variants.printing_id')
             ->where('variants.condition', CardCondition::Nm->value)

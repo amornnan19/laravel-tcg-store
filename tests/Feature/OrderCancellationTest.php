@@ -190,6 +190,8 @@ test('seeded open orders took their stock, so cancelling one returns exactly wha
     $variants = collect(range(1, 7))->map(fn (): Variant => cancellableVariant(qty: 5));
     $before = $variants->mapWithKeys(fn (Variant $variant): array => [$variant->id => $variant->qty]);
 
+    // The seeder's local shape: open orders, a waiting slip. A deployed demo seeds a quieter set.
+    app()['env'] = 'local';
     app(OrderSeeder::class)->run();
 
     $orders = Order::query()->with('items')->orderBy('id')->get();
