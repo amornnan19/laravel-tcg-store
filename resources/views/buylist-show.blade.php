@@ -102,7 +102,7 @@
             @if (filled($address))
                 <p class="whitespace-pre-line text-small text-ink">{{ $address }}</p>
             @else
-                <p class="text-small text-muted">{{ __('storefront.buylist.show.address_missing') }}</p>
+                <p class="text-small text-muted">{{ __('storefront.buylist.show.address_missing'.(\App\Support\LineLogin::isConfigured() ? '' : '_email')) }}</p>
             @endif
         </section>
         @endif

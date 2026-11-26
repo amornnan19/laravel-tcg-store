@@ -1,5 +1,5 @@
 @php
-    $lineConfigured = filled(config('services.line.client_id'));
+    $lineConfigured = \App\Support\LineLogin::isConfigured();
     // One gold primary per screen: with the LINE button on it, the email submit is the secondary one.
     $submitButton = $lineConfigured
         ? 'inline-flex min-h-11 w-full items-center justify-center rounded-control border border-line-strong bg-surface px-4 text-small text-ink transition-[border-color] duration-160 ease-ui hover:border-accent motion-reduce:transition-none'

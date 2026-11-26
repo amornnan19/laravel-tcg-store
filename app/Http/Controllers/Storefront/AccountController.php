@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
+use App\Support\LineLogin;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -40,7 +41,7 @@ class AccountController extends Controller
                 ->orderByDesc('id')
                 ->get(),
             'savedDecks' => $user->savedDeckLists()->select(['id', 'name', 'game_id', 'requested_cards', 'created_at'])->with('game:id,name_en')->orderByDesc('id')->get(),
-            'lineConfigured' => filled(config('services.line.client_id')),
+            'lineConfigured' => LineLogin::isConfigured(),
             'lineMessagingConfigured' => filled(config('services.line.messaging_token')),
         ]);
     }

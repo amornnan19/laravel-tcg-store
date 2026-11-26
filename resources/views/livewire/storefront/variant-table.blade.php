@@ -142,7 +142,7 @@
                         $restockNotice = $this->restockNotices[$row->id] ?? null;
                     @endphp
                     <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-line px-3 py-2">
-                        <p class="text-label text-muted max-lg:basis-full">{{ __('storefront.alerts.restock_hint') }}</p>
+                        <p class="text-label text-muted max-lg:basis-full">{{ __('storefront.alerts.restock_hint'.(\App\Support\LineLogin::isConfigured() ? '' : '_email')) }}</p>
                         <button
                             type="button"
                             wire:key="restock-action-{{ $row->id }}"

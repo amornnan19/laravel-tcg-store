@@ -419,16 +419,17 @@ describe('the submission page', function () {
             ->assertSee(__('storefront.buylist.show.quote_until', ['date' => $submission->quote_expires_at->copy()->setTimezone(config('shop.timezone'))->locale('th')->translatedFormat('j M Y')]))
             ->assertSee('1 Example Road')
             ->assertSee('฿ 230')
-            ->assertDontSee(__('storefront.buylist.show.address_missing'));
+            ->assertDontSee(__('storefront.buylist.show.address_missing_email'));
     });
 
     test('without a configured address it says the shop will send one, and prints no address of its own', function () {
+        // LINE Login is not configured in tests, so the email-only wording shows (LineCopyTest covers the configured copy).
         config(['buylist.receiving_address' => null]);
         $owner = User::factory()->create();
 
         $this->actingAs($owner)->get(route('buylist.show', submittedBy($owner)->number))
             ->assertOk()
-            ->assertSee(__('storefront.buylist.show.address_missing'))
+            ->assertSee(__('storefront.buylist.show.address_missing_email'))
             ->assertDontSee(__('storefront.buylist.show.address_title').' ');
     });
 });
@@ -482,6 +483,7 @@ test('the customer copy is the approved Thai, verbatim', function () {
         ->and(__('storefront.buylist.quote_changed'))->toBe('ราคารับซื้อเปลี่ยนแล้ว ตรวจยอดใหม่อีกครั้ง')
         ->and(__('storefront.buylist.empty'))->toBe('ลิสต์ขายยังว่าง')
         ->and(__('storefront.buylist.show.address_missing'))->toBe('ร้านจะแจ้งที่อยู่สำหรับส่งการ์ดทาง LINE หรืออีเมล')
+        ->and(__('storefront.buylist.show.address_missing_email'))->toBe('ร้านจะแจ้งที่อยู่สำหรับส่งการ์ดทางอีเมล')
         ->and(__('storefront.buylist.payout_credit', ['credit' => '฿ 460', 'diff' => '฿ 60']))->toBe('เครดิตร้าน ฿ 460 · ได้มากกว่า ฿ 60 · เข้าบัญชีทันทีหลังร้านตรวจ')
         ->and(__('storefront.buylist.payout_cash', ['cash' => '฿ 400']))->toBe('เงินสด ฿ 400 · โอนภายใน 1 วันทำการหลังร้านตรวจ')
         ->and(__('enums.buylist_status.revised'))->toBe('รอคุณยืนยันราคาใหม่');

@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use App\Support\LineLogin;
 use RuntimeException;
 
 /**
@@ -20,6 +21,8 @@ class AlertRefused extends RuntimeException
 
     public function message(): string
     {
-        return __('storefront.alerts.refused.'.$this->reason, $this->replace);
+        $key = $this->reason === 'no_channel' && ! LineLogin::isConfigured() ? 'no_channel_email' : $this->reason;
+
+        return __('storefront.alerts.refused.'.$key, $this->replace);
     }
 }

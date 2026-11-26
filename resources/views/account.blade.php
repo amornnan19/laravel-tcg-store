@@ -13,13 +13,15 @@
     <div class="mx-auto flex max-w-3xl flex-col gap-6 px-4 pb-8 pt-4 lg:px-8 lg:pb-16 lg:pt-6">
         <div>
             <h1 class="font-display text-h2 font-medium lg:text-h1">{{ $user->name }}</h1>
-            <p class="mt-1 text-small text-muted">
-                @if ($user->email !== null)
-                    {{ $user->email }}
-                @else
-                    {{ $user->hasLine() ? __('storefront.account.line_status', ['name' => $user->line_display_name ?? '']) : __('storefront.account.line_not_linked') }}
-                @endif
-            </p>
+            @if ($user->email !== null || $user->hasLine() || $lineConfigured)
+                <p class="mt-1 text-small text-muted">
+                    @if ($user->email !== null)
+                        {{ $user->email }}
+                    @else
+                        {{ $user->hasLine() ? __('storefront.account.line_status', ['name' => $user->line_display_name ?? '']) : __('storefront.account.line_not_linked') }}
+                    @endif
+                </p>
+            @endif
         </div>
 
         <x-auth.status />
@@ -157,7 +159,7 @@
             <h2 id="account-wishlist-heading" class="mb-3 font-display text-card font-medium">{{ __('storefront.account.wishlist') }}</h2>
 
             @if ($wishlist->isEmpty())
-                <x-empty-state :title="__('storefront.account.wishlist_empty')" :hint="__('storefront.account.wishlist_empty_hint')" :icon="$heartIcon">
+                <x-empty-state :title="__('storefront.account.wishlist_empty')" :hint="__('storefront.account.wishlist_empty_hint'.(\App\Support\LineLogin::isConfigured() ? '' : '_email'))" :icon="$heartIcon">
                     <a href="{{ route('search') }}" class="{{ $secondaryButton }}">{{ __('storefront.cart.search') }}</a>
                 </x-empty-state>
             @else
@@ -320,7 +322,7 @@
             @elseif ($user->hasLine())
                 <p class="text-small text-muted">{{ __('storefront.account.line_not_open') }}</p>
             @else
-                <p class="text-small text-muted">{{ __('storefront.account.no_channel') }}</p>
+                <p class="text-small text-muted">{{ __('storefront.account.no_channel'.(\App\Support\LineLogin::isConfigured() ? '' : '_email')) }}</p>
             @endif
         </section>
 

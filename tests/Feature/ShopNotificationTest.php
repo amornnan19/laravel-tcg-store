@@ -371,15 +371,16 @@ test('the rejected line text says the order is still held', function () {
 
 test('the account page copy per state without a usable LINE channel', function () {
     config(['services.line.messaging_token' => null]);
+    // LINE Login is not configured here, so the no-channel line is the email-only wording (LineCopyTest covers the configured copy).
 
     $this->actingAs(User::factory()->create())->get(route('account'))
         ->assertSee(__('storefront.account.notify_email'))
-        ->assertDontSee(__('storefront.account.no_channel'));
+        ->assertDontSee(__('storefront.account.no_channel_email'));
 
     $this->actingAs(User::factory()->withLine()->create(['email' => null]))->get(route('account'))
         ->assertSee(__('storefront.account.line_not_open'))
-        ->assertDontSee(__('storefront.account.no_channel'));
+        ->assertDontSee(__('storefront.account.no_channel_email'));
 
     $this->actingAs(User::factory()->create(['email' => null]))->get(route('account'))
-        ->assertSee(__('storefront.account.no_channel'));
+        ->assertSee(__('storefront.account.no_channel_email'));
 });

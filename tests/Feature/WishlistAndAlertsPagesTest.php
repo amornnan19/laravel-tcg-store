@@ -79,7 +79,7 @@ test('a sold-out row offers the restock alert, which a signed-in customer sets a
 
     expect(RestockAlert::query()->where('user_id', $user->id)->where('variant_id', $variant->id)->where('is_active', true)->exists())->toBeTrue();
 
-    $table->call('cancelRestock', $variant->id)->assertSeeHtml('wire:click="notifyRestock(')->assertSee(__('storefront.alerts.restock_hint'));
+    $table->call('cancelRestock', $variant->id)->assertSeeHtml('wire:click="notifyRestock(')->assertSee(__('storefront.alerts.restock_hint_email'));
 
     expect(RestockAlert::query()->count())->toBe(0);
 });
@@ -102,7 +102,7 @@ test('a restock alert for a customer with no channel shows the refusal', functio
 
     Livewire::actingAs($user)->test(VariantTable::class, ['cardId' => $variant->printing->card_id, 'printingId' => $variant->printing_id])
         ->call('notifyRestock', $variant->id)
-        ->assertSet('restockNotices', [$variant->id => __('storefront.alerts.refused.no_channel')]);
+        ->assertSet('restockNotices', [$variant->id => __('storefront.alerts.refused.no_channel_email')]);
 });
 
 test('a restock alert cannot be set on a variant of another card', function () {
@@ -278,7 +278,7 @@ test('a price-watch error is shown inside its form, linked to the input, and a r
     $table->call('notifyRestock', $soldOut->id)
         ->assertSet('watching', false)
         ->assertSet('priceWatchError', null)
-        ->assertSet('restockNotices', [$soldOut->id => __('storefront.alerts.refused.no_channel')])
+        ->assertSet('restockNotices', [$soldOut->id => __('storefront.alerts.refused.no_channel_email')])
         ->assertDontSeeHtml('aria-invalid="true"')
         ->assertDontSeeHtml('id="price-target-error"');
 });
@@ -296,7 +296,7 @@ test('a restock action closes an open price form, and its refusal renders once, 
         ->assertSet('watching', false)
         ->html();
 
-    $refusal = __('storefront.alerts.refused.no_channel');
+    $refusal = __('storefront.alerts.refused.no_channel_email');
     $footer = fn (Variant $variant): string => str($html)->after('id="restock-action-'.$variant->id.'"')->before('</div>')->toString();
 
     expect(substr_count($html, $refusal))->toBe(1)
