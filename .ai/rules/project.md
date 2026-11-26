@@ -137,6 +137,7 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **A Filament bulk action that saves records another action locks saves them in ascending key order (`sortBy` the key, or `lockForUpdate()->orderBy('id')` first): `getSelectedTableRecords()` applies the table sort, which is often `id desc`. A "shown quote" signature covers every field that decides what is bought (printing, condition, finish), not only prices and quantities.**
 - **Every `ShopNotification` overrides `fallbackMailRoute()` with an address it snapshots itself: `failed()` runs with no notifiable, so the base route returns null and the message is dropped when LINE keeps failing. A Filament header action that saves the form first computes the figure in its confirmation from the form's live state, never from the saved record.**
 - **A phone-only fixed bottom action bar never hides on input focus, and its page sets `scroll-padding-bottom` on `html` (as `#deck-add-bar` and `#checkout-bar` do in `resources/css/app.css`) so a focused field is never under it.**
+- **Seeders that run in production (`db:seed --force` in the image) may use `fake()` and factories only because `fakerphp/faker` is in `require`; every demo seeder guards itself with `shouldSeedDemoData()`, is safe to run twice, and seeds nothing a scheduled job would act on or mail outside `isLocal()`.**
 
 ## Language
 
