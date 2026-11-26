@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\BuylistSubmission;
 use App\Models\Game;
 use App\Models\GradedItem;
 use App\Models\Order;
@@ -65,7 +66,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // An alias, not enforceMorphMap(): Filament's notifications and imports store other morph types unaliased.
-        Relation::morphMap(['variant' => Variant::class, 'graded' => GradedItem::class, 'sealed' => SealedProduct::class, 'order' => Order::class]);
+        Relation::morphMap(['variant' => Variant::class, 'graded' => GradedItem::class, 'sealed' => SealedProduct::class, 'order' => Order::class, 'buylist_submission' => BuylistSubmission::class]);
 
         // `php artisan dev` runs no scheduler by default, and ReleaseExpiredReservations runs from the schedule.
         DevCommands::artisan('schedule:work');

@@ -119,4 +119,10 @@ return [
         'action' => 'ดูการ์ด',
         'line_text' => 'ราคาลดแล้ว: :card (:meta) เหลือ :price ถึงราคาที่คุณตั้งไว้ :target',
     ],
+
+    'buylist_submitted' => [
+        'subject' => 'ได้รับลิสต์ขาย :number แล้ว',
+        'line_text' => 'ได้รับลิสต์ขาย :number แล้ว ยอดเสนอ :total ยืนยันถึง :date',
+        'action' => 'ดูลิสต์ขาย',
+    ],
 ];

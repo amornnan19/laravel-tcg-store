@@ -1,5 +1,15 @@
 <?php
 
+use App\Actions\SubmitBuylist;
+use App\Enums\BuylistPayout;
+use App\Models\BuylistPrice;
+use App\Models\BuylistSubmission;
+use App\Models\Card;
+use App\Models\CardSet;
+use App\Models\Game;
+use App\Models\Printing;
+use App\Models\User;
+use App\Support\BuylistQuote;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -47,4 +57,42 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+/**
+ * A buy price on a printing the storefront shows (live game, set and card). Pass `$for` to price another condition or
+ * finish of a printing you already have.
+ *
+ * @param  array<string, mixed>  $price
+ * @param  array<string, mixed>  $card
+ * @param  array<string, mixed>  $printing
+ */
+function buylistRow(array $price = [], array $card = [], array $printing = [], ?Printing $for = null): BuylistPrice
+{
+    $game = Game::factory()->create();
+
+    $for ??= Printing::factory()
+        ->for(Card::factory()->for($game, 'game')->create($card))
+        ->for(CardSet::factory()->for($game, 'game')->create(), 'set')
+        ->create($printing);
+
+    return BuylistPrice::factory()->for($for, 'printing')->create($price);
+}
+
+/**
+ * Submits `price id => qty` the way the builder does: with the signature of what it would have shown.
+ *
+ * @param  array<int, int>  $quantities
+ */
+function submitBuylist(User $user, array $quantities, BuylistPayout $payout = BuylistPayout::Credit, ?string $signature = null): BuylistSubmission
+{
+    $prices = BuylistPrice::query()->whereKey(array_keys($quantities))->get();
+    $signature ??= BuylistQuote::signature($prices->map(fn (BuylistPrice $price): array => ['price' => $price, 'qty' => $quantities[$price->getKey()]]));
+
+    return app(SubmitBuylist::class)->handle(
+        $user,
+        $payout,
+        collect($quantities)->map(fn (int $qty, int $id): array => ['buylist_price_id' => $id, 'qty' => $qty])->values()->all(),
+        $signature,
+    );
 }

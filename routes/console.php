@@ -3,6 +3,7 @@
 use App\Jobs\CancelUnpaidOrders;
 use App\Jobs\ReleaseExpiredReservations;
 use App\Jobs\RequestPreorderBalances;
+use App\Jobs\ResetBuylistQuotas;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -15,3 +16,5 @@ Schedule::job(new ReleaseExpiredReservations)->everyMinute()->withoutOverlapping
 Schedule::job(new CancelUnpaidOrders)->everyMinute()->withoutOverlapping();
 // Asks for the balance of deposit pre-orders a week before their release, at 09:00 shop time.
 Schedule::job(new RequestPreorderBalances)->dailyAt('09:00')->timezone(config('shop.timezone'))->withoutOverlapping();
+// A new buylist week starts on Monday at 00:00 shop time: every weekly quota is whole again.
+Schedule::job(new ResetBuylistQuotas)->weeklyOn(1, '0:00')->timezone(config('shop.timezone'))->withoutOverlapping();

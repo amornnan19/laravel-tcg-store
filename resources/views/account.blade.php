@@ -74,6 +74,37 @@
             @endif
         </section>
 
+        <section aria-labelledby="account-buylist-heading">
+            <h2 id="account-buylist-heading" class="mb-3 font-display text-card font-medium">{{ __('storefront.account.buylist.title') }}</h2>
+
+            @if ($buylistSubmissions->isEmpty())
+                <x-empty-state :title="__('storefront.account.buylist.empty')" :hint="__('storefront.account.buylist.empty_hint')">
+                    <a href="{{ route('buylist') }}" class="{{ $secondaryButton }}">{{ __('storefront.account.buylist.cta') }}</a>
+                </x-empty-state>
+            @else
+                <ul class="flex flex-col gap-2">
+                    @foreach ($buylistSubmissions as $submission)
+                        <li>
+                            <a
+                                href="{{ route('buylist.show', $submission->number) }}"
+                                aria-label="{{ __('storefront.account.buylist.open', ['number' => $submission->number]) }}"
+                                class="flex min-h-14 items-center justify-between gap-3 rounded-card border border-line bg-sunken p-3 transition-[border-color] duration-160 ease-ui hover:border-line-strong motion-reduce:transition-none"
+                            >
+                                <span class="min-w-0">
+                                    <span class="block text-small font-medium tabular-nums">{{ $submission->number }}</span>
+                                    <span class="block text-label text-faint tabular-nums">{{ $placed($submission->created_at) }}</span>
+                                </span>
+                                <span class="flex flex-none flex-col items-end gap-1">
+                                    <x-order-status-badge :status="$submission->status" />
+                                    <span class="text-small font-medium tabular-nums">{{ __($submission->final_total_satang === null ? 'storefront.account.buylist.quoted' : 'storefront.account.buylist.final', ['amount' => \App\Support\Money::fromSatang($submission->totalSatang())->format()]) }}</span>
+                                </span>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </section>
+
         <section aria-labelledby="account-credit-heading">
             <h2 id="account-credit-heading" class="mb-3 font-display text-card font-medium">{{ __('storefront.account.credit.title') }}</h2>
 
@@ -85,7 +116,7 @@
 
             @if ($creditEntries->isEmpty())
                 <x-empty-state class="mt-3" :title="__('storefront.account.credit.empty')" :hint="__('storefront.account.credit.empty_hint')">
-                    <a href="{{ route('home') }}" class="{{ $secondaryButton }}">{{ __('storefront.account.credit.empty_cta') }}</a>
+                    <a href="{{ route('buylist') }}" class="{{ $secondaryButton }}">{{ __('storefront.account.credit.empty_cta') }}</a>
                 </x-empty-state>
             @else
                 <p class="mt-4 text-label text-faint">{{ __('storefront.account.credit.latest') }}</p>
@@ -102,6 +133,8 @@
                                     {{ $placed($entry->created_at) }}
                                     @if ($source instanceof \App\Models\Order)
                                         · <a href="{{ route('order.show', $source->number) }}" class="rounded-tag text-accent underline underline-offset-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">{{ $source->number }}</a>
+                                    @elseif ($source instanceof \App\Models\BuylistSubmission)
+                                        · <a href="{{ route('buylist.show', $source->number) }}" class="rounded-tag text-accent underline underline-offset-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">{{ $source->number }}</a>
                                     @elseif ($source !== null)
                                         · {{ $source->number }}
                                     @endif

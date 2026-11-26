@@ -131,3 +131,6 @@
 
 /* The deck page's add-all bar and the checkouts' confirm bar are fixed to the bottom of a phone screen: keep a focused control clear of them. */
 @media (width < 64rem) { html:has(#deck-add-bar, #checkout-bar) { scroll-padding-bottom: 7rem; } }
+
+/* The buylist's submit bar is fixed to the bottom of a phone screen too: keep a focused control clear of it. */
+@media (width < 64rem) { html:has(#buylist-bar) { scroll-padding-bottom: 7rem; } }

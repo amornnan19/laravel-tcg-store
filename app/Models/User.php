@@ -75,6 +75,14 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     }
 
     /**
+     * @return HasMany<BuylistSubmission, $this>
+     */
+    public function buylistSubmissions(): HasMany
+    {
+        return $this->hasMany(BuylistSubmission::class);
+    }
+
+    /**
      * @return HasMany<WishlistItem, $this>
      */
     public function wishlistItems(): HasMany

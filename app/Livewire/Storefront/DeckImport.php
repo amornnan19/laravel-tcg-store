@@ -292,22 +292,23 @@ class DeckImport extends Component
 
     /**
      * The rate-limit key of a client: its IPv4 address, or for IPv6 its /64 prefix, since one client owns a whole /64.
+     * `$prefix` names the limit, so another page's checks (the buylist's) count on their own.
      */
-    public static function throttleKey(string $ip): string
+    public static function throttleKey(string $ip, string $prefix = 'deck-check'): string
     {
         $packed = filter_var($ip, FILTER_VALIDATE_IP) !== false ? (string) inet_pton($ip) : '';
 
         // An IPv4 client seen on a dual-stack socket arrives as ::ffff:a.b.c.d; its /64 would be all zeros and shared by every
         // IPv4 visitor, so it is keyed by the IPv4 address it carries.
         if (strlen($packed) === 16 && str_starts_with($packed, str_repeat("\0", 10)."\xff\xff")) {
-            return 'deck-check:'.inet_ntop(substr($packed, 12));
+            return $prefix.':'.inet_ntop(substr($packed, 12));
         }
 
         if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
             $ip = bin2hex(substr((string) inet_pton($ip), 0, 8));
         }
 
-        return 'deck-check:'.$ip;
+        return $prefix.':'.$ip;
     }
 
     private function rematch(): void

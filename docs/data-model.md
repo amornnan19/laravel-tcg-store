@@ -298,7 +298,12 @@ What the shop will pay. A printing the shop does not buy simply has no row — t
 
 | column | type |
 |---|---|
-| id, printing_id, condition, cash_satang, credit_satang, weekly_quota, accepted_this_week, is_active |
+| id, printing_id, condition, finish, cash_satang, credit_satang, weekly_quota, accepted_this_week, is_active |
+
+`finish` (`normal`/`foil`, default `normal`) is part of the key: a foil printing has its own buy price and its own
+target variant when the cards are accepted into stock, so the unique key is `(printing_id, condition, finish)`.
+`accepted_this_week` counts the quantity committed to submissions since Monday 00:00 shop time, when
+`ResetBuylistQuotas` sets it back to 0.
 
 ### `buylist_submissions`, `buylist_submission_items`
 
@@ -337,7 +342,7 @@ An append-only ledger. `users.store_credit_satang` is a cache of its sum.
 - `variants (qty)` — "in stock only" is the most-used filter. A plain index: a partial index (`where qty > 0`) is not portable across SQLite, MySQL and Postgres
 - `stock_reservations (expires_at)` — the release job
 - `orders (user_id, placed_at desc)` — the account page
-- `buylist_prices (printing_id, condition)` unique
+- `buylist_prices (printing_id, condition, finish)` unique
 
 ## A note on SQLite
 

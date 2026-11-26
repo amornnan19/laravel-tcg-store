@@ -9,6 +9,8 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Storefront\AccountAlertController;
 use App\Http\Controllers\Storefront\AccountController;
 use App\Http\Controllers\Storefront\AccountDeckController;
+use App\Http\Controllers\Storefront\BuylistController;
+use App\Http\Controllers\Storefront\BuylistSubmissionController;
 use App\Http\Controllers\Storefront\CardController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CheckoutController;
@@ -43,6 +45,8 @@ Route::get('/checkout', CheckoutController::class)->name('checkout');
 
 Route::get('/deck', DeckController::class)->name('deck.import');
 
+Route::get('/buylist', BuylistController::class)->name('buylist');
+
 Route::get('/orders/{order:number}', OrderController::class)->name('order.show');
 
 Route::get('/orders/{order:number}/qr.png', PaymentQrController::class)->name('order.qr');
@@ -74,6 +78,7 @@ Route::middleware('auth')->group(function (): void {
 
     Route::post('/account/line/unlink', [LineController::class, 'unlink'])->name('line.unlink');
     Route::get('/preorder/{preorder}/checkout', PreorderCheckoutController::class)->name('preorder.checkout');
+    Route::get('/buylist/{submission:number}', BuylistSubmissionController::class)->name('buylist.show');
     Route::get('/account', AccountController::class)->name('account');
     Route::post('/account/notifications', [AccountController::class, 'notifications'])->name('account.notifications');
     Route::delete('/account/wishlist/{wishlistItem}', [AccountAlertController::class, 'destroyWishlistItem'])->name('account.wishlist.destroy');

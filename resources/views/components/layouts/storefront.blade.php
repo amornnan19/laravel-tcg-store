@@ -44,6 +44,15 @@
                     {{ __('storefront.nav.deck') }}
                 </a>
 
+                <a
+                    href="{{ route('buylist') }}"
+                    @if (request()->routeIs('buylist*')) aria-current="page" @endif
+                    class="inline-flex min-h-11 flex-none items-center gap-2 rounded-control border border-line-strong bg-surface px-4 text-small text-ink transition-[border-color] duration-160 ease-ui hover:border-accent motion-reduce:transition-none max-lg:hidden"
+                >
+                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 6.5h14v9.7H3V6.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6.5 6.5V4.2h7v2.3M10 9.2v4.2M8.2 11.3h3.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    {{ __('storefront.nav.buylist') }}
+                </a>
+
                 <livewire:storefront.cart-link variant="header" />
 
                 <a

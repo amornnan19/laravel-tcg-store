@@ -14,6 +14,12 @@
             </section>
         @endif
 
+        {{-- The desktop header links to the buylist; the phone's bottom nav is full, so the link lives here. --}}
+        <a href="{{ route('buylist') }}" class="flex min-h-14 items-center gap-3 rounded-card border border-line bg-surface px-4 py-3 text-ink transition-[background-color] duration-160 ease-ui hover:bg-raised motion-reduce:transition-none lg:hidden">
+            <span class="min-w-0 flex-1 text-body font-medium">{{ __('storefront.home.sell_cards') }}</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="flex-none text-faint"><path d="m6 3 5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+
         @if ($newSingles->isNotEmpty())
             <section>
                 <div class="mb-3 flex items-baseline justify-between gap-4">
