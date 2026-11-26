@@ -2,6 +2,7 @@
 
 use App\Models\CardSet;
 use App\Models\Printing;
+use App\Models\SealedProduct;
 
 return [
 
@@ -156,6 +157,10 @@ return [
             CardSet::class => [
                 'searchableAttributes' => ['code', 'name_en', 'name_th'],
                 'filterableAttributes' => ['game'],
+            ],
+            SealedProduct::class => [
+                'searchableAttributes' => ['name_en', 'name_th', 'sku', 'set_code'],
+                'filterableAttributes' => ['game', 'kind'],
             ],
         ],
         'model-settings' => [

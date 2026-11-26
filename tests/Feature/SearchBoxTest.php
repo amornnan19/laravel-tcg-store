@@ -149,7 +149,7 @@ test('remembering a search does not re-render the box', function () {
     $this->mock(CatalogueSearch::class)
         ->shouldReceive('autocomplete')
         ->once()
-        ->andReturn(new AutocompleteResult(null, collect(), collect()));
+        ->andReturn(new AutocompleteResult(null, collect(), collect(), collect()));
 
     Livewire::test(SearchBox::class)->set('query', 'OP05')->call('remember', 'OP05');
 });
@@ -259,7 +259,7 @@ test('the query is capped at 100 characters before the catalogue is searched', f
         ->shouldReceive('autocomplete')
         ->with(str_repeat('a', 100))
         ->once()
-        ->andReturn(new AutocompleteResult(null, collect(), collect()));
+        ->andReturn(new AutocompleteResult(null, collect(), collect(), collect()));
 
     Livewire::test(SearchBox::class)
         ->set('query', str_repeat('a', 150))
@@ -271,7 +271,7 @@ test('the cap counts characters, not bytes, and holds even if the property was n
         ->shouldReceive('autocomplete')
         ->with(str_repeat('ก', 100))
         ->once()
-        ->andReturn(new AutocompleteResult(null, collect(), collect()));
+        ->andReturn(new AutocompleteResult(null, collect(), collect(), collect()));
 
     $component = new SearchBox;
     $component->query = str_repeat('ก', 150);

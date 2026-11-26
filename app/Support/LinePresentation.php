@@ -20,6 +20,7 @@ final readonly class LinePresentation
      * @param  Printing|null  $printing  For the placeholder card art; null draws the neutral one.
      * @param  string|null  $imageUrl  A real photo of the item (a graded card's front) that replaces the placeholder art.
      * @param  string|null  $gradeBadge  "PSA 10", shown through the grade badge component.
+     * @param  string  $shape  The art's shape: `card` (63:88 placeholder art), `photo` (a real photo, 3:4) or `square` (a box).
      */
     public function __construct(
         public string $title,
@@ -32,5 +33,6 @@ final readonly class LinePresentation
         public bool $foil = false,
         public ?string $imageUrl = null,
         public ?string $gradeBadge = null,
+        public string $shape = 'card',
     ) {}
 }

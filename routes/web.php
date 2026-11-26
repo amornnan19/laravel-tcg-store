@@ -18,6 +18,7 @@ use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\OrderController;
 use App\Http\Controllers\Storefront\PaymentQrController;
 use App\Http\Controllers\Storefront\ResultsController;
+use App\Http\Controllers\Storefront\SealedProductController;
 use App\Http\Controllers\Storefront\SetController;
 use Filament\Http\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,8 @@ Route::get('/c/{card:slug}', CardController::class)->name('card.show');
 Route::get('/s/{set:code}', SetController::class)->name('set.show');
 
 Route::get('/graded/{gradedItem}', GradedItemController::class)->name('graded.show');
+
+Route::get('/p/{sealedProduct:slug}', SealedProductController::class)->name('sealed.show');
 
 Route::get('/cart', CartController::class)->name('cart');
 

@@ -45,7 +45,18 @@
             </section>
         @endif
 
-        @if ($heroSet === null && $newSingles->isEmpty())
+        @if ($sealedProducts->isNotEmpty())
+            <section>
+                <h2 class="mb-3 font-display text-card font-medium lg:text-h3">{{ __('storefront.sealed.section') }}</h2>
+                <div class="grid grid-cols-1 gap-3 lg:grid-cols-3">
+                    @foreach ($sealedProducts as $product)
+                        <x-sealed-tile :product="$product" />
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        @if ($heroSet === null && $newSingles->isEmpty() && $sealedProducts->isEmpty())
             <x-empty-state :title="__('storefront.home.empty')" />
         @else
             <x-trust-row class="justify-center" />

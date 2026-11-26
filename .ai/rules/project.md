@@ -86,7 +86,7 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **The admin panel's second factor is enforced only by Filament's login page.** Any other way of logging a user
   in (LINE/Socialite, a storefront login, password-reset auto-login, impersonation) must refuse `is_staff` users,
   or the panel must move to its own auth guard first. The panel shares the `web` guard today.
-- **Search hits come back from Meilisearch without `searchVisible()`; hydrate them through `->query(fn ($b) => $b->searchVisible())` so a trashed card or inactive game never reaches a view before the queued re-index runs.**
+- **Search hits come back from Meilisearch without `searchVisible()`; hydrate them through `->query(fn ($b) => $b->searchVisible())` so a trashed card or inactive game never reaches a view before the queued re-index runs. Scout hydrates any SoftDeletes model with `withTrashed()`, so a `searchVisible()` on a soft-deleting model excludes `deleted_at` explicitly rather than relying on the global scope.**
 - **Card art is placeholder only, rendered by `<x-card-art>`. Never fetch, store, hotlink or seed official card images from any game; staff-uploaded variant photos are the only real photos.**
 - **A storefront count shown against `sets.card_count` counts distinct card numbers, never raw printings: printings include secret rares past the set size and every language.**
 - **Focus rings use `:focus-visible` (`focus-visible:` / `has-focus-visible:`), never `focus-within:`, and never stack on an element whose border already turns accent.**
@@ -125,6 +125,8 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **A session value a guest leaves for "after login" is read with `pull()`, never `get()`, and only from the key `CustomerLogin` writes. Any other login (the Filament panel shares the web guard) leaves a guest's `put` value in place, and a `get()` replays it on every request.**
 - **A one-of-a-kind item's system states (`reserved`, `sold`) are written only by the hold and order actions; admin forms offer only `listed`/`withdrawn`, and every status the purchasable scope accepts must satisfy the listing rule. A state change made inside a release or return path falls back (to `withdrawn`) and logs; it never throws, or one bad row strands every hold after it.**
 - **Locking an admin status select on a system state does not protect the saving-hook rule: every field that rule reads must also be validated (or disabled) for each status the purchasable scope accepts, so a save surfaces as a form error, never a model exception.**
+- **Shared line UI (`LinePresentation`, `x-line-art`, order item rows) renders each purchasable kind in its own shape: cards 63:88 via `x-card-art`, graded photos, sealed products square via `x-sealed-art`. An order snapshot's `detail` is customer-facing — never put a SKU in it.**
+- **A `grid` that holds rows with `truncate` text sets `grid-cols-1` at the base breakpoint (or `min-w-0` on each item): an implicit grid track sizes to the text's full width and widens the page on phones. An autocomplete or listing row never shows a stock word for something the shop cannot sell (unpriced, pre-order): `searchVisible()` is not `purchasable()`.**
 
 ## Language
 

@@ -13,6 +13,7 @@ use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\StockReservation;
 use App\Models\User;
+use App\Models\Variant;
 use App\Notifications\OrderPlaced;
 use App\Support\CartLines;
 use App\Support\OrderRecipient;
@@ -51,7 +52,7 @@ class PlaceOrder
         $refs = PurchasableTypes::referencedBy(CartItem::query()->where('cart_id', $cart->getKey())->get());
 
         $order = DB::transaction(function () use ($cart, $data, $method, $courier, $refs, $user): Order {
-            // Variants first, then graded items, each by ascending id: every path that locks several types uses this order.
+            // Variants first, then graded items, then sealed products, each by ascending id: every path that locks several types uses this order.
             $locked = PurchasableTypes::lockMany($refs);
 
             $items = $cart->items()->orderBy('id')->get();
@@ -86,9 +87,9 @@ class PlaceOrder
 
             $subtotal = $items->sum(fn (CartItem $item): int => $item->unit_price_satang * $item->qty);
             $shipping = $courier->rateSatang();
-            // Protective packing is for singles: with no line outside a hard case there is nothing to pack, so a forced
-            // `protection` is not charged.
-            $packable = $items->contains(fn (CartItem $item): bool => ! $locked[$item->purchasable_type][$item->purchasable_id]->isInsured());
+            // Protective packing is for single cards: with none in the order (graded cards, sealed products) there is
+            // nothing to pack, so a forced `protection` is not charged.
+            $packable = $items->contains(fn (CartItem $item): bool => $locked[$item->purchasable_type][$item->purchasable_id] instanceof Variant);
             $protection = $data->protection && $packable ? (int) config('shipping.protection_satang') : 0;
             // Mandatory hard case and parcel insurance, per insured item (a graded card), whatever the customer ticked.
             $insured = $items->sum(fn (CartItem $item): int => $locked[$item->purchasable_type][$item->purchasable_id]->isInsured() ? $item->qty : 0);

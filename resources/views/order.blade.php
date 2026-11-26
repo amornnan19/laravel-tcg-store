@@ -59,9 +59,12 @@
                     <li class="flex items-start gap-3 rounded-card border border-line bg-sunken p-3">
                         @php
                             $photo = $item->kind === 'graded' && $item->purchasable instanceof \App\Models\GradedItem ? $item->purchasable->photoUrl('front_path') : null;
+                            $boxPhoto = $item->kind === 'sealed' && $item->purchasable instanceof \App\Models\SealedProduct ? $item->purchasable->imageUrl() : null;
                         @endphp
                         @if ($photo !== null)
                             <img src="{{ $photo }}" alt="" loading="lazy" class="aspect-[3/4] w-10 flex-none rounded-tag border border-line bg-surface object-cover">
+                        @elseif ($item->kind === 'sealed')
+                            <x-sealed-art :url="$boxPhoto" size="w-10" />
                         @else
                             <x-card-art size="w-10" :foil="$item->finish === 'foil'" />
                         @endif

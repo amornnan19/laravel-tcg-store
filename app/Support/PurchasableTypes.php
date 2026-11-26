@@ -4,10 +4,12 @@ namespace App\Support;
 
 use App\Contracts\Purchasable;
 use App\Models\GradedItem;
+use App\Models\SealedProduct;
 use App\Models\Variant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 
 /**
@@ -24,7 +26,7 @@ class PurchasableTypes
      */
     public static function lockOrder(): array
     {
-        return [Variant::class, GradedItem::class];
+        return [Variant::class, GradedItem::class, SealedProduct::class];
     }
 
     /**
@@ -104,7 +106,15 @@ class PurchasableTypes
                 continue;
             }
 
-            $locked[$type] = $class::query()->whereIn('id', $refs[$type] ?? [])->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+            // A soft-deleted product is locked too: an order placed before it was trashed can still be cancelled or
+            // refunded, and its quantity goes back. Whether a trashed one may be bought is purchasableIdsAmong()'s question.
+            $locked[$type] = $class::query()
+                ->when(in_array(SoftDeletes::class, class_uses_recursive($class), true), fn ($query) => $query->withTrashed())
+                ->whereIn('id', $refs[$type] ?? [])
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
         }
 
         return $locked;

@@ -16,6 +16,7 @@ use App\Support\CartLines;
 use App\Support\CurrentCart;
 use Carbon\CarbonInterface;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
@@ -49,7 +50,7 @@ class CartPanel extends Component
                 $changeCartQuantity->handle($item, $item->qty + 1);
             } catch (InsufficientStock) {
                 $this->results[$itemId] = ['outcome' => 'at_cap'];
-            } catch (LogicException|NotPurchasable) {
+            } catch (LogicException|NotPurchasable|ModelNotFoundException) {
                 // The hold ran out, or the item was withdrawn, between the render and this click: the refreshed line shows it.
             }
         }
@@ -65,8 +66,8 @@ class CartPanel extends Component
         if ($item->qty > 1 && $this->isLive($item)) {
             try {
                 $changeCartQuantity->handle($item, $item->qty - 1);
-            } catch (LogicException) {
-                // Expired between the render and this click, as in increment().
+            } catch (LogicException|ModelNotFoundException) {
+                // Expired, or the product was trashed, between the render and this click, as in increment().
             }
         }
 

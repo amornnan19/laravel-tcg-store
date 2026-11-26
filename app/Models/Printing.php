@@ -99,7 +99,8 @@ class Printing extends Model
      */
     public function scopeSearchVisible(Builder $query): Builder
     {
-        return $query->whereHas('card')->whereHas('set.game', fn (Builder $game) => $game->where('is_active', true));
+        // Scout hydrates a soft-deleting model withTrashed(), so the trashed rows are excluded here, not left to the global scope.
+        return $query->whereNull($query->qualifyColumn('deleted_at'))->whereHas('card')->whereHas('set.game', fn (Builder $game) => $game->where('is_active', true));
     }
 
     /**

@@ -5,6 +5,7 @@ use App\Models\Card;
 use App\Models\CardSet;
 use App\Models\Game;
 use App\Models\Printing;
+use App\Models\SealedProduct;
 use App\Models\Variant;
 use App\Search\CatalogueSearch;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -212,7 +213,7 @@ test('Meilisearch ranks in stock printings first', function () {
     config()->set('scout.after_commit', false);
 
     $client = app(MeilisearchClient::class);
-    $indexes = [(new Printing)->searchableAs(), (new CardSet)->searchableAs()];
+    $indexes = [(new Printing)->searchableAs(), (new CardSet)->searchableAs(), (new SealedProduct)->searchableAs()];
 
     try {
         $catalogue = searchCatalogue();
@@ -223,7 +224,7 @@ test('Meilisearch ranks in stock printings first', function () {
 
         $tasks = [];
 
-        foreach ([Printing::class, CardSet::class] as $model) {
+        foreach ([Printing::class, CardSet::class, SealedProduct::class] as $model) {
             $name = (new $model)->searchableAs();
             $tasks[] = $client->createIndex($name, ['primaryKey' => 'id'])['taskUid'];
             $tasks[] = $client->index($name)->updateSettings(config('scout.meilisearch.index-settings')[$model])['taskUid'];

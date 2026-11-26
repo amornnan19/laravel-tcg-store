@@ -6,6 +6,7 @@ use App\Contracts\Purchasable;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\GradedItem;
+use App\Models\SealedProduct;
 use App\Models\StockReservation;
 use App\Models\Variant;
 use Carbon\CarbonInterface;
@@ -65,10 +66,15 @@ class CartLines
 
         return $this->lines = $this->cart->items()
             ->with(['purchasable' => fn (MorphTo $morph) => $morph
-                ->constrain([Variant::class => fn (Builder $variants) => $variants->withReservedQty()])
+                ->constrain([
+                    Variant::class => fn (Builder $variants) => $variants->withReservedQty(),
+                    // A product trashed while in a cart stays loaded, so the gone line still shows its name.
+                    SealedProduct::class => fn (Builder $products) => $products->withTrashed(),
+                ])
                 ->morphWith([
                     Variant::class => ['printing.card', 'printing.cardWithTrashed', 'printing.set'],
                     GradedItem::class => ['printing.card', 'printing.cardWithTrashed', 'printing.set'],
+                    SealedProduct::class => ['set'],
                 ]),
             ])
             ->orderBy('id')
@@ -168,12 +174,12 @@ class CartLines
     }
 
     /**
-     * Whether any held line is not already in a hard case, so the optional protective packing means something. A cart
-     * of graded cards only has nothing to pack.
+     * Whether any held line is a single card, so the optional protective packing means something. A cart of graded
+     * cards or sealed products only has nothing to pack: a graded card is already in a hard case and a box is not a card.
      */
     public function hasPackableLines(): bool
     {
-        return $this->heldLines()->contains(fn (CartItem $line): bool => ! $line->purchasable->isInsured());
+        return $this->heldLines()->contains(fn (CartItem $line): bool => $line->purchasable instanceof Variant);
     }
 
     /**

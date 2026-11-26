@@ -4,6 +4,7 @@ use App\Models\Card;
 use App\Models\CardSet;
 use App\Models\Game;
 use App\Models\Printing;
+use App\Models\SealedProduct;
 use App\Models\Variant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -78,8 +79,9 @@ test('a set of an inactive game never reaches the home page', function () {
     $this->get(route('home'))->assertDontSee('Hidden Set')->assertDontSee('Hidden Card');
 });
 
-test('the home page runs at most seven queries', function () {
+test('the home page runs at most eight queries', function () {
     $game = Game::factory()->create();
+    SealedProduct::factory()->count(4)->create(['qty' => 3, 'price_satang' => 100000]);
 
     foreach (range(1, 4) as $number) {
         $set = CardSet::factory()->for($game)->create();
@@ -90,7 +92,7 @@ test('the home page runs at most seven queries', function () {
     DB::enableQueryLog();
     $this->get(route('home'))->assertOk();
 
-    expect(count(DB::getQueryLog()))->toBeLessThanOrEqual(7);
+    expect(count(DB::getQueryLog()))->toBeLessThanOrEqual(8);
 });
 
 test('a trashed card is neither shown nor counted on the home page', function () {

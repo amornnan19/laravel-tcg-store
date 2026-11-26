@@ -5,12 +5,14 @@ namespace App\Search;
 use App\Enums\QueryKind;
 use App\Models\CardSet;
 use App\Models\Printing;
+use App\Models\SealedProduct;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Throwable;
 
 /**
- * The autocomplete's one entry point. Sealed products join in M8.
+ * The autocomplete's one entry point: printings, sets and sealed products.
  *
  * A jump (set or printing) is an extra row: the results always come from a text search of the whole raw
  * query. Only a matched printing is also placed first in the list.
@@ -21,6 +23,8 @@ class CatalogueSearch
 
     private const SET_LIMIT = 2;
 
+    private const SEALED_LIMIT = 2;
+
     public function __construct(private readonly QueryParser $parser) {}
 
     public function autocomplete(string $query): AutocompleteResult
@@ -29,31 +33,31 @@ class CatalogueSearch
         $jump = $parsed->kind === QueryKind::Text ? null : $parsed;
 
         try {
-            [$printings, $sets, $total] = $this->fromEngine($parsed);
+            [$printings, $sets, $sealed, $total] = $this->fromEngine($parsed);
             $limited = false;
         } catch (Throwable $exception) {
             report($exception);
 
-            [$printings, $sets, $total] = $this->fromDatabase($parsed);
+            [$printings, $sets, $sealed, $total] = $this->fromDatabase($parsed);
             $limited = true;
         }
 
         $printings = $this->jumpPrintings($parsed)->concat($printings)->unique('id')->take(self::PRINTING_LIMIT)->values();
 
-        return new AutocompleteResult($jump, $printings, $sets, $limited, max($total, $printings->count()));
+        return new AutocompleteResult($jump, $printings, $sets, $sealed, $limited, max($total, $printings->count()));
     }
 
     /**
      * Hits come back from the engine without the visibility rules, so they are hydrated through `searchVisible()`:
      * a trashed card or an inactive game never reaches a view before the queued re-index runs.
      *
-     * @return array{Collection<int, Printing>, Collection<int, CardSet>, int}
+     * @return array{Collection<int, Printing>, Collection<int, CardSet>, Collection<int, SealedProduct>, int}
      */
     private function fromEngine(ParsedQuery $parsed): array
     {
         // Nothing typed means the SearchBox shows recent searches, not results.
         if ($parsed->text === '') {
-            return [new Collection, new Collection, 0];
+            return [new Collection, new Collection, new Collection, 0];
         }
 
         $page = Printing::search($parsed->text)
@@ -65,16 +69,16 @@ class CatalogueSearch
             ->take(self::SET_LIMIT)
             ->get();
 
-        return [new Collection($page->items()), $sets, $page->total()];
+        return [new Collection($page->items()), $sets, $this->sealedFromEngine($parsed), $page->total()];
     }
 
     /**
-     * @return array{Collection<int, Printing>, Collection<int, CardSet>, int}
+     * @return array{Collection<int, Printing>, Collection<int, CardSet>, Collection<int, SealedProduct>, int}
      */
     private function fromDatabase(ParsedQuery $parsed): array
     {
         if ($parsed->text === '') {
-            return [new Collection, new Collection, 0];
+            return [new Collection, new Collection, new Collection, 0];
         }
 
         $term = '%'.$parsed->text.'%';
@@ -91,7 +95,44 @@ class CatalogueSearch
             ->limit(self::SET_LIMIT)
             ->get();
 
-        return [$printings, $sets, $total];
+        return [$printings, $sets, $this->sealedFromDatabase($term), $total];
+    }
+
+    /**
+     * Sealed products have an index of their own, so a failure of it (a missing index, say) falls back to the database
+     * for them alone: printings and sets keep the engine, and the result is not marked limited.
+     *
+     * @return Collection<int, SealedProduct>
+     */
+    private function sealedFromEngine(ParsedQuery $parsed): Collection
+    {
+        try {
+            return SealedProduct::search($parsed->text)
+                ->query(fn (Builder $builder) => $builder->searchVisible()->withReservedQty())
+                ->take(self::SEALED_LIMIT)
+                ->get();
+        } catch (Throwable $exception) {
+            // A missing index is an expected state right after a deploy; report it once per ten minutes, not on every keystroke.
+            if (Cache::add('search:sealed-engine-failed', true, 600)) {
+                report($exception);
+            }
+
+            return $this->sealedFromDatabase('%'.$parsed->text.'%');
+        }
+    }
+
+    /**
+     * @return Collection<int, SealedProduct>
+     */
+    private function sealedFromDatabase(string $term): Collection
+    {
+        return SealedProduct::query()
+            ->searchVisible()
+            ->withReservedQty()
+            ->where(fn (Builder $builder) => $builder->whereLike('name_en', $term)->orWhereLike('name_th', $term)->orWhereLike('sku', $term))
+            ->orderBy('id')
+            ->limit(self::SEALED_LIMIT)
+            ->get();
     }
 
     /**

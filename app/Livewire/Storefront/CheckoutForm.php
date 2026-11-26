@@ -9,6 +9,7 @@ use App\Exceptions\CheckoutBlocked;
 use App\Livewire\Forms\CheckoutData;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Variant;
 use App\Support\CartLines;
 use App\Support\CurrentCart;
 use Carbon\CarbonInterface;
@@ -43,9 +44,9 @@ class CheckoutForm extends Component
 
         $this->form->courier = Courier::Flash->value;
         $this->form->method = PaymentMethod::offered()[0]->value ?? '';
-        // Only a line that is not already in a hard case is worth packing: a graded card never turns this on.
+        // Only a single card is worth packing: a graded card or a sealed product never turns this on.
         $this->form->protection = $this->heldLines->contains(
-            fn (CartItem $line): bool => ! $line->purchasable->isInsured() && $line->unit_price_satang >= (int) config('shipping.protection_threshold_satang'),
+            fn (CartItem $line): bool => $line->purchasable instanceof Variant && $line->unit_price_satang >= (int) config('shipping.protection_threshold_satang'),
         );
     }
 

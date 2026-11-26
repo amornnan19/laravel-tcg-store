@@ -2,7 +2,7 @@
     $optionNumber = 0;
     $hasPanel = $result !== null || $recent !== [];
     $cardTotal = $result === null ? 0 : max($result->printingTotal, $result->printings->count());
-    $hasResults = $result !== null && ($jumpSets->isNotEmpty() || $result->printings->isNotEmpty() || $result->sets->isNotEmpty());
+    $hasResults = $result !== null && ($jumpSets->isNotEmpty() || $result->printings->isNotEmpty() || $result->sets->isNotEmpty() || $result->sealed->isNotEmpty());
 @endphp
 
 <div
@@ -195,6 +195,37 @@
                             >
                                 <span class="min-w-0 flex-1 truncate text-body font-medium">{{ $set->code }} — {{ $set->name_en }}</span>
                                 <span class="flex-none text-label tabular-nums text-faint">{{ __('storefront.search.set_cards', ['n' => $set->card_count]) }}</span>
+                            </a>
+                        @endforeach
+                    @endif
+
+                    @if ($result->sealed->isNotEmpty())
+                        <div class="mx-4 my-2 h-px bg-line"></div>
+                        <p class="px-4 pb-2 pt-3 text-label font-medium text-faint">{{ __('storefront.search.group_sealed', ['n' => $result->sealed->count()]) }}</p>
+
+                        @foreach ($result->sealed as $product)
+                            <a
+                                role="option"
+                                aria-selected="false"
+                                data-option
+                                id="search-option-{{ $optionNumber++ }}"
+                                href="{{ route('sealed.show', $product) }}"
+                                class="flex min-h-14 items-center gap-3 px-4 py-2 text-ink transition-[color,background-color,border-color] duration-160 ease-ui hover:bg-sunken aria-selected:bg-raised aria-selected:outline-2 aria-selected:-outline-offset-2 aria-selected:outline-accent motion-reduce:transition-none"
+                            >
+                                <span class="min-w-0 flex-1">
+                                    <span class="block truncate text-body font-medium">{{ $product->displayName() }}</span>
+                                    <span class="mt-1 block truncate text-label text-faint">{{ $product->kind->label() }}</span>
+                                </span>
+                                <span class="flex-none text-right">
+                                    @if ($product->price_satang !== null)
+                                        <x-price :satang="$product->price_satang" class="block text-body font-medium" />
+                                    @endif
+                                    @if ($product->is_preorder)
+                                        <span class="mt-1 block text-label text-muted">{{ __('storefront.sealed.preorder_soon') }}</span>
+                                    @elseif ($product->price_satang !== null)
+                                        <x-stock-indicator :in-stock="$product->isAvailable()" :qty="$product->availableQty()" class="mt-1 block" />
+                                    @endif
+                                </span>
                             </a>
                         @endforeach
                     @endif

@@ -28,6 +28,12 @@ return [
         'sold' => 'ขายแล้ว',
         'withdrawn' => 'ถอนออกจากร้าน',
     ],
+    'sealed_kind' => [
+        'booster_box' => 'บูสเตอร์บ็อกซ์',
+        'booster_pack' => 'บูสเตอร์แพ็ก',
+        'starter_deck' => 'สตาร์ทเตอร์เด็ค',
+        'accessory' => 'อุปกรณ์',
+    ],
     'order_status' => [
         'awaiting_payment' => 'รอชำระเงิน',
         'paid' => 'ชำระเงินแล้ว',

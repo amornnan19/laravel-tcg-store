@@ -299,6 +299,7 @@ class GradedItem extends Model implements Purchasable
             printing: $printing,
             imageUrl: $this->photoUrl('front_path'),
             gradeBadge: $this->gradeBadge(),
+            shape: 'photo',
         );
     }
 
