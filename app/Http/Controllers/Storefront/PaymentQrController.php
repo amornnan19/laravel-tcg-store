@@ -20,7 +20,7 @@ class PaymentQrController extends Controller
     {
         abort_unless($request->hasValidSignature() || OrderAccess::canView($order), 404);
 
-        $payment = $order->isAwaitingPayment()
+        $payment = $order->isWaitingForMoney()
             ? $order->payments()->where('status', PaymentStatus::Pending->value)->whereNotNull('qr_payload')->latest('id')->first()
             : null;
 

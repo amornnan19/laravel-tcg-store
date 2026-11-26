@@ -10,6 +10,9 @@
     $accept = '.jpg,.jpeg,.png,.heic,.heif,image/jpeg,image/png,image/heic,image/heif';
     $received = $order->receivedSatang();
     $dueTime = $order->payment_due_at->copy()->setTimezone($timezone)->format('H:i');
+    $dueDate = $order->paymentDueLabel();
+    // A deposit is asked for before the whole total: name it, so the amount is not read as everything still owed.
+    $isDeposit = $order->amountDueNowSatang() < $order->remainingSatang();
 @endphp
 
 <div class="flex flex-col gap-3">
@@ -24,11 +27,12 @@
                 </p>
             @else
                 @if ($state !== 'window_closed')
-                    <h2 id="order-payment-heading" class="text-small font-medium text-low">{{ __('storefront.order.pay_by', ['time' => $dueTime]) }}</h2>
+                    <h2 id="order-payment-heading" class="text-small font-medium text-low">@if ($order->status === \App\Enums\OrderStatus::AwaitingBalance){{ __('storefront.order.pay_balance_by') }} <span class="whitespace-nowrap">{{ $dueDate }}</span>@else{{ __('storefront.order.pay_by', ['time' => $dueTime]) }}@endif</h2>
                 @endif
-                <p class="mt-3 flex items-baseline justify-between gap-4">
-                    <span class="text-small text-muted">{{ __('storefront.order.amount_due') }}</span>
-                    <x-price :satang="$order->remainingSatang()" class="text-h3 font-medium text-accent" />
+                <p @class(['flex items-baseline justify-between gap-4', 'mt-3' => $state !== 'window_closed'])>
+                    <span class="text-small text-muted">{{ $isDeposit ? __('storefront.order.deposit_due') : __('storefront.order.amount_due') }}</span>
+                    {{-- An overdue amount is not a call to pay in gold: the window is closed. --}}
+                    <x-price :satang="$order->amountDueNowSatang()" :class="'text-h3 font-medium '.($state === 'window_closed' ? 'text-ink' : 'text-accent')" />
                 </p>
             @endif
             @if ($received > 0)
@@ -47,7 +51,7 @@
     @elseif ($state === 'window_closed')
         <div role="status" class="flex items-start gap-3 rounded-card border border-line bg-surface p-4">
             {!! $alertIcon !!}
-            <p class="text-small text-muted">{{ __('storefront.payment.window_closed') }}</p>
+            <p class="text-small text-muted">{{ $order->status === \App\Enums\OrderStatus::AwaitingBalance ? __('storefront.payment.balance_window_closed') : __('storefront.payment.window_closed') }}</p>
         </div>
     @elseif ($state === 'submitted')
         <div wire:poll.15s="checkStatus" role="status" class="flex items-start gap-3 rounded-card border border-line-strong bg-surface p-4">

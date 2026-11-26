@@ -17,6 +17,7 @@ use App\Http\Controllers\Storefront\GradedItemController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\OrderController;
 use App\Http\Controllers\Storefront\PaymentQrController;
+use App\Http\Controllers\Storefront\PreorderCheckoutController;
 use App\Http\Controllers\Storefront\ResultsController;
 use App\Http\Controllers\Storefront\SealedProductController;
 use App\Http\Controllers\Storefront\SetController;
@@ -72,6 +73,7 @@ Route::middleware('auth')->group(function (): void {
         ->name('verification.send');
 
     Route::post('/account/line/unlink', [LineController::class, 'unlink'])->name('line.unlink');
+    Route::get('/preorder/{preorder}/checkout', PreorderCheckoutController::class)->name('preorder.checkout');
     Route::get('/account', AccountController::class)->name('account');
     Route::post('/account/notifications', [AccountController::class, 'notifications'])->name('account.notifications');
     Route::delete('/account/wishlist/{wishlistItem}', [AccountAlertController::class, 'destroyWishlistItem'])->name('account.wishlist.destroy');

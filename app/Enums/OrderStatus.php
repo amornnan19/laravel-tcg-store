@@ -5,6 +5,7 @@ namespace App\Enums;
 enum OrderStatus: string
 {
     case AwaitingPayment = 'awaiting_payment';
+    case AwaitingBalance = 'awaiting_balance';
     case Paid = 'paid';
     case Packing = 'packing';
     case Shipped = 'shipped';
@@ -23,7 +24,7 @@ enum OrderStatus: string
     public function color(): string
     {
         return match ($this) {
-            self::AwaitingPayment => 'low',
+            self::AwaitingPayment, self::AwaitingBalance => 'low',
             self::Paid, self::Packing => 'info',
             self::Shipped, self::Delivered => 'stock',
             self::Cancelled, self::Refunded => 'danger',

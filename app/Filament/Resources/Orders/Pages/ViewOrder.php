@@ -58,6 +58,30 @@ class ViewOrder extends ViewRecord
         return $this->orderRecord()->payments()->where('status', PaymentStatus::Submitted->value)->latest('id')->first();
     }
 
+    /**
+     * For a pre-order, which side of `cancel_until` the refund falls on, so staff know what the amount above is.
+     */
+    private static function depositRule(Order $order): string
+    {
+        if (! $order->isPreorder() || $order->cancelUntilEnd() === null) {
+            return '';
+        }
+
+        $date = $order->cancelUntilEnd()->locale('th')->translatedFormat('j M Y');
+
+        return ' '.($order->isDepositRefundable()
+            ? __('admin.orders.deposit_refunded', ['date' => $date])
+            : __('admin.orders.deposit_kept', ['date' => $date, 'amount' => Money::fromSatang(min($order->deposit_satang, $order->receivedSatang()))->format()]));
+    }
+
+    /**
+     * A pre-order cannot be packed before its release date, so its pack button waits for it; every other order is ready.
+     */
+    private function isReleased(Order $order): bool
+    {
+        return ! $order->isPreorder() || $order->preorder === null || $order->preorder->releaseAt()->lte(now());
+    }
+
     private function orderRecord(): Order
     {
         /** @var Order $order */
@@ -71,7 +95,7 @@ class ViewOrder extends ViewRecord
         return Action::make('pack')
             ->label(__('admin.orders.actions.pack'))
             ->icon(Heroicon::OutlinedArchiveBox)
-            ->visible(fn (): bool => $this->orderRecord()->status === OrderStatus::Paid)
+            ->visible(fn (): bool => $this->orderRecord()->status === OrderStatus::Paid && $this->isReleased($this->orderRecord()))
             ->requiresConfirmation()
             ->action(function (): void {
                 Gate::authorize('update', $this->orderRecord());
@@ -171,16 +195,17 @@ class ViewOrder extends ViewRecord
             ->label(__('admin.orders.actions.cancel'))
             ->icon(Heroicon::OutlinedNoSymbol)
             ->color('danger')
-            ->visible(fn (): bool => in_array($this->orderRecord()->status, [OrderStatus::AwaitingPayment, OrderStatus::Paid], true)
+            ->visible(fn (): bool => in_array($this->orderRecord()->status, [OrderStatus::AwaitingPayment, OrderStatus::AwaitingBalance, OrderStatus::Paid], true)
                 && $this->submittedPayment() === null)
             ->requiresConfirmation()
             ->modalHeading(__('admin.orders.actions.cancel_heading'))
             ->modalDescription(function (): string {
-                $received = $this->orderRecord()->receivedSatang();
+                $order = $this->orderRecord();
+                $owed = $order->refundOwedSatang();
 
-                return __('admin.orders.actions.cancel_description').($received > 0
-                    ? ' '.__('admin.orders.return_money', ['amount' => Money::fromSatang($received)->format()])
-                    : '');
+                return ($order->isPreorder() ? __('admin.orders.actions.cancel_description_preorder') : __('admin.orders.actions.cancel_description'))
+                    .($owed > 0 ? ' '.__('admin.orders.return_money', ['amount' => Money::fromSatang($owed)->format()]) : '')
+                    .self::depositRule($order);
             })
             ->schema([
                 Textarea::make('reason')
@@ -195,7 +220,7 @@ class ViewOrder extends ViewRecord
                 PaymentActions::attempt(function () use ($data): void {
                     $cancelled = app(CancelOrder::class)->handle($this->orderRecord(), trim((string) $data['reason']));
 
-                    $received = $cancelled?->receivedSatang() ?? 0;
+                    $received = $cancelled?->refundOwedSatang() ?? 0;
 
                     Notification::make()
                         ->success()
@@ -216,9 +241,9 @@ class ViewOrder extends ViewRecord
             ->visible(fn (): bool => in_array($this->orderRecord()->status, [OrderStatus::Paid, OrderStatus::Packing], true))
             ->requiresConfirmation()
             ->modalHeading(__('admin.orders.actions.refund_heading'))
-            ->modalDescription(fn (): string => __('admin.orders.actions.refund_description', [
-                'amount' => Money::fromSatang($this->orderRecord()->receivedSatang())->format(),
-            ]))
+            ->modalDescription(fn (): string => __($this->orderRecord()->isPreorder() ? 'admin.orders.actions.refund_description_preorder' : 'admin.orders.actions.refund_description', [
+                'amount' => Money::fromSatang($this->orderRecord()->refundOwedSatang())->format(),
+            ]).self::depositRule($this->orderRecord()))
             ->schema([
                 Textarea::make('reason')
                     ->label(__('admin.orders.fields.reason'))

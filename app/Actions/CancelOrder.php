@@ -7,6 +7,7 @@ use App\Enums\PaymentStatus;
 use App\Exceptions\IllegalOrderTransition;
 use App\Exceptions\PaymentRefused;
 use App\Models\Order;
+use App\Models\Preorder;
 use App\Models\Variant;
 use App\Notifications\OrderCancelled;
 use App\Support\OrderRecipient;
@@ -18,7 +19,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * Cancels an order that is waiting for money or has just been paid, and gives its stock back. By the time an order
  * exists its hold is already consumed and its quantity taken out of the variant, so the quantity goes back here
- * explicitly, to the variants that still exist.
+ * explicitly, to the variants that still exist. A pre-order took no stock: it gives its places back to the pre-order
+ * instead (`reserved_count`), taking that row's lock after the order's. What is owed back is `Order::refundOwedSatang()`.
  */
 class CancelOrder
 {
@@ -32,7 +34,7 @@ class CancelOrder
      *
      * @param  (Closure(Order): bool)|null  $guard
      *
-     * @throws IllegalOrderTransition when the order is not `awaiting_payment` or `paid`.
+     * @throws IllegalOrderTransition when the order is not `awaiting_payment`, `awaiting_balance` or `paid`.
      * @throws PaymentRefused when a slip is waiting for staff (`slip_submitted`): decide the slip first.
      */
     public function handle(Order $order, string $reason, ?Closure $guard = null): ?Order
@@ -48,11 +50,15 @@ class CancelOrder
 
             $locked = Order::query()->lockForUpdate()->findOrFail($order->getKey());
 
+            // Order, then pre-order, and both before any locking read or update on `payments`: on MySQL the payments gap lock
+            // blocks a concurrent order's payment insert, and a later lock request would deadlock with it.
+            $preorder = $locked->isPreorder() ? Preorder::lockForPlacing((int) $locked->preorder_id) : null;
+
             if ($guard !== null && ! $guard($locked)) {
                 return null;
             }
 
-            if (! in_array($locked->status, [OrderStatus::AwaitingPayment, OrderStatus::Paid], true)) {
+            if (! in_array($locked->status, [OrderStatus::AwaitingPayment, OrderStatus::AwaitingBalance, OrderStatus::Paid], true)) {
                 throw new IllegalOrderTransition("An order that is {$locked->status->value} cannot be cancelled.");
             }
 
@@ -67,6 +73,12 @@ class CancelOrder
                 ->update(['status' => PaymentStatus::Rejected->value, 'rejected_reason' => $reason, 'updated_at' => now()]);
 
             $locked->update(['status' => OrderStatus::Cancelled, 'cancelled_at' => now(), 'cancel_reason' => $reason]);
+
+            if ($locked->isPreorder()) {
+                $this->returnPlaces($locked, $preorder);
+
+                return $locked;
+            }
 
             // After the status moved: a one-of-a-kind item checks that no other live order holds its sale.
             foreach ($locked->items()->get() as $item) {
@@ -88,5 +100,19 @@ class CancelOrder
         OrderRecipient::notify($cancelled, new OrderCancelled($cancelled));
 
         return $cancelled;
+    }
+
+    /**
+     * Gives a pre-order's places back; the pre-order row is already locked, after the order's own.
+     */
+    private function returnPlaces(Order $order, ?Preorder $preorder): void
+    {
+        if ($preorder === null) {
+            return;
+        }
+
+        $qty = (int) $order->items()->sum('qty');
+
+        $preorder->update(['reserved_count' => max(0, $preorder->reserved_count - $qty)]);
     }
 }

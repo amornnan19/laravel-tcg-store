@@ -30,7 +30,7 @@ class PayShortfall
 
             $slipAmount = $locked->slip_amount_satang;
 
-            $remaining = $order->remainingSatang();
+            $remaining = $order->amountDueNowSatang();
 
             if ($slipAmount === null || $slipAmount <= 0 || $slipAmount >= $locked->amount_satang || $remaining <= 0) {
                 throw new PaymentRefused('changed');

@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             OrderSeeder::class,
             GradedItemSeeder::class,
             SealedProductSeeder::class,
+            PreorderSeeder::class,
             SavedDeckListSeeder::class,
         ]);
     }

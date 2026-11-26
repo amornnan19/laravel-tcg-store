@@ -127,6 +127,11 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 - **Locking an admin status select on a system state does not protect the saving-hook rule: every field that rule reads must also be validated (or disabled) for each status the purchasable scope accepts, so a save surfaces as a form error, never a model exception.**
 - **Shared line UI (`LinePresentation`, `x-line-art`, order item rows) renders each purchasable kind in its own shape: cards 63:88 via `x-card-art`, graded photos, sealed products square via `x-sealed-art`. An order snapshot's `detail` is customer-facing — never put a SKU in it.**
 - **A `grid` that holds rows with `truncate` text sets `grid-cols-1` at the base breakpoint (or `min-w-0` on each item): an implicit grid track sizes to the text's full width and widens the page on phones. An autocomplete or listing row never shows a stock word for something the shop cannot sell (unpriced, pre-order): `searchVisible()` is not `purchasable()`.**
+- **A transaction that takes a locking read or update on `payments` takes every other row lock it needs (pre-order, product) before that read: on MySQL/MariaDB the payments gap lock blocks a concurrent order's payment insert, and a later lock request deadlocks with it.**
+- **A Livewire `render()` never passes view data under the name of a public property: Livewire 4 renders the property over it.**
+- **Every Filament `DateTimePicker` sets `->timezone(config('shop.timezone'))`.**
+- **A Filament page hook (`afterSave`, `afterCreate`, an action's `after`) runs inside the panel's save transaction, after the record's row is already written and locked: an action called from it takes its locks in the project-wide order relative to that row, or runs in `DB::afterCommit`.**
+- **A phone-only fixed bottom action bar never hides on input focus, and its page sets `scroll-padding-bottom` on `html` (as `#deck-add-bar` and `#checkout-bar` do in `resources/css/app.css`) so a focused field is never under it.**
 
 ## Language
 

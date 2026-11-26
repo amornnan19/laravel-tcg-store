@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
@@ -343,6 +344,14 @@ class SealedProduct extends Model implements Purchasable
     public function liveReservations(): MorphMany
     {
         return $this->morphMany(StockReservation::class, 'purchasable')->live();
+    }
+
+    /**
+     * @return HasOne<Preorder, $this>
+     */
+    public function preorder(): HasOne
+    {
+        return $this->hasOne(Preorder::class);
     }
 
     /**

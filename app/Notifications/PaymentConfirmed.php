@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Support\Money;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -21,6 +22,11 @@ class PaymentConfirmed extends ShopNotification
 
         if ($this->order->isPaid()) {
             $mail->line(__('notifications.payment_confirmed.paid', ['number' => $this->order->number]));
+        } elseif ($this->order->status === OrderStatus::AwaitingBalance) {
+            $mail->line(__($this->balanceFollowsNow() ? 'notifications.payment_confirmed.deposit_now' : 'notifications.payment_confirmed.deposit', [
+                'number' => $this->order->number,
+                'remaining' => Money::fromSatang($this->order->remainingSatang())->format(),
+            ]));
         } else {
             $mail->line(__('notifications.payment_confirmed.partial', [
                 'number' => $this->order->number,
@@ -37,13 +43,27 @@ class PaymentConfirmed extends ShopNotification
     {
         $text = $this->order->isPaid()
             ? __('notifications.payment_confirmed.line_text', ['number' => $this->order->number])
-            : __('notifications.payment_confirmed.line_text_partial', [
-                'number' => $this->order->number,
-                'remaining' => Money::fromSatang($this->order->remainingSatang())->format(),
-            ]);
+            : ($this->order->status === OrderStatus::AwaitingBalance
+                ? __($this->balanceFollowsNow() ? 'notifications.payment_confirmed.line_text_deposit_now' : 'notifications.payment_confirmed.line_text_deposit', [
+                    'number' => $this->order->number,
+                    'remaining' => Money::fromSatang($this->order->remainingSatang())->format(),
+                ])
+                : __('notifications.payment_confirmed.line_text_partial', [
+                    'number' => $this->order->number,
+                    'remaining' => Money::fromSatang($this->order->remainingSatang())->format(),
+                ]));
 
         return $text
             ."\n".$this->order->signedUrl();
+    }
+
+    /**
+     * Whether the balance request goes out together with this message (the release is inside the balance window), so the
+     * message must not promise one seven days before the release.
+     */
+    private function balanceFollowsNow(): bool
+    {
+        return $this->order->preorder?->isWithinBalanceWindow() ?? false;
     }
 
     public function fallbackMailRoute(?object $notifiable): ?string

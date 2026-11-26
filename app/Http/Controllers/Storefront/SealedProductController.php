@@ -16,7 +16,7 @@ class SealedProductController extends Controller
     {
         abort_unless(SealedProduct::query()->searchVisible()->whereKey($sealedProduct->getKey())->exists(), 404);
 
-        $sealedProduct->load(['game', 'set']);
+        $sealedProduct->load(['game', 'set', 'preorder']);
 
         return view('sealed', [
             'product' => $sealedProduct,

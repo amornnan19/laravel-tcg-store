@@ -25,6 +25,9 @@
                     <h1 class="font-display text-h2 font-medium lg:text-h1">{{ $product->displayName() }}</h1>
                     <p class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-small text-muted">
                         <span class="inline-flex h-6 items-center rounded-full border border-line-strong bg-raised px-3 text-label text-muted">{{ $product->kind->label() }}</span>
+                        @if ($product->is_preorder && $product->preorder !== null && $product->preorder->state() !== 'released')
+                            <span class="inline-flex h-6 items-center rounded-full border border-accent/40 bg-accent/10 px-3 text-label font-medium text-accent">{{ __('storefront.preorder.badge', ['date' => $product->preorder->releaseAt()->locale('th')->translatedFormat('j M Y')]) }}</span>
+                        @endif
                         @if ($game !== null)
                             <span>{{ $game->name_en }}</span>
                         @endif
@@ -34,7 +37,11 @@
                     </p>
                 </div>
 
-                <livewire:storefront.sealed-buy-box :sealed-product-id="$product->id" />
+                @if ($product->is_preorder && $product->preorder !== null)
+                    <livewire:storefront.preorder-box :preorder-id="$product->preorder->id" />
+                @else
+                    <livewire:storefront.sealed-buy-box :sealed-product-id="$product->id" />
+                @endif
 
                 @if (filled($product->description_th))
                     <p class="whitespace-pre-line text-small text-muted">{{ $product->description_th }}</p>

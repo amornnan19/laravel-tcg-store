@@ -557,6 +557,7 @@ test('every payment action takes the order row lock first, before any other read
 
 test('a submitted slip makes the unpaid-order guard stand down, because SubmitSlip took the same order lock', function () {
     Notification::fake();
+    $this->freezeTime();
     $order = panelOrder();
     $order->update(['payment_due_at' => now()->addSecond()]);
     app(SubmitSlip::class)->handle($order->payments()->sole(), UploadedFile::fake()->image('slip.jpg'));

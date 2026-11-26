@@ -188,7 +188,7 @@
                     <p class="mt-3 text-small text-muted">{{ __('storefront.checkout.terms', ['minutes' => config('shop.payment_window_minutes')]) }}</p>
                 </section>
 
-                <div class="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-line bg-sunken px-4 pb-4 pt-3 max-lg:group-has-[[data-text-input]:focus]:hidden lg:static lg:border-0 lg:bg-transparent lg:p-0">
+                <div id="checkout-bar" class="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-line bg-sunken px-4 pb-4 pt-3 lg:static lg:border-0 lg:bg-transparent lg:p-0">
                     <p class="min-w-0 flex-1 lg:hidden">
                         <span class="block text-label text-faint">{{ __('storefront.checkout.total') }}</span>
                         <x-price :satang="$total" class="mt-1 block text-h3 font-medium" />

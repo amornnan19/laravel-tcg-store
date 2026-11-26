@@ -28,12 +28,13 @@ trait LocksOrderForPayment
             throw new PaymentRefused('order_cancelled');
         }
 
-        if ($order->status !== OrderStatus::AwaitingPayment) {
+        // A pre-order's balance is paid on the same panel once it was requested.
+        if (! $order->isWaitingForMoney()) {
             throw new PaymentRefused('order_closed');
         }
 
         if ($order->payment_due_at->lte(now())) {
-            throw new PaymentRefused('window_closed');
+            throw new PaymentRefused($order->status === OrderStatus::AwaitingBalance ? 'balance_window_closed' : 'window_closed');
         }
 
         return $order;

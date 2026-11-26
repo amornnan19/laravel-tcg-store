@@ -11,11 +11,17 @@ use Illuminate\Notifications\Messages\MailMessage;
  */
 class OrderCancelled extends ShopNotification
 {
-    public function __construct(public Order $order) {}
+    /** What the shop owes back, fixed when the notification is made: a pre-order's depends on today's date. */
+    public int $refundSatang;
+
+    public function __construct(public Order $order)
+    {
+        $this->refundSatang = $order->refundOwedSatang();
+    }
 
     public function toMail(object $notifiable): MailMessage
     {
-        $received = $this->order->receivedSatang();
+        $received = $this->refundSatang;
 
         $mail = (new MailMessage)
             ->subject(__('notifications.order_cancelled.subject', ['number' => $this->order->number]))
@@ -35,7 +41,7 @@ class OrderCancelled extends ShopNotification
     public function toLine(object $notifiable): string
     {
         $text = __('notifications.order_cancelled.line_text', ['number' => $this->order->number]);
-        $received = $this->order->receivedSatang();
+        $received = $this->refundSatang;
 
         if ($received > 0) {
             $text .= ' '.__('notifications.order_cancelled.line_refund', ['amount' => Money::fromSatang($received)->format()]);

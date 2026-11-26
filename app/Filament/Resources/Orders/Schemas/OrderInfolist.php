@@ -3,7 +3,9 @@
 namespace App\Filament\Resources\Orders\Schemas;
 
 use App\Enums\OrderStatus;
+use App\Enums\PreorderPlan;
 use App\Models\Order;
+use App\Support\Money;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Components\Section;
@@ -36,6 +38,33 @@ class OrderInfolist
                         ViewEntry::make('timeline')
                             ->hiddenLabel()
                             ->view('filament.orders.timeline'),
+                    ]),
+                Section::make(__('admin.orders.sections.preorder'))
+                    ->visible(fn (Order $record): bool => $record->isPreorder())
+                    ->schema([
+                        TextEntry::make('preorder_plan')
+                            ->label(__('admin.orders.fields.preorder_plan'))
+                            ->formatStateUsing(fn (?PreorderPlan $state): string => $state?->label() ?? '—'),
+                        TextEntry::make('release')
+                            ->label(__('admin.orders.fields.release_on'))
+                            ->state(fn (Order $record): string => $record->preorder?->releaseAt()->locale('th')->translatedFormat('j M Y') ?? '—'),
+                        TextEntry::make('deposit_satang')
+                            ->label(__('admin.orders.fields.deposit'))
+                            ->formatStateUsing(fn (int $state): string => Money::fromSatang($state)->format()),
+                        TextEntry::make('balance_due_satang')
+                            ->label(__('admin.orders.fields.balance_due'))
+                            ->formatStateUsing(fn (int $state): string => Money::fromSatang($state)->format()),
+                        TextEntry::make('balance_requested_at')
+                            ->label(__('admin.orders.fields.balance_requested_at'))
+                            ->dateTime('j M Y H:i', config('shop.timezone'))
+                            ->placeholder(__('admin.orders.balance_not_requested')),
+                        TextEntry::make('balance_overdue')
+                            ->hiddenLabel()
+                            ->state(fn (): string => __('admin.orders.balance_overdue'))
+                            ->color('danger')
+                            ->visible(fn (Order $record): bool => $record->status === OrderStatus::AwaitingBalance
+                                && $record->balance_requested_at !== null
+                                && $record->payment_due_at->lte(now())),
                     ]),
                 Section::make(__('admin.orders.sections.payment'))
                     ->schema([

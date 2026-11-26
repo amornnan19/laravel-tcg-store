@@ -139,14 +139,15 @@ class PaymentPanel extends Component
     }
 
     /**
-     * Polled while a slip waits for staff. When the order has left `awaiting_payment` (paid or cancelled) the whole page
+     * Polled while a slip waits for staff. When the order has left the states that wait for money (paid, cancelled, or a
+     * deposit in and the balance not yet asked for) the whole page
      * is reloaded, so its badge and timeline follow.
      */
     public function checkStatus(): void
     {
         unset($this->order, $this->payment);
 
-        if (! $this->order->isAwaitingPayment()) {
+        if (! $this->order->isWaitingForMoney()) {
             $this->redirectRoute('order.show', ['order' => $this->order->number]);
         }
     }
@@ -159,7 +160,7 @@ class PaymentPanel extends Component
 
         // Cancelled (or otherwise closed) while the panel was open: reload, so the page shows why instead of offering
         // to pay. The page only renders the panel for awaiting or paid orders, so a first render never gets here.
-        if (! $order->isAwaitingPayment() && $order->status !== OrderStatus::Paid && app('livewire')->isLivewireRequest()) {
+        if (! $order->isWaitingForMoney() && $order->status !== OrderStatus::Paid && app('livewire')->isLivewireRequest()) {
             $this->redirectRoute('order.show', ['order' => $order->number]);
         }
 

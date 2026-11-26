@@ -36,12 +36,21 @@ return [
     ],
     'order_status' => [
         'awaiting_payment' => 'รอชำระเงิน',
+        'awaiting_balance' => 'รอชำระส่วนที่เหลือ',
         'paid' => 'ชำระเงินแล้ว',
         'packing' => 'กำลังแพ็ก',
         'shipped' => 'จัดส่งแล้ว',
         'delivered' => 'ส่งถึงแล้ว',
         'cancelled' => 'ยกเลิกแล้ว',
         'refunded' => 'คืนเงินแล้ว',
+    ],
+    'order_kind' => [
+        'stock' => 'สินค้าพร้อมส่ง',
+        'preorder' => 'พรีออเดอร์',
+    ],
+    'preorder_plan' => [
+        'deposit' => 'มัดจำ',
+        'full' => 'จ่ายเต็ม',
     ],
     'payment_method' => [
         'promptpay' => 'PromptPay QR',

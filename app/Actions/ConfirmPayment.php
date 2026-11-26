@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
+use App\Enums\PreorderPlan;
 use App\Exceptions\PaymentRefused;
 use App\Exceptions\SlipRefAlreadyCredited;
 use App\Models\Order;
@@ -14,7 +15,8 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Staff confirm a submitted slip: the payment is confirmed and, once the money received reaches the order total, the
- * order is paid. Lock order: the order row, then the payment (project-wide: variants, order, payment).
+ * order is paid. A pre-order on the deposit plan moves to `awaiting_balance` when the money received reaches its deposit,
+ * with `paid_at` still empty. Lock order: the order row, then the payment (project-wide: variants, order, payment).
  */
 class ConfirmPayment
 {
@@ -37,7 +39,8 @@ class ConfirmPayment
                 throw new PaymentRefused('changed');
             }
 
-            if ($order->status !== OrderStatus::AwaitingPayment) {
+            // `awaiting_balance` counts only once its balance was requested: that is when a payment of it exists to confirm.
+            if (! $order->isWaitingForMoney()) {
                 throw new PaymentRefused('order_closed');
             }
 
@@ -51,14 +54,25 @@ class ConfirmPayment
                 'slip_ref' => $slipRef,
             ]);
 
-            if ($order->receivedSatang() >= $order->total_satang) {
+            $received = $order->receivedSatang();
+
+            if ($received >= $order->total_satang) {
                 $order->update(['status' => OrderStatus::Paid, 'paid_at' => now()]);
+            } elseif ($order->status === OrderStatus::AwaitingPayment
+                && $order->preorder_plan === PreorderPlan::Deposit
+                && $received >= $order->deposit_satang) {
+                $order->update(['status' => OrderStatus::AwaitingBalance]);
             }
 
             return [$locked, $order];
         });
 
         OrderRecipient::notify($order, new PaymentConfirmed($order));
+
+        // A deposit that arrives inside the seven days is asked for its balance now, not at the next 09:00 run.
+        if ($order->status === OrderStatus::AwaitingBalance && $order->balance_requested_at === null && $order->preorder?->isWithinBalanceWindow()) {
+            app(RequestPreorderBalance::class)->handle($order);
+        }
 
         return $confirmed;
     }

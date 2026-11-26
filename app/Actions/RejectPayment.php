@@ -44,7 +44,7 @@ class RejectPayment
                 throw new PaymentRefused('changed');
             }
 
-            if ($order->status !== OrderStatus::AwaitingPayment) {
+            if (! $order->isWaitingForMoney()) {
                 throw new PaymentRefused('order_closed');
             }
 
@@ -62,7 +62,11 @@ class RejectPayment
                 'slip_ref' => $isShort ? $slipRef : null,
             ]);
 
-            $order->update(['payment_due_at' => now()->addMinutes((int) config('shop.payment_window_minutes'))]);
+            // A balance has until the release date; a rejection never shortens that, only gives a short deadline a window.
+            $window = now()->addMinutes((int) config('shop.payment_window_minutes'));
+            $order->update(['payment_due_at' => $order->status === OrderStatus::AwaitingBalance && $order->payment_due_at->gt($window)
+                ? $order->payment_due_at
+                : $window]);
 
             return [$locked, $order];
         });

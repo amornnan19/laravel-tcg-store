@@ -8,6 +8,7 @@ use App\Enums\PaymentStatus;
 use App\Enums\RejectReason;
 use App\Exceptions\IllegalOrderTransition;
 use App\Exceptions\PaymentRefused;
+use App\Exceptions\PreorderNotReleased;
 use App\Exceptions\SlipRefAlreadyCredited;
 use App\Filament\Forms\Components\MoneyInput;
 use App\Models\Payment;
@@ -164,6 +165,8 @@ final class PaymentActions
             self::refuse($refused->message());
         } catch (SlipRefAlreadyCredited $credited) {
             self::refuse($credited->message());
+        } catch (PreorderNotReleased) {
+            self::refuse(__('admin.orders.preorder_not_released'));
         } catch (IllegalOrderTransition) {
             self::refuse(__('admin.orders.illegal_transition'));
         } catch (InvalidArgumentException $invalid) {

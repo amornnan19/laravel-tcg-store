@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Orders\Tables;
 
+use App\Enums\OrderKind;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Filament\Resources\Orders\OrderResource;
@@ -62,6 +63,13 @@ class OrdersTable
                 SelectFilter::make('status')
                     ->label(__('admin.orders.fields.status'))
                     ->options(collect(OrderStatus::cases())->mapWithKeys(fn (OrderStatus $status): array => [$status->value => $status->label()])->all()),
+                SelectFilter::make('kind')
+                    ->label(__('admin.orders.fields.kind'))
+                    ->options(collect(OrderKind::cases())->mapWithKeys(fn (OrderKind $kind): array => [$kind->value => $kind->label()])->all()),
+                Filter::make('overdue_balance')
+                    ->label(__('admin.orders.filters.overdue_balance'))
+                    ->toggle()
+                    ->query(fn (Builder $query): Builder => $query->overdueBalance()),
                 Filter::make('overdue_with_money')
                     ->label(__('admin.orders.filters.overdue_with_money'))
                     ->toggle()

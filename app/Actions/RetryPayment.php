@@ -28,7 +28,7 @@ class RetryPayment
             $locked = $this->lockPayment($rejected, PaymentStatus::Rejected);
             $this->requireLatest($order, $locked);
 
-            $remaining = $order->remainingSatang();
+            $remaining = $order->amountDueNowSatang();
 
             if ($remaining <= 0) {
                 throw new PaymentRefused('changed');

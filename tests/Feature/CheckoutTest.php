@@ -642,3 +642,14 @@ test('checkout leaves the fields empty for a guest and for a customer without an
     $this->actingAs(User::factory()->withLine()->create(['email' => null, 'password' => null]));
     Livewire::test(CheckoutForm::class)->assertSet('form.email', '');
 });
+
+test('the phone confirm bar stays tappable while a text field has focus', function () {
+    // Hiding the bar on input focus made a tap from the last field land on the page behind it: the order never went out.
+    $cart = checkoutCart([checkoutVariant()]);
+    session(['cart_token' => $cart->token]);
+
+    $html = Livewire::test(CheckoutForm::class)->html();
+
+    expect($html)->toContain('wire:submit="placeOrder"')
+        ->and($html)->not->toContain('data-text-input]:focus]:hidden');
+});

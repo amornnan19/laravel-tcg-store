@@ -19,10 +19,33 @@
             <p role="status" class="rounded-control border border-stock/40 bg-stock/10 px-4 py-3 text-small font-medium text-stock">{{ __('storefront.order.placed_flash') }}</p>
         @endif
 
+        @if ($order->isPreorder() && $order->preorder !== null)
+            <p class="rounded-control border border-line-strong bg-sunken px-4 py-3 text-small text-muted">
+                <span class="font-medium text-ink">{{ __('storefront.preorder.order.badge', ['date' => $order->preorder->releaseAt()->locale('th')->translatedFormat('j M Y')]) }}</span>
+                @if (! $order->isCancelled() && $order->status !== \App\Enums\OrderStatus::Refunded)
+                    <x-preorder-refund :until="$order->cancelUntilEnd()" :kept-satang="$order->preorder_plan === \App\Enums\PreorderPlan::Full ? $order->deposit_satang : null" class="mt-1 block" />
+                    <span class="mt-1 block">{{ __('storefront.preorder.order.ships_after', ['date' => $order->preorder->releaseAt()->locale('th')->translatedFormat('j M Y')]) }}</span>
+                @endif
+            </p>
+        @endif
+
         @if ($order->isAwaitingPayment())
             <section aria-label="{{ __('storefront.payment.section') }}" class="rounded-card border border-line bg-sunken p-4">
                 <livewire:storefront.payment-panel :order-id="$order->id" />
                 <p class="mt-3 text-label text-muted">{{ __('storefront.order.emailed', ['email' => $order->contact_email]) }}</p>
+            </section>
+        @elseif ($order->status === \App\Enums\OrderStatus::AwaitingBalance)
+            <section aria-label="{{ __('storefront.payment.section') }}" class="flex flex-col gap-3 rounded-card border border-line bg-sunken p-4">
+                @if ($order->balance_requested_at !== null)
+                    <livewire:storefront.payment-panel :order-id="$order->id" />
+                @else
+                    <h2 class="text-small font-medium text-muted">{{ __('storefront.preorder.order.deposit_in') }}</h2>
+                    <p class="flex items-baseline justify-between gap-4 text-small">
+                        <span class="text-muted">{{ __('storefront.preorder.order.balance') }}</span>
+                        <x-price :satang="$order->balance_due_satang" class="text-h3 font-medium text-accent" />
+                    </p>
+                    <p class="text-small text-muted">{{ __($order->preorder?->isWithinBalanceWindow() ? 'storefront.preorder.order.balance_pending_soon' : 'storefront.preorder.order.balance_pending') }}</p>
+                @endif
             </section>
         @elseif ($order->status === \App\Enums\OrderStatus::Paid)
             <livewire:storefront.payment-panel :order-id="$order->id" />
@@ -34,8 +57,26 @@
                     @if (filled($order->cancel_reason))
                         <p class="mt-1 text-small text-muted">{{ $order->cancel_reason }}</p>
                     @endif
-                    <p class="mt-1 text-small text-muted">{{ __('storefront.order.stock_returned') }}</p>
-                    <a href="{{ route('search') }}" class="mt-3 inline-flex min-h-11 items-center rounded-control bg-accent px-4 text-small font-medium text-accent-ink transition-transform duration-160 ease-ui active:scale-98 motion-reduce:transition-none">{{ __('storefront.cart.search') }}</a>
+                    <p class="mt-1 text-small text-muted">@if ($order->isPreorder())<span class="whitespace-nowrap">{{ __('storefront.preorder.order.places_returned') }}</span>@else{{ __('storefront.order.stock_returned') }}@endif</p>
+                    @if ($order->isPreorder())
+                        @php
+                            $refund = $order->refundSummary();
+                        @endphp
+                        @if ($refund['owed'] > 0)
+                            <p class="mt-1 text-small font-medium text-ink">{{ __('storefront.preorder.order.refund_owed', ['amount' => $format($refund['owed'])]) }}</p>
+                        @endif
+                        @if ($refund['kept'] > 0)
+                            <p class="mt-1 text-small text-muted">{{ __($order->preorder_plan === \App\Enums\PreorderPlan::Full ? 'storefront.preorder.order.deposit_deducted' : 'storefront.preorder.order.deposit_kept', ['amount' => $format($refund['kept'])]) }}</p>
+                        @endif
+                    @endif
+                    @php
+                        $product = $order->isPreorder() ? $order->items->first()?->purchasable : null;
+                    @endphp
+                    @if ($product instanceof \App\Models\SealedProduct && ! $product->trashed())
+                        <a href="{{ route('sealed.show', $product) }}" class="mt-3 inline-flex min-h-11 items-center rounded-control bg-accent px-4 text-small font-medium text-accent-ink transition-transform duration-160 ease-ui active:scale-98 motion-reduce:transition-none">{{ __('storefront.preorder.checkout.back') }}</a>
+                    @else
+                        <a href="{{ route('search') }}" class="mt-3 inline-flex min-h-11 items-center rounded-control bg-accent px-4 text-small font-medium text-accent-ink transition-transform duration-160 ease-ui active:scale-98 motion-reduce:transition-none">{{ __('storefront.cart.search') }}</a>
+                    @endif
                 </div>
             </section>
         @endif
@@ -143,8 +184,11 @@
                 @endif
                 <p class="mt-2 flex items-baseline justify-between gap-4 border-t border-line pt-3">
                     <span class="text-body font-medium text-ink">{{ __('storefront.checkout.total') }}</span>
-                    <x-price :satang="$order->total_satang" class="text-h3 font-medium text-accent" />
+                    <x-price :satang="$order->total_satang" :class="'text-h3 font-medium '.($order->isPreorder() && $order->status === \App\Enums\OrderStatus::AwaitingPayment && $order->preorder_plan === \App\Enums\PreorderPlan::Deposit ? 'text-ink' : 'text-accent')" />
                 </p>
+                @if ($order->isPreorder() && $order->balance_due_satang > 0 && in_array($order->status, [\App\Enums\OrderStatus::AwaitingPayment, \App\Enums\OrderStatus::AwaitingBalance], true))
+                    <p class="flex items-baseline justify-between gap-4"><span>{{ __('storefront.preorder.order.balance') }}</span><x-price :satang="$order->balance_due_satang" class="text-ink" /></p>
+                @endif
             </div>
         </section>
     </div>
