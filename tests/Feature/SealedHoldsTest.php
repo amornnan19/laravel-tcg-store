@@ -154,7 +154,7 @@ test('a product with no set snapshots an empty set code, and the snapshot surviv
 test('a sealed id equal to a variant id sells the sealed product and leaves the variant alone', function () {
     Notification::fake();
     $variant = gradedVariant(qty: 5);
-    $product = sealedProduct(['qty' => 4]);
+    $product = sealedProduct(['id' => $variant->id, 'qty' => 4]);
     expect($product->id)->toBe($variant->id);
 
     $order = app(PlaceOrder::class)->handle(gradedCart([$variant, $product]), gradedCheckoutData());

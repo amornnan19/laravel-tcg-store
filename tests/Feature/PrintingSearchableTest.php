@@ -161,7 +161,7 @@ describe('freshness', function () {
     function queuedPrintingIds(string $job = MakeSearchable::class): array
     {
         return Queue::pushed($job)
-            ->flatMap(fn (object $queued) => $queued->models->pluck('id'))
+            ->flatMap(fn (object $queued) => $queued->models->filter(fn (object $model) => $model instanceof Printing)->pluck('id'))
             ->unique()->values()->all();
     }
 

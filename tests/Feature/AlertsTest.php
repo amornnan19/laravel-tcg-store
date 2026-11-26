@@ -242,7 +242,7 @@ test('an alert fires after a cancelled order returns its quantity', function () 
 test('cancelling and refunding each queue exactly one check per returned variant', function () {
     config(['queue.default' => 'database']);
     Notification::fake();
-    $queuedChecks = fn (Variant $variant): int => DB::table('jobs')->where('payload', 'like', '%CheckVariantAlerts%')->where('payload', 'like', '%variantId\\";i:'.$variant->id.';%')->count();
+    $queuedChecks = fn (Variant $variant): int => DB::table('jobs')->where('payload', 'like', '%CheckVariantAlerts%')->where('payload', 'like', '%variantId__;i:'.$variant->id.';%')->count();
     $make = fn (Variant $variant, string $state) => Order::factory()->{$state}()->has(OrderItem::factory()->count(2)->state([
         'purchasable_type' => $variant->getMorphClass(),
         'purchasable_id' => $variant->id,

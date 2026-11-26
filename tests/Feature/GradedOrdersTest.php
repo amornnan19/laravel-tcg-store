@@ -88,7 +88,7 @@ test('an order of singles only carries no insurance', function () {
 test('a graded id equal to a variant id sells the graded item and takes only the variant line quantity', function () {
     Notification::fake();
     $variant = gradedVariant(qty: 5);
-    $item = gradedItem();
+    $item = gradedItem(['id' => $variant->id]);
     expect($item->id)->toBe($variant->id);
 
     $order = app(PlaceOrder::class)->handle(gradedCart([$variant, $item]), gradedCheckoutData());

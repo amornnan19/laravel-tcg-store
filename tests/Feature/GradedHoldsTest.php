@@ -140,7 +140,7 @@ test('a renew finds the item taken by another cart, with no substitute even when
     // variant, that sibling would be offered as a substitute.
     $variant = gradedVariant(qty: 0);
     Variant::factory()->for($variant->printing)->create(['condition' => CardCondition::Lp, 'qty' => 3, 'price_satang' => 1000]);
-    $item = gradedItem();
+    $item = gradedItem(['id' => $variant->id]);
     expect($item->id)->toBe($variant->id);
 
     $line = app(AddToCart::class)->handle(Cart::factory()->create(), $item, 1);
@@ -189,7 +189,7 @@ test('a withdrawn or sold item, or one whose game is hidden, cannot be put in a 
 
 test('a line is resolved by its own type: a graded id equal to a variant id never touches the variant', function () {
     $variant = gradedVariant(qty: 5);
-    $item = gradedItem();
+    $item = gradedItem(['id' => $variant->id]);
     expect($item->id)->toBe($variant->id);
 
     $line = app(AddToCart::class)->handle(Cart::factory()->create(), $item, 1);
@@ -209,7 +209,7 @@ test('a swap refuses a line that is not a variant and changes nothing', function
     // read as a variant, the sibling would be offered and the swap would replace the graded line.
     $variant = gradedVariant(qty: 0);
     $sibling = Variant::factory()->for($variant->printing)->create(['condition' => CardCondition::Lp, 'qty' => 3, 'price_satang' => 1000]);
-    $item = gradedItem();
+    $item = gradedItem(['id' => $variant->id]);
     expect($item->id)->toBe($variant->id);
 
     $line = app(AddToCart::class)->handle(Cart::factory()->create(), $item, 1);
@@ -286,11 +286,21 @@ test('the release job carries on past an item that fails to release, and reports
     StockReservation::query()->update(['expires_at' => now()->subMinute()]);
 
     // The first row cannot be written back: a trigger raises only for it.
-    DB::unprepared("create trigger graded_fail before update on graded_items when new.id = {$first->id} begin select raise(abort, 'boom'); end");
+    if (DB::getDriverName() === 'pgsql') {
+        DB::unprepared("create function graded_fail() returns trigger language plpgsql as \$\$ begin if new.id = {$first->id} then raise exception 'boom'; end if; return new; end \$\$");
+        DB::unprepared('create trigger graded_fail before update on graded_items for each row execute function graded_fail()');
+    } else {
+        DB::unprepared("create trigger graded_fail before update on graded_items when new.id = {$first->id} begin select raise(abort, 'boom'); end");
+    }
 
     (new ReleaseExpiredReservations)->handle();
 
-    DB::unprepared('drop trigger graded_fail');
+    if (DB::getDriverName() === 'pgsql') {
+        DB::unprepared('drop trigger graded_fail on graded_items');
+        DB::unprepared('drop function graded_fail()');
+    } else {
+        DB::unprepared('drop trigger graded_fail');
+    }
 
     expect($second->fresh()->status)->toBe(GradedStatus::Listed)
         ->and($first->fresh()->status)->toBe(GradedStatus::Reserved);
