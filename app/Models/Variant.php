@@ -59,7 +59,7 @@ class Variant extends Model implements Purchasable
      * `{set.code}-{number}-{language}-{condition}-{finish}`, upper-cased, with every character
      * outside `[A-Z0-9-]` replaced by `_`. Example: `OP05-119-JA-NM-F`. A taken SKU gets `-2`, `-3`...
      */
-    protected static function makeSku(Variant $variant): string
+    public static function makeSku(Variant $variant): string
     {
         $printing = Printing::withTrashed()->with('set')->find($variant->printing_id);
 

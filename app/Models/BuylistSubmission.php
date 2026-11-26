@@ -22,7 +22,7 @@ class BuylistSubmission extends Model
 
     protected $fillable = [
         'number', 'user_id', 'payout', 'status', 'quoted_total_satang', 'final_total_satang', 'quote_expires_at',
-        'received_at', 'revised_at', 'responded_at', 'accepted_at', 'paid_at', 'returned_at', 'late_note',
+        'received_at', 'revised_at', 'responded_at', 'accepted_at', 'paid_at', 'returned_at', 'quota_released_at', 'late_note',
         'payout_reference', 'staff_note', 'return_tracking',
     ];
 
@@ -43,6 +43,7 @@ class BuylistSubmission extends Model
             'accepted_at' => 'datetime',
             'paid_at' => 'datetime',
             'returned_at' => 'datetime',
+            'quota_released_at' => 'datetime',
         ];
     }
 

@@ -19,6 +19,14 @@ enum BuylistStatus: string
     }
 
     /**
+     * The label staff read: the same states, but `revised` says who is waited on.
+     */
+    public function staffLabel(): string
+    {
+        return $this === self::Revised ? __('enums.buylist_status_staff.revised') : $this->label();
+    }
+
+    /**
      * The design-token name, so the badge is never hand-coloured.
      */
     public function color(): string

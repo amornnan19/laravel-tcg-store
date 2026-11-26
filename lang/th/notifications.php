@@ -125,4 +125,23 @@ return [
         'line_text' => 'ได้รับลิสต์ขาย :number แล้ว ยอดเสนอ :total ยืนยันถึง :date',
         'action' => 'ดูลิสต์ขาย',
     ],
+
+    'buylist_revised' => [
+        'subject' => 'ร้านตรวจการ์ด :number แล้ว กรุณายืนยันราคาใหม่',
+        'line_text' => 'ร้านตรวจการ์ดใน :number แล้ว มี :n ใบที่สภาพไม่ตรง ยอดใหม่ :final กรุณายืนยันหรือขอการ์ดคืน',
+        'action' => 'ดูราคาใหม่',
+    ],
+
+    'buylist_accepted' => [
+        'subject' => 'ร้านยืนยันยอดลิสต์ขาย :number แล้ว',
+        'line_text' => 'ร้านยืนยันยอด :amount ของ :number แล้ว จะโอนภายใน 1 วันทำการ',
+        'action' => 'ดูลิสต์ขาย',
+    ],
+
+    'buylist_paid' => [
+        'subject' => 'จ่ายเงินลิสต์ขาย :number แล้ว',
+        'line_credit' => 'เครดิต :amount เข้าบัญชีแล้ว (:number)',
+        'line_cash' => 'โอนเงิน :amount แล้ว อ้างอิง :ref (:number)',
+        'action' => 'ดูลิสต์ขาย',
+    ],
 ];

@@ -84,6 +84,9 @@ return [
         'cash' => 'เงินสด',
         'credit' => 'เครดิตร้าน',
     ],
+    'buylist_status_staff' => [
+        'revised' => 'รอลูกค้ายืนยันราคาใหม่',
+    ],
     'buylist_status' => [
         'draft' => 'ร่าง',
         'submitted' => 'รอการ์ดมาถึง',

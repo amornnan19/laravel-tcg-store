@@ -2,3 +2,13 @@
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+
+/* FilePond ships no Thai: show the field's own idle text (set as --upload-idle-label on the field) in the drop zone. */
+.fi-fo-file-upload .filepond--drop-label label {
+    font-size: 0;
+}
+
+.fi-fo-file-upload .filepond--drop-label label::before {
+    content: var(--upload-idle-label);
+    font-size: 0.875rem;
+}
