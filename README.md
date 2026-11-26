@@ -1,58 +1,115 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# TCG Store
+
+[![tests](https://github.com/amornnan19/laravel-tcg-store/actions/workflows/tests.yml/badge.svg)](https://github.com/amornnan19/laravel-tcg-store/actions/workflows/tests.yml)
+
+A Thai trading-card shop built as one Laravel app, with the storefront and the admin panel in the
+same codebase. It sells single cards, graded slabs, sealed product and pre-orders across five games
+and three card languages. It takes PromptPay and bank-transfer slips, and it buys cards back from
+customers for cash or store credit.
+
+**This is a demo project.** It follows the milestones in [`docs/`](docs/README.md) and is not a
+running shop. All card art is a placeholder. No official card images are fetched, stored or
+shipped. Prices, addresses and payment details come from config and seed data, never from the
+templates.
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="docs/screenshots/home.png" alt="Home page: newest singles, latest sets and sealed product" width="49%">
+  <img src="docs/screenshots/card.png" alt="Card page: every printing of the card with its condition, finish, price and stock" width="49%">
 </p>
 
-## About Laravel
+## What it does
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+| Area | What a customer or staff member gets |
+|---|---|
+| **Search** | Meilisearch autocomplete that understands set codes and card numbers (`OP05-119`, `SV4a 190/190`), with Thai, English and Japanese names |
+| **Browsing** | Results with filters as a bottom sheet on phones and a sidebar on desktop, a set browser ordered by card number, and a card page with every printing, condition and finish |
+| **Cart** | A real 15-minute stock hold per line (a `stock_reservations` table, not the session), with a countdown, renewal and substitutes when a hold lapses |
+| **Checkout** | Thai addresses, couriers, optional protective packing, a PromptPay QR, and slip upload with staff checking (short slips, retries, refunds) |
+| **Accounts** | LINE Login or email, order tracking, a wishlist, and price and restock alerts sent by LINE or email |
+| **Deck import** | Paste a 60-line deck list and get three buckets (in stock, short, missing), then add all of it to the cart in one click |
+| **Graded and sealed** | One-of-a-kind graded slabs with real photos and mandatory insurance, sealed product from stock, and pre-orders with a deposit or full payment |
+| **Buylist** | Customers see what the shop will pay before they pack a parcel. They choose cash or store credit (credit pays more), the shop re-inspects with photos, and a lower grade needs the customer's confirmation before anything is paid |
+| **Store credit** | An append-only ledger, spent at checkout and returned on cancel or refund |
+| **Admin** | A Filament panel built for bulk work: variant pricing in bulk, CSV import, a payment desk, a buylist desk, and dashboard widgets for the morning queue |
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<p align="center">
+  <img src="docs/screenshots/deck-import.png" alt="Deck import: the in-stock, short and missing buckets with a total" width="49%">
+  <img src="docs/screenshots/buylist.png" alt="Buylist builder: cash against store credit and the re-inspection notice" width="49%">
+</p>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+<p align="center">
+  <img src="docs/screenshots/checkout-promptpay.png" alt="Order page on a phone with the PromptPay QR and slip upload" width="24%">
+  <img src="docs/screenshots/buylist-revised.png" alt="Buylist on a phone after re-inspection: claimed against found, with the new price to confirm" width="24%">
+  <img src="docs/screenshots/preorder.png" alt="Pre-order page with countdown, quota and deposit or full-payment plans" width="49%">
+</p>
 
-## Learning Laravel
+<p align="center">
+  <img src="docs/screenshots/admin-buylist.png" alt="Admin buylist desk: per-line assessment with a live total" width="98%">
+</p>
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Stack
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Layer | Choice |
+|---|---|
+| Framework | Laravel 13 on PHP 8.5 |
+| Storefront | Blade, Livewire 4, Alpine, Tailwind CSS 4, Vite |
+| Admin | Filament 5 at `/admin`, staff only, with two-factor authentication |
+| Search | Laravel Scout with Meilisearch |
+| Auth | Laravel's own auth plus LINE Login through Socialite |
+| Database | SQLite while building, with every migration kept portable to MySQL, MariaDB and Postgres |
+| Tests | Pest, formatted with Pint, run on GitHub Actions |
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Money is always an integer of satang. Every write that touches more than one table goes through a
+single action class that owns its transaction and takes its row locks in one project-wide order.
+The reasoning is in [`docs/architecture.md`](docs/architecture.md) and
+[`.ai/rules/project.md`](.ai/rules/project.md).
 
-## Agentic Development
+## Running it locally
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+You need PHP 8.5 with `gd`, `intl` and `pdo_sqlite`, Composer, Node 24, and Docker for Meilisearch.
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/amornnan19/laravel-tcg-store.git
+cd laravel-tcg-store
+composer setup                      # install, .env, key, migrate, npm install, build
+docker compose up -d meilisearch
+php artisan migrate:fresh --seed    # catalogue, stock, demo orders and buylist prices
+php artisan scout:sync-index-settings
+php artisan scout:import "App\Models\Printing"
+php artisan scout:import "App\Models\CardSet"
+php artisan scout:import "App\Models\SealedProduct"
+composer run dev                    # server, queue, logs and Vite together
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Open <http://localhost:8000>. On a local environment only, the seeders create two accounts with a
+known password:
 
-## Contributing
+| Account | Email | Password |
+|---|---|---|
+| Customer | `customer@example.com` | `password` |
+| Staff (`/admin`) | `test@example.com` | `password` |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The staff account is asked to set up an authenticator app on first login.
 
-## Code of Conduct
+PromptPay, the bank account, LINE and the buylist receiving address are all empty in
+`.env.example`. A payment method without its details is simply not offered, and the receiving
+address falls back to a line saying the shop will send it.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Tests
 
-## Security Vulnerabilities
+```bash
+php artisan test --compact
+vendor/bin/pint --test
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+The suite runs on every push and pull request, through [the tests workflow](.github/workflows/tests.yml).
+
+## Documentation
+
+[`docs/README.md`](docs/README.md) is the entry point. It covers the data model, search, the
+storefront screens, the admin panel, payments and shipping, and accounts with the buylist. The
+implementation plan for each milestone is in [`.claude/plans/`](.claude/plans).
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT.
