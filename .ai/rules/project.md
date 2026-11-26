@@ -157,7 +157,7 @@ Do not invent screens. If a screen is missing from `docs/storefront.md`, ask.
 
 ## Branching
 
-**Deployment status: not deployed.**
+**Deployment status: deployed since 2026-11-26.** (https://demo-tcg-store.amornnan.xyz, Coolify)
 
 While that line says "not deployed", commit straight to `main`. No feature branch, no pull request.
 Nobody is using the shop, there is nothing to break, and a branch per change at this stage is
