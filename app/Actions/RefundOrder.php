@@ -19,7 +19,7 @@ use InvalidArgumentException;
  * Refunds a paid order that has not shipped: its confirmed payments become `refunded`, its quantity goes back to the
  * variants that still exist and `refunded_at` is stamped. The amount to return is `Order::refundOwedSatang()` as it stood
  * before the payments moved: all that was received, except that a pre-order refunded after its `cancel_until` keeps its
- * deposit. A pre-order took no stock: its places go back to the pre-order (`reserved_count`) instead. Lock order: variants, order, payments, as `CancelOrder` does.
+ * deposit. A pre-order took no stock: its places go back to the pre-order (`reserved_count`) instead. Store credit the order spent goes back to the ledger, not as cash (`ReturnOrderCredit`). Lock order: variants, order, pre-order, user, payments, as `CancelOrder` does.
  */
 class RefundOrder
 {
@@ -52,6 +52,9 @@ class RefundOrder
 
             $refundedSatang = $locked->refundOwedSatang();
 
+            // Store credit goes back as credit, before the payments move (users come before payments in the lock order).
+            $creditReturned = app(ReturnOrderCredit::class)->handle($locked);
+
             $locked->payments()
                 ->where('status', PaymentStatus::Confirmed->value)
                 ->update(['status' => PaymentStatus::Refunded->value, 'updated_at' => now()]);
@@ -66,7 +69,7 @@ class RefundOrder
             if ($locked->isPreorder()) {
                 $preorder?->update(['reserved_count' => max(0, $preorder->reserved_count - (int) $locked->items()->sum('qty'))]);
 
-                return new RefundResult($locked, $refundedSatang);
+                return new RefundResult($locked, $refundedSatang, $creditReturned);
             }
 
             // After the status moved: a one-of-a-kind item checks that no other live order holds its sale.
@@ -77,12 +80,12 @@ class RefundOrder
                 $purchasable?->onReturned($item->qty);
             }
 
-            return new RefundResult($locked, $refundedSatang);
+            return new RefundResult($locked, $refundedSatang, $creditReturned);
         });
 
         VariantAlerts::dispatchFor($variantIds);
 
-        OrderRecipient::notify($result->order, new OrderRefunded($result->order, $result->refundedSatang));
+        OrderRecipient::notify($result->order, new OrderRefunded($result->order, $result->refundedSatang, $result->creditReturnedSatang));
 
         return $result;
     }

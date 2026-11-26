@@ -151,6 +151,20 @@
                     @endif
                 </section>
 
+                @if ($creditBalance > 0)
+                    <section aria-labelledby="checkout-credit-heading">
+                        <h2 id="checkout-credit-heading" class="mb-3 font-display text-card font-medium">{{ __('storefront.checkout.credit.heading') }}</h2>
+                        <label class="flex cursor-pointer items-start gap-3 rounded-card border border-line bg-surface p-3 has-checked:border-accent has-checked:bg-accent/8 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent">
+                            <x-checkbox wire:model.live="form.useCredit" class="mt-0.5" />
+                            <span class="min-w-0 flex-1">
+                                <span class="block text-small font-medium">{{ __('storefront.checkout.credit.title') }}</span>
+                                <span class="mt-1 block text-small text-muted">{{ __('storefront.checkout.credit.hint', ['balance' => $format($creditBalance), 'usable' => $format($creditUsable)]) }}</span>
+                            </span>
+                        </label>
+                    </section>
+                @endif
+
+                @if ($payable > 0)
                 <section aria-labelledby="checkout-payment-heading">
                     <h2 id="checkout-payment-heading" class="mb-3 font-display text-card font-medium">{{ __('storefront.checkout.payment') }}</h2>
                     <div class="flex flex-col gap-2">
@@ -168,6 +182,7 @@
                         <p class="mt-1 text-small text-danger">{{ $errors->first('form.method') }}</p>
                     @endif
                 </section>
+                @endif
 
                 <section aria-labelledby="checkout-summary-heading">
                     <h2 id="checkout-summary-heading" class="mb-3 font-display text-card font-medium">{{ __('storefront.checkout.summary') }}</h2>
@@ -180,20 +195,34 @@
                         @if ($insuredCount > 0)
                             <p class="flex items-baseline justify-between gap-4"><span>{{ __('storefront.checkout.insurance', ['n' => $insuredCount]) }}<span class="block text-label text-faint">{{ __('storefront.checkout.insurance_note') }}</span></span><x-price :satang="$insurance" class="text-ink" /></p>
                         @endif
-                        <p class="mt-2 flex items-baseline justify-between gap-4 border-t border-line pt-3">
-                            <span class="text-body font-medium text-ink">{{ __('storefront.checkout.total_due') }}</span>
-                            <x-price :satang="$total" class="text-h3 font-medium text-ink" />
-                        </p>
+                        @if ($creditApplied > 0)
+                            <p class="mt-2 flex items-baseline justify-between gap-4"><span>{{ __('storefront.checkout.total') }}</span><x-price :satang="$total" class="text-ink" /></p>
+                            <p class="flex items-baseline justify-between gap-4"><span>{{ __('storefront.checkout.credit.line') }}</span><span class="text-ink tabular-nums">−{{ $format($creditApplied) }}</span></p>
+                            <p class="mt-2 flex items-baseline justify-between gap-4 border-t border-line pt-3">
+                                <span class="text-body font-medium text-ink">{{ __('storefront.checkout.total_transfer') }}</span>
+                                <x-price :satang="$payable" class="text-h3 font-medium text-accent" />
+                            </p>
+                        @else
+                            <p class="mt-2 flex items-baseline justify-between gap-4 border-t border-line pt-3">
+                                <span class="text-body font-medium text-ink">{{ __('storefront.checkout.total_due') }}</span>
+                                <x-price :satang="$total" class="text-h3 font-medium text-ink" />
+                            </p>
+                        @endif
                     </div>
-                    <p class="mt-3 text-small text-muted">{{ __('storefront.checkout.terms', ['minutes' => config('shop.payment_window_minutes')]) }}</p>
+                    <p class="mt-3 text-small text-muted">{{ $payable > 0 ? __('storefront.checkout.terms', ['minutes' => config('shop.payment_window_minutes')]) : __('storefront.checkout.terms_credit') }}</p>
                 </section>
 
                 <div id="checkout-bar" class="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-line bg-sunken px-4 pb-4 pt-3 lg:static lg:border-0 lg:bg-transparent lg:p-0">
                     <p class="min-w-0 flex-1 lg:hidden">
-                        <span class="block text-label text-faint">{{ __('storefront.checkout.total') }}</span>
-                        <x-price :satang="$total" class="mt-1 block text-h3 font-medium" />
+                        <span class="block text-label text-faint">{{ $creditApplied > 0 ? __('storefront.checkout.total_transfer') : __('storefront.checkout.total') }}</span>
+                        <x-price :satang="$payable" class="mt-1 block text-h3 font-medium" />
                     </p>
-                    <button type="submit" wire:loading.attr="aria-busy" wire:target="placeOrder" class="{{ $primaryButton }} min-h-12 flex-none px-5 text-body lg:w-full">{{ __('storefront.checkout.confirm') }}</button>
+                    <div class="flex flex-none flex-col gap-2 lg:w-full">
+                        @if ($creditChanged)
+                            <p role="alert" class="text-small text-danger">{{ __('storefront.checkout.credit.changed') }}</p>
+                        @endif
+                        <button type="submit" wire:loading.attr="aria-busy" wire:target="placeOrder" class="{{ $primaryButton }} min-h-12 flex-none px-5 text-body lg:w-full">{{ __('storefront.checkout.confirm') }}</button>
+                    </div>
                 </div>
             </form>
         @endif

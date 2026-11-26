@@ -26,6 +26,13 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     use HasFactory, InteractsWithAppAuthentication, InteractsWithAppAuthenticationRecovery, Notifiable;
 
     /**
+     * A user made in memory (a factory, a test) has the column's default until it is read back.
+     *
+     * @var array<string, int>
+     */
+    protected $attributes = ['store_credit_satang' => 0];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -36,6 +43,7 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_staff' => 'boolean',
+            'store_credit_satang' => 'integer',
             'line_notify_opt_in' => 'boolean',
         ];
     }
@@ -54,6 +62,16 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * The store-credit ledger; `store_credit_satang` is a cache of its sum and is written only by `RecordStoreCredit`.
+     *
+     * @return HasMany<StoreCreditEntry, $this>
+     */
+    public function storeCreditEntries(): HasMany
+    {
+        return $this->hasMany(StoreCreditEntry::class);
     }
 
     /**

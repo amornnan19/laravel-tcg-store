@@ -14,9 +14,13 @@ class OrderCancelled extends ShopNotification
     /** What the shop owes back, fixed when the notification is made: a pre-order's depends on today's date. */
     public int $refundSatang;
 
+    /** The store credit that went back to the customer's account, fixed when the notification is made. */
+    public int $creditReturnedSatang;
+
     public function __construct(public Order $order)
     {
         $this->refundSatang = $order->refundOwedSatang();
+        $this->creditReturnedSatang = $order->credit_returned_at !== null ? $order->credit_used_satang : 0;
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -33,6 +37,10 @@ class OrderCancelled extends ShopNotification
             $mail->line(__('notifications.order_cancelled.refund_line', ['amount' => Money::fromSatang($received)->format()]));
         }
 
+        if ($this->creditReturnedSatang > 0) {
+            $mail->line(__('notifications.credit_returned', ['amount' => Money::fromSatang($this->creditReturnedSatang)->format()]));
+        }
+
         return $mail
             ->action(__('notifications.order_cancelled.action'), $this->order->signedUrl())
             ->salutation(__('notifications.salutation', ['shop' => config('app.name')]));
@@ -45,6 +53,10 @@ class OrderCancelled extends ShopNotification
 
         if ($received > 0) {
             $text .= ' '.__('notifications.order_cancelled.line_refund', ['amount' => Money::fromSatang($received)->format()]);
+        }
+
+        if ($this->creditReturnedSatang > 0) {
+            $text .= ' '.__('notifications.credit_returned', ['amount' => Money::fromSatang($this->creditReturnedSatang)->format()]);
         }
 
         return $text

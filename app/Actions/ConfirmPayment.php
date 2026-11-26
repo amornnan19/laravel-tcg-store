@@ -14,7 +14,7 @@ use App\Support\OrderRecipient;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Staff confirm a submitted slip: the payment is confirmed and, once the money received reaches the order total, the
+ * Staff confirm a submitted slip: the payment is confirmed and, once the money received reaches what the order must pay (total less store credit), the
  * order is paid. A pre-order on the deposit plan moves to `awaiting_balance` when the money received reaches its deposit,
  * with `paid_at` still empty. Lock order: the order row, then the payment (project-wide: variants, order, payment).
  */
@@ -56,7 +56,7 @@ class ConfirmPayment
 
             $received = $order->receivedSatang();
 
-            if ($received >= $order->total_satang) {
+            if ($received >= $order->payableSatang()) {
                 $order->update(['status' => OrderStatus::Paid, 'paid_at' => now()]);
             } elseif ($order->status === OrderStatus::AwaitingPayment
                 && $order->preorder_plan === PreorderPlan::Deposit

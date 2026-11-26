@@ -57,7 +57,11 @@
                                 </span>
                                 <span class="flex flex-none flex-col items-end gap-1">
                                     <x-order-status-badge :status="$order->status" />
-                                    <x-price :satang="$order->total_satang" class="text-small font-medium" />
+                                    @if ($order->credit_used_satang > 0)
+                                        <span class="text-label text-faint tabular-nums">{{ __('storefront.account.order_credit', ['total' => \App\Support\Money::fromSatang($order->total_satang)->format(), 'credit' => \App\Support\Money::fromSatang($order->credit_used_satang)->format()]) }}</span>
+                                    @else
+                                        <x-price :satang="$order->total_satang" class="text-small font-medium" />
+                                    @endif
                                 </span>
                             </a>
                         </li>
@@ -67,6 +71,52 @@
                 @if ($orders->hasPages())
                     <div class="mt-4">{{ $orders->links() }}</div>
                 @endif
+            @endif
+        </section>
+
+        <section aria-labelledby="account-credit-heading">
+            <h2 id="account-credit-heading" class="mb-3 font-display text-card font-medium">{{ __('storefront.account.credit.title') }}</h2>
+
+            <div class="flex flex-col gap-1 rounded-card border border-line bg-sunken p-4">
+                <p class="text-label text-faint">{{ __('storefront.account.credit.balance') }}</p>
+                <x-price :satang="$user->store_credit_satang" class="text-h2 font-medium" />
+                <p class="text-small text-muted">{{ __('storefront.account.credit.note') }}</p>
+            </div>
+
+            @if ($creditEntries->isEmpty())
+                <x-empty-state class="mt-3" :title="__('storefront.account.credit.empty')" :hint="__('storefront.account.credit.empty_hint')">
+                    <a href="{{ route('home') }}" class="{{ $secondaryButton }}">{{ __('storefront.account.credit.empty_cta') }}</a>
+                </x-empty-state>
+            @else
+                <p class="mt-4 text-label text-faint">{{ __('storefront.account.credit.latest') }}</p>
+                <ul class="mt-2 flex flex-col gap-2">
+                    @foreach ($creditEntries as $entry)
+                        @php
+                            $source = $entry->source;
+                            $gain = $entry->delta_satang > 0;
+                        @endphp
+                        <li class="flex items-start justify-between gap-3 rounded-card border border-line bg-sunken p-3">
+                            <span class="min-w-0">
+                                <span class="block text-small font-medium">{{ $entry->reason->label() }}</span>
+                                <span class="block text-label text-faint tabular-nums">
+                                    {{ $placed($entry->created_at) }}
+                                    @if ($source instanceof \App\Models\Order)
+                                        · <a href="{{ route('order.show', $source->number) }}" class="rounded-tag text-accent underline underline-offset-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">{{ $source->number }}</a>
+                                    @elseif ($source !== null)
+                                        · {{ $source->number }}
+                                    @endif
+                                </span>
+                                @if (filled($entry->note))
+                                    <span class="mt-1 block text-label text-muted">{{ $entry->note }}</span>
+                                @endif
+                            </span>
+                            <span class="flex flex-none flex-col items-end gap-1">
+                                <span @class(['text-small font-medium tabular-nums', 'text-stock' => $gain, 'text-ink' => ! $gain])>{{ $gain ? '+' : '−' }}{{ \App\Support\Money::fromSatang(abs($entry->delta_satang))->format() }}</span>
+                                <span class="text-label text-faint tabular-nums">{{ __('storefront.account.credit.balance_after', ['amount' => \App\Support\Money::fromSatang($entry->balance_after_satang)->format()]) }}</span>
+                            </span>
+                        </li>
+                    @endforeach
+                </ul>
             @endif
         </section>
 

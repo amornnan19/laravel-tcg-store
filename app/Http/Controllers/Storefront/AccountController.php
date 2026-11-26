@@ -10,7 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 /**
- * `/account`: the signed-in customer's orders, LINE link, notification choice and email verification notice.
+ * `/account`: the signed-in customer's orders, store credit, LINE link, notification choice and email verification notice.
  */
 class AccountController extends Controller
 {
@@ -21,6 +21,7 @@ class AccountController extends Controller
         return view('account', [
             'user' => $user,
             'orders' => $user->orders()->latest('placed_at')->paginate(10),
+            'creditEntries' => $user->storeCreditEntries()->with('source')->orderByDesc('id')->limit(20)->get(),
             // Only what the storefront still shows: a card that left the shop or an inactive game drops off the list.
             'wishlist' => $user->wishlistItems()
                 ->whereHas('printing', fn (Builder $printing) => $printing->withoutTrashed()->searchVisible())

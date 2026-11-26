@@ -75,6 +75,16 @@ class ViewOrder extends ViewRecord
     }
 
     /**
+     * The store credit this order spent and has not yet got back, which goes to the customer's account when it is closed.
+     */
+    private static function creditRule(Order $order): string
+    {
+        return $order->credit_used_satang > 0 && $order->credit_returned_at === null
+            ? ' '.__('admin.orders.return_credit', ['amount' => Money::fromSatang($order->credit_used_satang)->format()])
+            : '';
+    }
+
+    /**
      * A pre-order cannot be packed before its release date, so its pack button waits for it; every other order is ready.
      */
     private function isReleased(Order $order): bool
@@ -205,6 +215,7 @@ class ViewOrder extends ViewRecord
 
                 return ($order->isPreorder() ? __('admin.orders.actions.cancel_description_preorder') : __('admin.orders.actions.cancel_description'))
                     .($owed > 0 ? ' '.__('admin.orders.return_money', ['amount' => Money::fromSatang($owed)->format()]) : '')
+                    .self::creditRule($order)
                     .self::depositRule($order);
             })
             ->schema([
@@ -221,12 +232,16 @@ class ViewOrder extends ViewRecord
                     $cancelled = app(CancelOrder::class)->handle($this->orderRecord(), trim((string) $data['reason']));
 
                     $received = $cancelled?->refundOwedSatang() ?? 0;
+                    $credit = $cancelled !== null && $cancelled->credit_returned_at !== null ? $cancelled->credit_used_satang : 0;
 
                     Notification::make()
                         ->success()
                         ->title(__('admin.orders.done.cancel'))
-                        ->body($received > 0 ? __('admin.orders.return_money', ['amount' => Money::fromSatang($received)->format()]) : null)
-                        ->persistent($received > 0)
+                        ->body(collect([
+                            $received > 0 ? __('admin.orders.return_money', ['amount' => Money::fromSatang($received)->format()]) : null,
+                            $credit > 0 ? __('admin.orders.return_credit', ['amount' => Money::fromSatang($credit)->format()]) : null,
+                        ])->filter()->implode(' ') ?: null)
+                        ->persistent($received > 0 || $credit > 0)
                         ->send();
                 });
             });
@@ -243,7 +258,7 @@ class ViewOrder extends ViewRecord
             ->modalHeading(__('admin.orders.actions.refund_heading'))
             ->modalDescription(fn (): string => __($this->orderRecord()->isPreorder() ? 'admin.orders.actions.refund_description_preorder' : 'admin.orders.actions.refund_description', [
                 'amount' => Money::fromSatang($this->orderRecord()->refundOwedSatang())->format(),
-            ]).self::depositRule($this->orderRecord()))
+            ]).self::creditRule($this->orderRecord()).self::depositRule($this->orderRecord()))
             ->schema([
                 Textarea::make('reason')
                     ->label(__('admin.orders.fields.reason'))
@@ -260,7 +275,10 @@ class ViewOrder extends ViewRecord
                     Notification::make()
                         ->success()
                         ->title(__('admin.orders.done.refund'))
-                        ->body(__('admin.orders.return_money', ['amount' => Money::fromSatang($result->refundedSatang)->format()]))
+                        ->body(collect([
+                            __('admin.orders.return_money', ['amount' => Money::fromSatang($result->refundedSatang)->format()]),
+                            $result->creditReturnedSatang > 0 ? __('admin.orders.return_credit', ['amount' => Money::fromSatang($result->creditReturnedSatang)->format()]) : null,
+                        ])->filter()->implode(' '))
                         ->persistent()
                         ->send();
                 });

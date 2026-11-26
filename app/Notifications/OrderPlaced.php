@@ -23,21 +23,33 @@ class OrderPlaced extends ShopNotification
         if ($this->order->isPreorder()) {
             $mail->line(__('notifications.order_placed.preorder_line', ['number' => $this->order->number, 'due' => $this->dueNow()]))
                 ->line(__('notifications.order_placed.preorder_deadline', ['minutes' => config('shop.payment_window_minutes')]));
+        } elseif ($this->order->isCoveredByCredit()) {
+            $mail->line(__('notifications.order_placed.credit_paid_line', ['number' => $this->order->number, 'credit' => Money::fromSatang($this->order->credit_used_satang)->format()]));
         } else {
-            $mail->line(__('notifications.order_placed.line', ['number' => $this->order->number, 'total' => Money::fromSatang($this->order->total_satang)->format()]))
-                ->line(__('notifications.order_placed.deadline', ['minutes' => config('shop.payment_window_minutes')]));
+            $mail->line(__('notifications.order_placed.line', ['number' => $this->order->number, 'total' => Money::fromSatang($this->order->payableSatang())->format()]));
+
+            if ($this->order->credit_used_satang > 0) {
+                $mail->line(__('notifications.order_placed.credit_used', ['credit' => Money::fromSatang($this->order->credit_used_satang)->format()]));
+            }
+
+            $mail->line(__('notifications.order_placed.deadline', ['minutes' => config('shop.payment_window_minutes')]));
         }
 
         return $mail
-            ->action(__('notifications.order_placed.action'), $this->order->signedUrl())
+            ->action(__($this->order->isCoveredByCredit() ? 'notifications.order_placed.action_paid' : 'notifications.order_placed.action'), $this->order->signedUrl())
             ->salutation(__('notifications.salutation', ['shop' => config('app.name')]));
     }
 
     public function toLine(object $notifiable): string
     {
+        if ($this->order->isCoveredByCredit()) {
+            return __('notifications.order_placed.credit_paid_line_text', ['number' => $this->order->number])
+                ."\n".$this->order->signedUrl();
+        }
+
         return __($this->order->isPreorder() ? 'notifications.order_placed.preorder_line_text' : 'notifications.order_placed.line_text', [
             'number' => $this->order->number,
-            'total' => $this->order->isPreorder() ? $this->dueNow() : Money::fromSatang($this->order->total_satang)->format(),
+            'total' => $this->order->isPreorder() ? $this->dueNow() : Money::fromSatang($this->order->payableSatang())->format(),
             'minutes' => config('shop.payment_window_minutes'),
         ])
             ."\n".$this->order->signedUrl();

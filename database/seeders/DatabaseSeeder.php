@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             SealedProductSeeder::class,
             PreorderSeeder::class,
             SavedDeckListSeeder::class,
+            StoreCreditSeeder::class,
         ]);
     }
 }

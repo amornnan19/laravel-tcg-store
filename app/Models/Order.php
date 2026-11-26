@@ -34,7 +34,7 @@ class Order extends Model
         'balance_requested_at', 'contact_name', 'contact_phone', 'contact_email', 'address', 'courier',
         'subtotal_satang', 'shipping_satang', 'protection_satang', 'insurance_satang', 'credit_used_satang',
         'refunded_satang', 'total_satang', 'tracking_number', 'staff_note', 'cancel_reason', 'refund_reason', 'payment_due_at', 'placed_at', 'paid_at', 'packed_at',
-        'shipped_at', 'delivered_at', 'cancelled_at', 'refunded_at',
+        'shipped_at', 'delivered_at', 'cancelled_at', 'refunded_at', 'credit_returned_at',
     ];
 
     /**
@@ -67,6 +67,7 @@ class Order extends Model
             'delivered_at' => 'datetime',
             'cancelled_at' => 'datetime',
             'refunded_at' => 'datetime',
+            'credit_returned_at' => 'datetime',
         ];
     }
 
@@ -108,11 +109,28 @@ class Order extends Model
     }
 
     /**
-     * What is still owed: the total less what has been received, never below zero.
+     * What must arrive as money: the total less the store credit the order spent, never below zero. `total_satang` stays
+     * the order's full value and is what displays show.
+     */
+    public function payableSatang(): int
+    {
+        return max(0, $this->total_satang - $this->credit_used_satang);
+    }
+
+    /**
+     * What is still owed in money: what must arrive less what has been received, never below zero.
      */
     public function remainingSatang(): int
     {
-        return max(0, $this->total_satang - $this->receivedSatang());
+        return max(0, $this->payableSatang() - $this->receivedSatang());
+    }
+
+    /**
+     * Whether store credit covered the whole order, so no payment was ever asked for.
+     */
+    public function isCoveredByCredit(): bool
+    {
+        return $this->credit_used_satang > 0 && $this->payableSatang() === 0;
     }
 
     /**

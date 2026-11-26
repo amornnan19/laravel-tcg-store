@@ -6,6 +6,7 @@ use App\Actions\PlaceOrder;
 use App\Enums\Courier;
 use App\Enums\PaymentMethod;
 use App\Exceptions\CheckoutBlocked;
+use App\Exceptions\StoreCreditChanged;
 use App\Livewire\Forms\CheckoutData;
 use App\Models\Cart;
 use App\Models\CartItem;
@@ -33,6 +34,10 @@ class CheckoutForm extends Component
     #[Locked]
     public bool $refused = false;
 
+    /** Set when PlaceOrder refused because the store credit balance changed after the page rendered. */
+    #[Locked]
+    public bool $creditChanged = false;
+
     public function mount(): void
     {
         $user = auth()->user();
@@ -55,6 +60,10 @@ class CheckoutForm extends Component
      */
     public function updated(string $name): void
     {
+        if ($name === 'form.useCredit') {
+            $this->creditChanged = false;
+        }
+
         if (str_starts_with($name, 'form.')) {
             $this->form->validateOnly(substr($name, 5));
         }
@@ -78,8 +87,15 @@ class CheckoutForm extends Component
             throw $exception;
         }
 
+        $this->creditChanged = false;
+
         try {
             $order = $placeOrder->handle($cart, $this->form, auth()->user());
+        } catch (StoreCreditChanged) {
+            // The render that follows shows the new balance and its figures; the next confirm is against those.
+            $this->creditChanged = true;
+
+            return;
         } catch (CheckoutBlocked) {
             $this->refused = true;
             unset($this->cart, $this->cartLines, $this->heldLines, $this->expiresAt, $this->subtotal);
@@ -152,6 +168,14 @@ class CheckoutForm extends Component
         $protection = $this->form->protection && $packable ? (int) config('shipping.protection_satang') : 0;
         $insuredCount = $this->cartLines->insuredCount();
         $insurance = $insuredCount * (int) config('shipping.graded_insurance_satang');
+        $total = $this->subtotal + $shipping + $protection + $insurance;
+
+        // Only what the card shows and the summary previews: PlaceOrder reads the balance again under the user's lock.
+        $creditBalance = (int) auth()->user()?->store_credit_satang;
+        $creditUsable = min($creditBalance, $total);
+        $creditApplied = $this->form->useCredit ? $creditUsable : 0;
+        // What this render shows is what the next confirm is guarded against.
+        $this->form->shownCreditSatang = $creditApplied;
 
         return view('livewire.storefront.checkout-form', [
             'methods' => PaymentMethod::offered(),
@@ -162,7 +186,11 @@ class CheckoutForm extends Component
             'packable' => $packable,
             'insuredCount' => $insuredCount,
             'insurance' => $insurance,
-            'total' => $this->subtotal + $shipping + $protection + $insurance,
+            'total' => $total,
+            'creditBalance' => $creditBalance,
+            'creditUsable' => $creditUsable,
+            'creditApplied' => $creditApplied,
+            'payable' => $total - $creditApplied,
         ]);
     }
 }

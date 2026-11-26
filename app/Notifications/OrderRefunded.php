@@ -11,27 +11,47 @@ use Illuminate\Notifications\Messages\MailMessage;
  */
 class OrderRefunded extends ShopNotification
 {
-    public function __construct(public Order $order, public int $refundedSatang) {}
+    public function __construct(public Order $order, public int $refundedSatang, public int $creditReturnedSatang = 0) {}
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
+        $mail = (new MailMessage)
             ->subject(__('notifications.order_refunded.subject', ['number' => $this->order->number]))
-            ->greeting(__('notifications.greeting', ['name' => $this->order->contact_name]))
-            ->line(__('notifications.order_refunded.line', [
+            ->greeting(__('notifications.greeting', ['name' => $this->order->contact_name]));
+
+        // An order paid wholly with store credit has no money to return: it says only that the credit is back.
+        if ($this->refundedSatang > 0) {
+            $mail->line(__('notifications.order_refunded.line', [
                 'number' => $this->order->number,
                 'amount' => Money::fromSatang($this->refundedSatang)->format(),
-            ]))
+            ]));
+        } else {
+            $mail->line(__('notifications.order_refunded.line_no_money', ['number' => $this->order->number]));
+        }
+
+        if ($this->creditReturnedSatang > 0) {
+            $mail->line(__('notifications.credit_returned', ['amount' => Money::fromSatang($this->creditReturnedSatang)->format()]));
+        }
+
+        return $mail
             ->action(__('notifications.order_refunded.action'), $this->order->signedUrl())
             ->salutation(__('notifications.salutation', ['shop' => config('app.name')]));
     }
 
     public function toLine(object $notifiable): string
     {
-        return __('notifications.order_refunded.line_text', [
-            'number' => $this->order->number,
-            'amount' => Money::fromSatang($this->refundedSatang)->format(),
-        ])
+        $text = $this->refundedSatang > 0
+            ? __('notifications.order_refunded.line_text', [
+                'number' => $this->order->number,
+                'amount' => Money::fromSatang($this->refundedSatang)->format(),
+            ])
+            : __('notifications.order_refunded.line_text_no_money', ['number' => $this->order->number]);
+
+        if ($this->creditReturnedSatang > 0) {
+            $text .= ' '.__('notifications.credit_returned', ['amount' => Money::fromSatang($this->creditReturnedSatang)->format()]);
+        }
+
+        return $text
             ."\n".$this->order->signedUrl();
     }
 

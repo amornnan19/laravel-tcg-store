@@ -44,6 +44,12 @@ return [
         'cancelled' => 'ยกเลิกแล้ว',
         'refunded' => 'คืนเงินแล้ว',
     ],
+    'store_credit_reason' => [
+        'buylist' => 'ขายการ์ดให้ร้าน',
+        'order' => 'ใช้ซื้อสินค้า',
+        'refund' => 'คืนจากคำสั่งซื้อ',
+        'adjustment' => 'ปรับยอดโดยร้าน',
+    ],
     'order_kind' => [
         'stock' => 'สินค้าพร้อมส่ง',
         'preorder' => 'พรีออเดอร์',

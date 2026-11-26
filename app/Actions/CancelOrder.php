@@ -20,7 +20,8 @@ use Illuminate\Support\Facades\DB;
  * Cancels an order that is waiting for money or has just been paid, and gives its stock back. By the time an order
  * exists its hold is already consumed and its quantity taken out of the variant, so the quantity goes back here
  * explicitly, to the variants that still exist. A pre-order took no stock: it gives its places back to the pre-order
- * instead (`reserved_count`), taking that row's lock after the order's. What is owed back is `Order::refundOwedSatang()`.
+ * instead (`reserved_count`), taking that row's lock after the order's. Store credit the order spent goes back to the
+ * customer's ledger once (`ReturnOrderCredit`), after the pre-order lock and before any lock on payments. What is owed back is `Order::refundOwedSatang()`.
  */
 class CancelOrder
 {
@@ -61,6 +62,9 @@ class CancelOrder
             if (! in_array($locked->status, [OrderStatus::AwaitingPayment, OrderStatus::AwaitingBalance, OrderStatus::Paid], true)) {
                 throw new IllegalOrderTransition("An order that is {$locked->status->value} cannot be cancelled.");
             }
+
+            // Store credit goes back first: the user's row comes before any lock on `payments` (the slip check below).
+            app(ReturnOrderCredit::class)->handle($locked);
 
             // A slip waiting for staff may be money in: it is decided first, never swept away by a cancel. A locking
             // read: inside the panel's outer transaction a plain read would see the snapshot from before the lock.

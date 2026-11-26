@@ -6,6 +6,7 @@ return [
     'navigation' => [
         'catalogue' => 'แคตตาล็อก',
         'orders' => 'คำสั่งซื้อ',
+        'customers' => 'ลูกค้า',
     ],
 
     'models' => [
@@ -19,6 +20,7 @@ return [
         'graded_item' => ['singular' => 'การ์ดเกรด', 'plural' => 'การ์ดเกรด'],
         'sealed_product' => ['singular' => 'สินค้ากล่อง', 'plural' => 'สินค้ากล่อง'],
         'preorder' => ['singular' => 'พรีออเดอร์', 'plural' => 'พรีออเดอร์'],
+        'store_credit_entry' => ['singular' => 'รายการเครดิตร้าน', 'plural' => 'เครดิตร้าน'],
     ],
 
     'fields' => [
@@ -273,6 +275,9 @@ return [
             'refund' => 'คืนเงินคำสั่งซื้อแล้ว',
         ],
         'return_money' => 'ต้องคืนเงินให้ลูกค้า :amount',
+        'return_credit' => 'คืนเครดิตร้าน :amount',
+        'credit_used' => 'ใช้เครดิตร้าน',
+        'payable' => 'ต้องโอน',
         'deposit_refunded' => 'ยังอยู่ในกำหนด (ถึง :date) คืนมัดจำเต็มจำนวน',
         'deposit_kept' => 'เลยกำหนด :date แล้ว ร้านเก็บมัดจำ :amount ไว้ ไม่คืน',
         'balance_not_requested' => 'ยังไม่ได้ขอ',
@@ -338,5 +343,28 @@ return [
         'restock_variant' => 'สภาพและพิมพ์',
         'restock_count' => 'จำนวนที่แจ้ง',
         'restock_empty' => 'เมื่อคืนยังไม่มีการแจ้งเตือนของเข้า',
+    ],
+
+    'credit' => [
+        'fields' => [
+            'user' => 'ลูกค้า',
+            'reason' => 'เหตุผล',
+            'delta' => 'เปลี่ยนแปลง',
+            'balance_after' => 'คงเหลือ',
+            'source' => 'อ้างอิง',
+            'staff' => 'ผู้ปรับ',
+            'created_at' => 'เมื่อ',
+            'note' => 'หมายเหตุ',
+            'direction' => 'ประเภท',
+            'amount' => 'จำนวนเงิน',
+        ],
+        'adjust' => 'ปรับยอดเครดิต',
+        'adjust_heading' => 'ปรับยอดเครดิตร้านของลูกค้า',
+        'direction' => ['add' => 'เพิ่ม', 'subtract' => 'ลด'],
+        'amount_positive' => 'จำนวนเงินต้องมากกว่า 0',
+        'amount_max' => 'ปรับได้ครั้งละไม่เกิน :max',
+        'adjusted' => 'ปรับยอดเครดิตแล้ว คงเหลือ :balance',
+        'insufficient' => 'ลดไม่ได้ ลูกค้ามีเครดิตเพียง :balance',
+        'empty' => 'ยังไม่มีรายการเครดิต',
     ],
 ];

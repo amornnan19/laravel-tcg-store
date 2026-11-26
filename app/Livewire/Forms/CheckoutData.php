@@ -9,7 +9,8 @@ use Illuminate\Validation\Rule;
 use Livewire\Form;
 
 /**
- * What checkout asks for: the recipient, the address, the courier, the packing option and the payment method.
+ * What checkout asks for: the recipient, the address, the courier, the packing option, the payment method and whether to
+ * spend store credit.
  * `validate()` checks the raw input; `normalized()` is what the order stores (trimmed, phone as digits).
  * The text properties are never rewritten server-side, so the response cannot overwrite what is being typed.
  */
@@ -37,6 +38,12 @@ class CheckoutData extends Form
 
     public string $method = '';
 
+    /** Spend store credit on this order; honoured only for a signed-in customer with a balance. */
+    public bool $useCredit = false;
+
+    /** The credit the form showed as applied when it last rendered (0 when the box is unticked): PlaceOrder refuses a spend that differs. */
+    public int $shownCreditSatang = 0;
+
     /**
      * @return array<string, array<int, mixed>>
      */
@@ -57,6 +64,8 @@ class CheckoutData extends Form
             'postcode' => ['required', 'regex:/^\d{5}$/'],
             'courier' => ['required', Rule::enum(Courier::class)],
             'protection' => ['boolean'],
+            'useCredit' => ['boolean'],
+            'shownCreditSatang' => ['integer', 'min:0'],
             'method' => ['required', Rule::in(array_map(fn (PaymentMethod $method): string => $method->value, PaymentMethod::offered()))],
         ];
     }

@@ -22,6 +22,16 @@
             <dt class="text-gray-500 dark:text-gray-400">{{ __('admin.orders.fields.received') }}</dt>
             <dd class="text-lg font-semibold tabular-nums">{{ Money::fromSatang($order->receivedSatang())->format() }}</dd>
         </div>
+        @if ($order->credit_used_satang > 0)
+            <div>
+                <dt class="text-gray-500 dark:text-gray-400">{{ __('admin.orders.credit_used') }}</dt>
+                <dd class="text-lg font-semibold tabular-nums">{{ Money::fromSatang($order->credit_used_satang)->format() }}</dd>
+            </div>
+            <div>
+                <dt class="text-gray-500 dark:text-gray-400">{{ __('admin.orders.payable') }}</dt>
+                <dd class="text-lg font-semibold tabular-nums">{{ Money::fromSatang($order->payableSatang())->format() }}</dd>
+            </div>
+        @endif
         @if ($order->refunded_satang > 0)
             <div>
                 <dt class="text-gray-500 dark:text-gray-400">{{ __('admin.orders.fields.refunded') }}</dt>

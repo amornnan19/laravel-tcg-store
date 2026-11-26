@@ -6,7 +6,9 @@ use App\Enums\Courier;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use App\Enums\StoreCreditReason;
 use App\Exceptions\CheckoutBlocked;
+use App\Exceptions\StoreCreditChanged;
 use App\Livewire\Forms\CheckoutData;
 use App\Models\Cart;
 use App\Models\CartItem;
@@ -25,7 +27,8 @@ use InvalidArgumentException;
 
 /**
  * Turns a cart whose holds are all live into an order: takes the stock out for real, snapshots every line, writes the
- * first payment and consumes the holds. One transaction; either all of it happens or none of it.
+ * first payment and consumes the holds. A signed-in customer may spend store credit, up to the total: what is left is the
+ * payment, and when nothing is left the order is paid and has no payment row. One transaction; either all of it happens or none of it.
  */
 class PlaceOrder
 {
@@ -34,6 +37,7 @@ class PlaceOrder
      *
      * @throws CheckoutBlocked when the cart is empty, or a line has no live hold of its full quantity, can no longer
      *                         be bought, or has less stock than the hold says.
+     * @throws StoreCreditChanged when the credit to spend, read under the user's lock, is not the amount the customer saw.
      * @throws InvalidArgumentException when the payment method is not one the shop offers.
      */
     public function handle(Cart $cart, CheckoutData $data, ?User $user = null): Order
@@ -98,12 +102,25 @@ class PlaceOrder
             $normalized = $data->normalized();
             $placedAt = now();
 
+            // Store credit is spent after the purchasables are locked and before anything is written: the user's row is
+            // locked here so the cap is read from the real balance, and RecordStoreCredit below re-reads it under the same lock.
+            $credit = 0;
+
+            if ($data->useCredit && $user !== null) {
+                $credit = min(User::query()->lockForUpdate()->findOrFail($user->getKey())->store_credit_satang, $total);
+            }
+
+            if ($credit !== $data->shownCreditSatang) {
+                throw new StoreCreditChanged($data->shownCreditSatang, $credit);
+            }
+
+            $payable = $total - $credit;
+
             // The number comes from the row id, so it is set right after the insert; the placeholder keeps the unique
             // column valid for that instant.
             $order = Order::query()->create([
                 'number' => 'new-'.Str::ulid(),
                 'user_id' => $user?->getKey(),
-                'status' => OrderStatus::AwaitingPayment,
                 'contact_name' => $normalized['name'],
                 'contact_phone' => $normalized['phone'],
                 'contact_email' => $normalized['email'],
@@ -122,6 +139,10 @@ class PlaceOrder
                 'protection_satang' => $protection,
                 'insurance_satang' => $insurance,
                 'total_satang' => $total,
+                'credit_used_satang' => $credit,
+                // Credit that covers everything is the payment: the order is paid at once and asks for no money.
+                'status' => $payable === 0 ? OrderStatus::Paid : OrderStatus::AwaitingPayment,
+                'paid_at' => $payable === 0 ? $placedAt : null,
                 'payment_due_at' => $placedAt->copy()->addMinutes((int) config('shop.payment_window_minutes')),
                 'placed_at' => $placedAt,
             ]);
@@ -142,12 +163,18 @@ class PlaceOrder
                 $purchasable->onSold($item->qty);
             }
 
-            $order->payments()->create([
-                'method' => $method,
-                'status' => PaymentStatus::Pending,
-                'amount_satang' => $total,
-                ...PaymentQr::attributes($method, $total, $order->payment_due_at),
-            ]);
+            if ($credit > 0) {
+                app(RecordStoreCredit::class)->handle($user, -$credit, StoreCreditReason::Order, $order);
+            }
+
+            if ($payable > 0) {
+                $order->payments()->create([
+                    'method' => $method,
+                    'status' => PaymentStatus::Pending,
+                    'amount_satang' => $payable,
+                    ...PaymentQr::attributes($method, $payable, $order->payment_due_at),
+                ]);
+            }
 
             // The holds are consumed, not released: the stock they held is now out of `qty` itself.
             // By the ids that were checked, not by cart: a line added to the cart meanwhile must survive.
