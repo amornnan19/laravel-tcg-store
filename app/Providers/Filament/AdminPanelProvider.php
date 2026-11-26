@@ -36,6 +36,7 @@ class AdminPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->font('IBM Plex Sans Thai')
             ->brandName(__('admin.brand'))
+            ->favicon(asset('favicon.svg'))
             ->colors([
                 'primary' => Color::Amber,
             ])

@@ -29,6 +29,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Demo notice
+    |--------------------------------------------------------------------------
+    |
+    | A deployed demo turns this on: the first home-page visit of a session opens a dialog saying the shop is not
+    | real. `source_url` is the repository the dialog links to; empty: no link.
+    |
+    */
+
+    'demo_notice' => (bool) env('SHOP_DEMO_NOTICE', false),
+
+    'source_url' => env('SHOP_SOURCE_URL', 'https://github.com/amornnan19/laravel-tcg-store'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Stock lock
     |--------------------------------------------------------------------------
     |

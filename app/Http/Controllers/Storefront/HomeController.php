@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * The home page (M01/D01): the latest set as the hero, new in-stock singles, the latest sets and sealed products.
+ * Once per session, when `shop.demo_notice` is on, it also opens the "this is a demo" dialog.
  * Sets, their number counts and the tile grid (printings, card, set, variants) besides the layout's game list.
  */
 class HomeController extends Controller
@@ -55,7 +56,14 @@ class HomeController extends Controller
             ->limit(self::SEALED_PRODUCTS)
             ->get();
 
+        $showDemoNotice = config('shop.demo_notice') && ! session()->has('demo_notice_seen');
+
+        if ($showDemoNotice) {
+            session()->put('demo_notice_seen', true);
+        }
+
         return view('home', [
+            'showDemoNotice' => $showDemoNotice,
             'heroSet' => $sets->first(),
             'latestSets' => $sets->slice(1),
             'newSingles' => $newSingles,
