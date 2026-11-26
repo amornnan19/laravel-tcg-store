@@ -95,6 +95,47 @@ PromptPay, the bank account, LINE and the buylist receiving address are all empt
 `.env.example`. A payment method without its details is simply not offered, and the receiving
 address falls back to a line saying the shop will send it.
 
+## Deploying
+
+[`compose.production.yaml`](compose.production.yaml) runs the app from one image (built from the
+[`Dockerfile`](Dockerfile): FrankenPHP, PHP 8.5, non-root, plain HTTP on `:8080` behind a reverse proxy)
+as four services:
+
+| Service | Role |
+|---|---|
+| `tcg-web` | Migrates on start, then serves the storefront and `/admin`; `/up` is its health check |
+| `tcg-worker` | `queue:work` on the database queue |
+| `tcg-scheduler` | `schedule:work` |
+| `tcg-meilisearch` | Search, with its data on a volume |
+
+The names carry a prefix so nothing collides on a shared proxy network such as Coolify's. Nothing publishes a
+port: the reverse proxy reaches `tcg-web` on the compose network, and the app trusts the forwarded headers it
+sends. In Coolify, set the domain on the `tcg-web` service **with its port**: `https://<domain>:8080`. The
+database is an external Postgres named by `DB_*`. The three app services share the `storage-app` volume
+(variant photos and payment slips).
+
+Settings come from [`.env.example`](.env.example) as `${VAR}` references. Compose refuses to start unless these
+are set: `APP_KEY`, `APP_ENV`, `APP_URL`, `APP_NAME`, `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`,
+`MEILI_MASTER_KEY` and `MAIL_FROM_ADDRESS`. The rest have defaults (the shop's own `SHOP_*` values are empty
+until you set them). Some values are fixed in the file and cannot be set from outside: `DB_CONNECTION=pgsql`,
+the session, queue, cache and filesystem drivers, `SCOUT_DRIVER`, `MEILISEARCH_HOST`, `MEILISEARCH_KEY` (from
+`MEILI_MASTER_KEY`) and `LINE_REDIRECT_URI` (from `APP_URL`).
+
+Once, after the first deploy, in the `tcg-web` container:
+
+```bash
+php artisan db:seed --force          # catalogue; with SHOP_DEMO_DATA=true also demo content; safe to run twice
+php artisan scout:sync-index-settings
+php artisan scout:import "App\Models\Printing"
+php artisan scout:import "App\Models\CardSet"
+php artisan scout:import "App\Models\SealedProduct"
+php artisan shop:make-staff owner@example.com   # prints a one-time password
+```
+
+`shop:make-staff` creates a staff account, or promotes an existing user (rotating their remember token and
+ending their sessions); `--reset-password` sets a new password for an existing account. Accounts with a
+known password are only ever seeded locally.
+
 ## Tests
 
 ```bash

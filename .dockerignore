@@ -1,0 +1,59 @@
+# Secrets and local state
+.env
+.env.*
+!.env.example
+auth.json
+storage/*.key
+database/*.sqlite
+database/*.sqlite-*
+
+# Rebuilt inside the image
+vendor
+node_modules
+public/build
+public/hot
+public/storage
+public/css/filament
+public/js/filament
+public/fonts/filament
+public/fonts-manifest.dev.json
+bootstrap/cache/*.php
+bootstrap/cache/filament
+
+# Runtime files from local runs (directories themselves are recreated)
+storage/app/public/*
+storage/app/private/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/testing
+storage/framework/views/*
+storage/logs/*
+storage/pail
+
+# Tests and tooling
+tests
+phpunit.xml
+.phpunit.cache
+.phpunit.result.cache
+scripts
+.playwright-mcp
+*.log
+
+# Agent, editor and VCS files
+.git
+.claude
+.mcp.json
+boost.json
+AGENTS.md
+CLAUDE.md
+.codex
+.cursor
+.idea
+.nova
+.vscode
+.zed
+.DS_Store
+
+# The build definition itself (docker/ is needed: the Dockerfile copies from it)
+Dockerfile
+.dockerignore

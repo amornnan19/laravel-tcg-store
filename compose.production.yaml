@@ -1,0 +1,131 @@
+# Production stack for Coolify (build pack: docker compose). One image, built from ./Dockerfile, runs three roles:
+# tcg-web, tcg-worker and tcg-scheduler, next to tcg-meilisearch. The service names carry a prefix because Coolify puts
+# the services of every app on one shared network, where a bare `web` or `meilisearch` could answer for another app.
+# No service publishes a port: tcg-web is reached only by Coolify's reverse proxy, which the app's trustProxies rule
+# depends on. The database is a separate (Coolify-managed) Postgres, named by DB_HOST.
+#
+# Required (compose refuses to start without them): APP_KEY, APP_ENV, APP_URL, APP_NAME, DB_HOST, DB_DATABASE,
+# DB_USERNAME, DB_PASSWORD, MEILI_MASTER_KEY, MAIL_FROM_ADDRESS. Fixed in this file, not settable: DB_CONNECTION=pgsql,
+# SESSION_DRIVER, QUEUE_CONNECTION, CACHE_STORE and FILESYSTEM_DISK, SCOUT_DRIVER, SCOUT_QUEUE, MEILISEARCH_HOST,
+# MEILISEARCH_KEY (from MEILI_MASTER_KEY), LINE_REDIRECT_URI (from APP_URL). Every other ${VAR} has a default (MAIL_FROM_NAME falls back to APP_NAME).
+
+x-app-environment: &app-environment
+  APP_NAME: ${APP_NAME:?set APP_NAME}
+  APP_ENV: ${APP_ENV:?set APP_ENV}
+  APP_KEY: ${APP_KEY:?set APP_KEY}
+  APP_DEBUG: ${APP_DEBUG}
+  APP_URL: ${APP_URL:?set APP_URL}
+  APP_LOCALE: ${APP_LOCALE:-th}
+  APP_FALLBACK_LOCALE: ${APP_FALLBACK_LOCALE:-en}
+  LOG_CHANNEL: ${LOG_CHANNEL:-stderr}
+  LOG_LEVEL: ${LOG_LEVEL:-warning}
+  DB_CONNECTION: pgsql
+  DB_HOST: ${DB_HOST:?set DB_HOST}
+  DB_PORT: ${DB_PORT:-5432}
+  DB_DATABASE: ${DB_DATABASE:?set DB_DATABASE}
+  DB_USERNAME: ${DB_USERNAME:?set DB_USERNAME}
+  DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD}
+  SESSION_DRIVER: database
+  SESSION_SECURE_COOKIE: ${SESSION_SECURE_COOKIE:-true}
+  QUEUE_CONNECTION: database
+  CACHE_STORE: database
+  FILESYSTEM_DISK: local
+  SCOUT_DRIVER: meilisearch
+  SCOUT_QUEUE: "true"
+  MEILISEARCH_HOST: http://tcg-meilisearch:7700
+  MEILISEARCH_KEY: ${MEILI_MASTER_KEY:?set MEILI_MASTER_KEY}
+  MAIL_MAILER: ${MAIL_MAILER:-log}
+  MAIL_SCHEME: ${MAIL_SCHEME:-}
+  MAIL_HOST: ${MAIL_HOST:-}
+  MAIL_PORT: ${MAIL_PORT:-}
+  MAIL_USERNAME: ${MAIL_USERNAME:-}
+  MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+  MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:?set MAIL_FROM_ADDRESS}
+  MAIL_FROM_NAME: ${MAIL_FROM_NAME:-${APP_NAME}}
+  LINE_CHANNEL_ID: ${LINE_CHANNEL_ID:-}
+  LINE_CHANNEL_SECRET: ${LINE_CHANNEL_SECRET:-}
+  LINE_REDIRECT_URI: ${APP_URL}/auth/line/callback
+  LINE_MESSAGING_CHANNEL_TOKEN: ${LINE_MESSAGING_CHANNEL_TOKEN:-}
+  SHOP_TIMEZONE: ${SHOP_TIMEZONE:-Asia/Bangkok}
+  SHOP_PROMPTPAY_ID: ${SHOP_PROMPTPAY_ID:-}
+  SHOP_BANK_NAME: ${SHOP_BANK_NAME:-}
+  SHOP_BANK_ACCOUNT_NAME: ${SHOP_BANK_ACCOUNT_NAME:-}
+  SHOP_BANK_ACCOUNT_NUMBER: ${SHOP_BANK_ACCOUNT_NUMBER:-}
+  SHOP_LINE_OA_URL: ${SHOP_LINE_OA_URL:-}
+  SHOP_BUYLIST_ADDRESS: ${SHOP_BUYLIST_ADDRESS:-}
+  SHOP_SAMPLE_PRICE_HISTORY: ${SHOP_SAMPLE_PRICE_HISTORY:-true}
+  SHOP_DEMO_DATA: ${SHOP_DEMO_DATA:-false}
+  BUYLIST_CREDIT_BONUS_BP: ${BUYLIST_CREDIT_BONUS_BP:-1500}
+  SHIPPING_FLASH_SATANG: ${SHIPPING_FLASH_SATANG:-4000}
+  SHIPPING_KERRY_SATANG: ${SHIPPING_KERRY_SATANG:-5000}
+  SHIPPING_JT_SATANG: ${SHIPPING_JT_SATANG:-4000}
+  SHIPPING_THAIPOST_SATANG: ${SHIPPING_THAIPOST_SATANG:-3500}
+  SHIPPING_PROTECTION_SATANG: ${SHIPPING_PROTECTION_SATANG:-3000}
+  SHIPPING_PROTECTION_THRESHOLD_SATANG: ${SHIPPING_PROTECTION_THRESHOLD_SATANG:-50000}
+  SHIPPING_GRADED_INSURANCE_SATANG: ${SHIPPING_GRADED_INSURANCE_SATANG:-20000}
+
+# The same image for all three roles. Each service names the build, so no service ever has to pull it; the layers
+# are shared, so building it three times costs the layer cache lookups only.
+x-app-image: &app-image
+  build: .
+  image: tcg-store:${IMAGE_TAG:-local}
+
+services:
+  tcg-web:
+    <<: *app-image
+    restart: unless-stopped
+    environment:
+      <<: *app-environment
+      CONTAINER_ROLE: web
+    expose:
+      - "8080"
+    volumes:
+      - storage-app:/app/storage/app
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/up"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+
+  tcg-worker:
+    <<: *app-image
+    restart: unless-stopped
+    command: php artisan queue:work --tries=1 --max-time=3600 --sleep=1
+    environment:
+      <<: *app-environment
+      CONTAINER_ROLE: worker
+    volumes:
+      - storage-app:/app/storage/app
+    healthcheck:
+      disable: true
+    depends_on:
+      - tcg-web
+
+  tcg-scheduler:
+    <<: *app-image
+    restart: unless-stopped
+    command: php artisan schedule:work
+    environment:
+      <<: *app-environment
+      CONTAINER_ROLE: scheduler
+    volumes:
+      - storage-app:/app/storage/app
+    healthcheck:
+      disable: true
+    depends_on:
+      - tcg-web
+
+  tcg-meilisearch:
+    image: getmeili/meilisearch:v1.58.0
+    restart: unless-stopped
+    environment:
+      MEILI_ENV: production
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:?set MEILI_MASTER_KEY}
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - meili-data:/meili_data
+
+volumes:
+  storage-app:
+  meili-data:
